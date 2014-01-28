@@ -1,0 +1,10 @@
+/**
+	@file	Localizable.strings
+	@author	Carlin
+	@date	7/12/13
+	@brief	iOSProjectTemplate
+*/
+//  Copyright (c) 2013 Carlin. All rights reserved.
+
+
+"APP_VIEW_TITLE" = "Simple GChat";
