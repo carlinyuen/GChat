@@ -38,7 +38,7 @@
 {
     [super viewDidLoad];
 	
-	self.view.backgroundColor = UIColorFromHex(COLOR_HEX_BACKGROUND_DARK);
+	self.view.backgroundColor = [UIColor whiteColor];
 	
 	[self setupNavBar];
 }
@@ -67,7 +67,7 @@
 - (void)setupNavBar
 {
 	// Color
-	self.navigationController.navigationBar.barStyle = UIBarStyleBlackTranslucent;
+	self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
 	
 	// Info button
 	UIButton* infoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
