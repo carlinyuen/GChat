@@ -146,6 +146,8 @@
 		22E3D34518986C7100678862 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22E3D34418986C7100678862 /* libxml2.dylib */; };
 		22E3D34A18986EFF00678862 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22E3D34918986EFF00678862 /* CoreData.framework */; };
 		22E3D3DD1898739C00678862 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22E3D3DC1898739C00678862 /* SystemConfiguration.framework */; };
+		22E3D3E11899AEF800678862 /* GCLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E3D3DF1899AEF800678862 /* GCLoginViewController.m */; };
+		22E3D3E21899AEF800678862 /* GCLoginViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22E3D3E01899AEF800678862 /* GCLoginViewController.xib */; };
 		5F7C892F1790A36700018AD7 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F7C892E1790A36700018AD7 /* UIKit.framework */; };
 		5F7C89311790A36700018AD7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F7C89301790A36700018AD7 /* Foundation.framework */; };
 		5F7C89331790A36700018AD7 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F7C89321790A36700018AD7 /* CoreGraphics.framework */; };
@@ -440,6 +442,9 @@
 		22E3D34818986E5900678862 /* XMPPFramework.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMPPFramework.h; sourceTree = "<group>"; };
 		22E3D34918986EFF00678862 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		22E3D3DC1898739C00678862 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		22E3D3DE1899AEF800678862 /* GCLoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCLoginViewController.h; sourceTree = "<group>"; };
+		22E3D3DF1899AEF800678862 /* GCLoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCLoginViewController.m; sourceTree = "<group>"; };
+		22E3D3E01899AEF800678862 /* GCLoginViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GCLoginViewController.xib; sourceTree = "<group>"; };
 		5F7C892B1790A36700018AD7 /* GChat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GChat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F7C892E1790A36700018AD7 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		5F7C89301790A36700018AD7 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -1378,6 +1383,9 @@
 		5F7C89781790AF0900018AD7 /* Views & Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				22E3D3DE1899AEF800678862 /* GCLoginViewController.h */,
+				22E3D3DF1899AEF800678862 /* GCLoginViewController.m */,
+				22E3D3E01899AEF800678862 /* GCLoginViewController.xib */,
 			);
 			path = "Views & Controllers";
 			sourceTree = "<group>";
@@ -1444,6 +1452,7 @@
 				5F7C895F1790A65000018AD7 /* Localizable.strings in Resources */,
 				5F7C897D1790AF3300018AD7 /* AppViewController.xib in Resources */,
 				22E3D00E189865C500678862 /* build-libidn.sh in Resources */,
+				22E3D3E21899AEF800678862 /* GCLoginViewController.xib in Resources */,
 				5F7C8982179439A700018AD7 /* Default-568h@2x.png in Resources */,
 				22E3D0181898667200678862 /* README.md in Resources */,
 				22E3CFEF189864A800678862 /* README.txt in Resources */,
@@ -1547,6 +1556,7 @@
 				22E3D2E718986BDF00678862 /* XMPPProcessOne.m in Sources */,
 				22E3D2F918986BDF00678862 /* XMPPRoom.xcdatamodeld in Sources */,
 				5F7C89571790A42400018AD7 /* Constants.m in Sources */,
+				22E3D3E11899AEF800678862 /* GCLoginViewController.m in Sources */,
 				22E3D31F18986BDF00678862 /* XMPPTransports.m in Sources */,
 				22E3D30B18986BDF00678862 /* XMPPvCardTempCoreDataStorageObject.m in Sources */,
 				22E3D2E418986BDF00678862 /* XMPPBandwidthMonitor.m in Sources */,
