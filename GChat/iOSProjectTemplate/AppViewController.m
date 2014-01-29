@@ -84,15 +84,17 @@
 	self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
 
     // Login button on left
+    NSString *loginTitle = [NSString stringWithFormat:@"%@%@",
+        (deviceOSVersionLessThan(@"7.0") ? @"" : @" "),
+        NSLocalizedString(@"LOGIN_BUTTON_TITLE", nil)];
     UIBarButtonItem *loginButton = [[UIBarButtonItem alloc]
-        initWithTitle:NSLocalizedString(@"LOGIN_BUTTON_TITLE", nil)
-        style:UIBarButtonItemStylePlain
+        initWithTitle:loginTitle style:UIBarButtonItemStylePlain
         target:self action:@selector(loginButtonTapped:)];
     [self.navigationItem setLeftBarButtonItem:loginButton animated:true];
 	
 	// Info button on right side
 	UIButton *infoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
-    if ([(getDeviceOSVersionString()) compare:@"7.0"] == NSOrderedAscending)
+    if (deviceOSVersionLessThan(@"7.0"))
     {
         CGRect frame = infoButton.frame;
         frame.size.width += UI_SIZE_INFO_BUTTON_MARGIN;

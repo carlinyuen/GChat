@@ -88,6 +88,10 @@
 
 	/** Get Device OS version */
 	#define getDeviceOSVersionString() ([[UIDevice currentDevice] systemVersion])
+    #define deviceOSVersionEqualTo(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
+    #define deviceOSVersionGreaterThan(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedDescending)
+    #define deviceOSVersionLessThan(v) ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
+
 
 	/** Get Device Model */
 	#define getDevicePlatformString() ([[UIDevice currentDevice] platformString])
