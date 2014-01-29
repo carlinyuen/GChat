@@ -124,7 +124,7 @@
 /** @brief Login button pressed */
 - (void)loginButtonTapped:(id)sender
 {
-    [self.navigationController pushViewController:[[GCLoginViewController alloc] initWithNibName:@"CGLoginViewController" bundle:nil] animated:true];
+    [self.navigationController pushViewController:[[GCLoginViewController alloc] initWithNibName:@"GCLoginViewController" bundle:nil] animated:true];
 }
 
 /** @brief Info button pressed */
