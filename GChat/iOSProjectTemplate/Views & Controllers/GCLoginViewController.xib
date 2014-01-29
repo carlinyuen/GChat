@@ -8,6 +8,8 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="GCLoginViewController">
             <connections>
                 <outlet property="loginButton" destination="WWe-WC-tjf" id="x0x-Iv-p9I"/>
+                <outlet property="passwordTextField" destination="rD6-1J-Sqs" id="8KG-zs-gGz"/>
+                <outlet property="persistButton" destination="LbO-dc-HrT" id="pQi-0V-Wkh"/>
                 <outlet property="usernameTextField" destination="V79-y9-AYp" id="hhR-fi-CKB"/>
                 <outlet property="view" destination="1" id="3"/>
             </connections>
@@ -30,11 +32,26 @@
                     <textInputTraits key="textInputTraits" keyboardAppearance="alert" secureTextEntry="YES"/>
                 </textField>
                 <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WWe-WC-tjf">
-                    <rect key="frame" x="128" y="309" width="65" height="30"/>
+                    <rect key="frame" x="196" y="310" width="65" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <state key="normal" title="Sign In">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
+                    <connections>
+                        <action selector="loginButtonTapped:" destination="-1" eventType="touchUpInside" id="FNw-KM-Nuu"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LbO-dc-HrT">
+                    <rect key="frame" x="59" y="310" width="129" height="30"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <state key="normal" title="Stay signed in">
+                        <color key="titleColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="persistButtonTapped:" destination="-1" eventType="touchUpInside" id="z8r-9L-wX1"/>
+                    </connections>
                 </button>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>

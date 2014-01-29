@@ -8,10 +8,18 @@
 
 #import "GCLoginViewController.h"
 
+    #define TEXT_CHECKBOX @"\u2610"
+    #define TEXT_CHECKBOX_CHECKED @"\u2611"
+
 @interface GCLoginViewController ()
-@property (weak, nonatomic) IBOutlet UITextField *usernameTextField;
-@property (weak, nonatomic) IBOutlet UITextField *passwordTextField;
-@property (weak, nonatomic) IBOutlet UIButton *loginButton;
+
+    @property (weak, nonatomic) IBOutlet UITextField *usernameTextField;
+    @property (weak, nonatomic) IBOutlet UITextField *passwordTextField;
+    @property (weak, nonatomic) IBOutlet UIButton *persistButton;
+    @property (weak, nonatomic) IBOutlet UIButton *loginButton;
+
+    - (IBAction)persistButtonTapped:(UIButton *)sender;
+    - (IBAction)loginButtonTapped:(UIButton *)sender;
 
 @end
 
@@ -29,7 +37,14 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
+
+    // Initial setup
+    self.usernameTextField.placeholder = NSLocalizedString(@"LOGIN_USERNAME_FIELD_PLACEHOLDER", nil);
+    self.passwordTextField.placeholder = NSLocalizedString(@"LOGIN_PASSWORD_FIELD_PLACEHOLDER", nil);
+    [self.loginButton setTitle:NSLocalizedString(@"LOGIN_SIGNIN_BUTTON_TITLE", nil) forState:UIControlStateNormal];
+
+    // Refresh persist button
+    [self refreshPersistButton];
 }
 
 - (void)didReceiveMemoryWarning
@@ -37,5 +52,31 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+
+#pragma mark - Class Methods
+
+/** @brief Refresh the persist button with checkbox characters */
+- (void)refreshPersistButton
+{
+    [self.persistButton setTitle:[NSString stringWithFormat:@"%@ %@",
+            (self.persistButton.selected
+                ? TEXT_CHECKBOX_CHECKED : TEXT_CHECKBOX),
+            NSLocalizedString(@"LOGIN_PERSIST_BUTTON_TITLE", nil)]
+        forState:UIControlStateNormal];
+}
+
+
+#pragma mark - Event Handlers
+
+- (IBAction)persistButtonTapped:(UIButton *)sender
+{
+    self.persistButton.selected = !self.persistButton.selected;
+    [self refreshPersistButton];
+}
+
+- (IBAction)loginButtonTapped:(UIButton *)sender {
+}
+
 
 @end

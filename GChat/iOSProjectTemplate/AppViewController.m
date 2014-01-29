@@ -9,6 +9,8 @@
 
 #import "AppViewController.h"
 
+#import "GCLoginViewController.h"
+
 	#define UI_SIZE_INFO_BUTTON_MARGIN 8
 
     #define KEY_CELL_ID @"ContactCell"
@@ -122,6 +124,7 @@
 /** @brief Login button pressed */
 - (void)loginButtonTapped:(id)sender
 {
+    [self.navigationController pushViewController:[[GCLoginViewController alloc] initWithNibName:@"CGLoginViewController" bundle:nil] animated:true];
 }
 
 /** @brief Info button pressed */
