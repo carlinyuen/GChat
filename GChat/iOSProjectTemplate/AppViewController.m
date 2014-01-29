@@ -11,7 +11,18 @@
 
 	#define UI_SIZE_INFO_BUTTON_MARGIN 8
 
-@interface AppViewController ()
+    #define KEY_CELL_ID @"ContactCell"
+
+@interface AppViewController () <
+    UITableViewDataSource
+    , UITableViewDelegate
+>
+
+    /** Tableview for contact list */
+    @property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+    /** Storage for contact list */
+    @property (strong, nonatomic) NSMutableArray *contactList;
 
 @end
 
@@ -26,6 +37,8 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
 		self.title = NSLocalizedString(@"APP_VIEW_TITLE", nil);
+
+        _contactList = [NSMutableArray new];
     }
     return self;
 }
@@ -41,6 +54,7 @@
 	self.view.backgroundColor = [UIColor whiteColor];
 	
 	[self setupNavBar];
+    [self setupTableView];
 }
 
 /** @brief Last-minute setup before view appears. */
@@ -68,16 +82,33 @@
 {
 	// Color
 	self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
+
+    // Login button on left
+    UIBarButtonItem *loginButton = [[UIBarButtonItem alloc]
+        initWithTitle:NSLocalizedString(@"LOGIN_BUTTON_TITLE", nil)
+        style:UIBarButtonItemStylePlain
+        target:self action:@selector(loginButtonTapped:)];
+    [self.navigationItem setLeftBarButtonItem:loginButton animated:true];
 	
-	// Info button
-	UIButton* infoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
-	CGRect frame = infoButton.frame;
-	frame.size.width += UI_SIZE_INFO_BUTTON_MARGIN;
-	infoButton.frame = frame;
-	[infoButton addTarget:self action:@selector(showInfo:)
+	// Info button on right side
+	UIButton *infoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
+    if ([(getDeviceOSVersionString()) compare:@"7.0"] == NSOrderedAscending)
+    {
+        CGRect frame = infoButton.frame;
+        frame.size.width += UI_SIZE_INFO_BUTTON_MARGIN;
+        infoButton.frame = frame;
+    }
+	[infoButton addTarget:self action:@selector(infoButtonTapped:)
 			forControlEvents:UIControlEventTouchUpInside];
 	[self.navigationItem setRightBarButtonItem:[[UIBarButtonItem alloc]
 			initWithCustomView:infoButton] animated:true];
+}
+
+/** @brief Setup tableview */
+- (void)setupTableView
+{
+    [self.tableView registerClass:[UITableViewCell class]
+        forCellReuseIdentifier:KEY_CELL_ID];
 }
 
 
@@ -86,11 +117,41 @@
 
 #pragma mark - UI Event Handlers
 
-/** @brief Info button pressed */
-- (void)showInfo:(id)sender
+/** @brief Login button pressed */
+- (void)loginButtonTapped:(id)sender
 {
 }
 
+/** @brief Info button pressed */
+- (void)infoButtonTapped:(id)sender
+{
+}
+
+
+#pragma mark - Protocols
+#pragma mark - UITableViewDataSource
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return self.contactList.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:KEY_CELL_ID];
+
+    return cell;
+}
+
+
+#pragma mark - UITableViewDelegate
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+}
 
 
 @end

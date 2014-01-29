@@ -7,6 +7,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="AppViewController">
             <connections>
+                <outlet property="tableView" destination="gcK-2y-nJ0" id="3sO-OY-wka"/>
                 <outlet property="view" destination="1" id="3"/>
             </connections>
         </placeholder>
@@ -14,7 +15,24 @@
         <view contentMode="scaleToFill" id="1">
             <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="gcK-2y-nJ0">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <connections>
+                        <outlet property="dataSource" destination="-1" id="W2l-F3-teH"/>
+                        <outlet property="delegate" destination="-1" id="sFx-0c-fxL"/>
+                    </connections>
+                </tableView>
+            </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="gcK-2y-nJ0" firstAttribute="leading" secondItem="1" secondAttribute="leading" id="HIn-S3-u8Z"/>
+                <constraint firstItem="gcK-2y-nJ0" firstAttribute="top" secondItem="1" secondAttribute="top" id="gCt-JI-uC3"/>
+                <constraint firstAttribute="bottom" secondItem="gcK-2y-nJ0" secondAttribute="bottom" id="qf2-X8-ftu"/>
+                <constraint firstAttribute="trailing" secondItem="gcK-2y-nJ0" secondAttribute="trailing" id="u2P-Kq-O9T"/>
+            </constraints>
             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
             <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
