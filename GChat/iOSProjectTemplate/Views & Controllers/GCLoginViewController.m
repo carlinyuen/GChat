@@ -48,14 +48,16 @@
     self.usernameTextField.placeholder = NSLocalizedString(@"LOGIN_USERNAME_FIELD_PLACEHOLDER", nil);
     self.passwordTextField.placeholder = NSLocalizedString(@"LOGIN_PASSWORD_FIELD_PLACEHOLDER", nil);
     [self.loginButton setTitle:NSLocalizedString(@"LOGIN_SIGNIN_BUTTON_TITLE", nil) forState:UIControlStateNormal];
-
-    // Refresh persist button
-    [self refreshPersistButton];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+   
+    // Refresh persist button
+    self.persistButton.selected = !![[NSUserDefaults standardUserDefaults]
+        objectForKey:CACHE_KEY_LOGIN_USERNAME];
+    [self refreshPersistButton];
 
     // Focus on username field
     [self.usernameTextField becomeFirstResponder];
@@ -91,14 +93,19 @@
 
 - (IBAction)loginButtonTapped:(UIButton *)sender
 {
-    // If persist, save credentials?
+    // If persist, save credentials
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     if (self.persistButton.selected)
     {
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         [defaults setObject:self.usernameTextField.text forKey:CACHE_KEY_LOGIN_USERNAME];
         [defaults setObject:self.passwordTextField.text forKey:CACHE_KEY_LOGIN_PASSWORD];
-        [defaults synchronize];
     }
+    else    // Clear credentials
+    {
+        [defaults removeObjectForKey:CACHE_KEY_LOGIN_USERNAME];
+        [defaults removeObjectForKey:CACHE_KEY_LOGIN_PASSWORD];
+    }
+    [defaults synchronize];
 
     [self dismissViewControllerAnimated:true completion:nil];
 }
