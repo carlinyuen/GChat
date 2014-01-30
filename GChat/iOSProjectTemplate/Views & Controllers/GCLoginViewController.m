@@ -11,7 +11,9 @@
     #define TEXT_CHECKBOX @"▢"
     #define TEXT_CHECKBOX_CHECKED @"\u2611"
 
-@interface GCLoginViewController ()
+@interface GCLoginViewController () <
+    UITextFieldDelegate
+>
 
     @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
     @property (weak, nonatomic) IBOutlet UITextField *usernameTextField;
@@ -49,6 +51,14 @@
 
     // Refresh persist button
     [self refreshPersistButton];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+
+    // Focus on username field
+    [self.usernameTextField becomeFirstResponder];
 }
 
 - (void)didReceiveMemoryWarning
@@ -91,6 +101,21 @@
     }
 
     [self dismissViewControllerAnimated:true completion:nil];
+}
+
+
+#pragma mark - Protocols
+#pragma mark - UITextFieldDelegate
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    if (textField == self.usernameTextField) {
+        [self.passwordTextField becomeFirstResponder];
+    } else if (textField == self.passwordTextField) {
+        [self loginButtonTapped:self.loginButton];
+    }
+
+    return true;
 }
 
 
