@@ -39,6 +39,7 @@ extern int const COLOR_HEX_BACKGROUND_DARK;
 extern int const COLOR_HEX_BACKGROUND_LIGHT;
 extern int const COLOR_HEX_COPY_DARK;
 extern int const COLOR_HEX_COPY_LIGHT;
+extern int const COLOR_HEX_APPLE_BUTTON_BLUE;
 
 // Animations
 extern float const ANIMATION_DURATION_FAST;

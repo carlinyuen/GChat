@@ -10,4 +10,10 @@
 
 @interface GCChatViewController : UIViewController
 
+    /** Contact to initialize view for chat */
+    @property (strong, nonatomic) NSDictionary *contactInfo;
+
+    /** @brief Init with contact to chat with */
+    - (id)initWithContact:(NSDictionary *)contact;
+
 @end
