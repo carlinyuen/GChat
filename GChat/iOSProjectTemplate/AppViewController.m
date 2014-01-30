@@ -92,11 +92,25 @@
 /** @brief Setup Nav bar */
 - (void)setupNavBar
 {
-	// Color
+    // Text Color
+    if (deviceOSVersionLessThan(@"7.0")) {
+        [[UINavigationBar appearance] setTitleTextAttributes:@{
+            UITextAttributeTextColor: [UIColor darkGrayColor],
+            UITextAttributeTextShadowColor: [UIColor clearColor],
+            UITextAttributeFont: [UIFont fontWithName:FONT_NAME_LIGHT size:FONT_SIZE_NAVBAR],
+        }];
+    } else {
+        [[UINavigationBar appearance] setTitleTextAttributes:@{
+            NSForegroundColorAttributeName: [UIColor darkGrayColor],
+            NSFontAttributeName: [UIFont fontWithName:FONT_NAME_THIN size:FONT_SIZE_NAVBAR],
+        }];
+    }
+
+	// Background Color
 	self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
     if (deviceOSVersionLessThan(@"7.0")) {
         [[UINavigationBar appearance] setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
-        [[UINavigationBar appearance] setBackgroundColor:[UIColor whiteColor]];
+        [[UINavigationBar appearance] setBackgroundColor:UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT)];
     }
 
     // Login button on left
@@ -109,12 +123,15 @@
     [self.navigationItem setLeftBarButtonItem:loginButton animated:true];
 	
 	// Info button on right side
-	UIButton *infoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
+	UIButton *infoButton;
     if (deviceOSVersionLessThan(@"7.0"))
     {
+        infoButton = [UIButton buttonWithType:UIButtonTypeInfoDark];
         CGRect frame = infoButton.frame;
         frame.size.width += UI_SIZE_INFO_BUTTON_MARGIN;
         infoButton.frame = frame;
+    } else {
+        infoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
     }
 	[infoButton addTarget:self action:@selector(infoButtonTapped:)
 			forControlEvents:UIControlEventTouchUpInside];
