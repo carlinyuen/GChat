@@ -10,6 +10,7 @@
 #import "AppViewController.h"
 
 #import "GCLoginViewController.h"
+#import "GCChatViewController.h"
 
 	#define UI_SIZE_INFO_BUTTON_MARGIN 8
 
@@ -54,6 +55,9 @@
     [super viewDidLoad];
 	
 	self.view.backgroundColor = [UIColor whiteColor];
+
+    // Test
+    [self.contactList addObject:@{}];
 	
 	[self setupNavBar];
     [self setupTableView];
@@ -163,6 +167,19 @@
         animated:true completion:nil];
 }
 
+/** @brief Show chat screen */
+- (void)showChatView:(NSDictionary *)contact
+{
+    // Set back button on navbar
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
+        initWithTitle:NSLocalizedString(@"LOGIN_NAVBAR_BACK_BUTTON_TITLE", nil)
+        style:UIBarButtonItemStylePlain target:nil action:nil];
+
+    // Jump to login page
+    [self.navigationController pushViewController:[[GCChatViewController alloc]
+        initWithNibName:@"GCChatViewController" bundle:nil] animated:true];
+}
+
 
 #pragma mark - UI Event Handlers
 
@@ -200,6 +217,11 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    // Animated deselect fade
+    [tableView deselectRowAtIndexPath:indexPath animated:true];
+
+    // Show chat view
+    [self showChatView:self.contactList[indexPath.row]];
 }
 
 

@@ -10,6 +10,8 @@
 
 @interface GCChatViewController ()
 
+    @property (weak, nonatomic) IBOutlet UITableView *tableView;
+
 @end
 
 @implementation GCChatViewController
