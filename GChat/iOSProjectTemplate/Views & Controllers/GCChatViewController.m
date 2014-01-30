@@ -19,6 +19,8 @@
 @interface GCChatViewController () <
     UITableViewDataSource
     , UITableViewDelegate
+    , UITextViewDelegate
+    , UIScrollViewDelegate
 >
 
     @property (weak, nonatomic) IBOutlet UITableView *tableView;
@@ -66,6 +68,7 @@
 - (void)setupFooterView
 {
     CGRect bounds = self.view.bounds;
+    CGRect reference;
 
     // Containing view
     self.footerView = [[UIView alloc] initWithFrame:CGRectMake(
@@ -81,22 +84,16 @@
     )];
     self.inputTextView.font = [UIFont fontWithName:FONT_NAME_LIGHT
         size:FONT_SIZE_CHAT_INPUT];
+    self.inputTextView.showsHorizontalScrollIndicator = false;
+    self.inputTextView.directionalLockEnabled = true;
     self.inputTextView.layer.borderColor = [[UIColor lightGrayColor] CGColor];
     self.inputTextView.layer.borderWidth = SIZE_BORDER_WIDTH;
     self.inputTextView.layer.cornerRadius = SIZE_CORNER_RADIUS;
-    if (deviceOSVersionLessThan(@"7.0")) {
-        self.inputTextView.contentInset = UIEdgeInsetsMake(
-            SIZE_MARGIN, SIZE_MARGIN, SIZE_MARGIN, SIZE_MARGIN
-        );
-    } else {
-        self.inputTextView.textContainerInset = UIEdgeInsetsMake(
-            SIZE_MARGIN, SIZE_MARGIN, SIZE_MARGIN, SIZE_MARGIN
-        );
-    }
+    self.inputTextView.delegate = self;
     [self.footerView addSubview:self.inputTextView];
 
     // Send button
-    CGRect reference = self.inputTextView.frame;
+    reference = self.inputTextView.frame;
     self.sendButton = [[UIButton alloc] initWithFrame:CGRectMake(
         CGRectGetMaxX(reference) + SIZE_MARGIN, 0,
         CGRectGetWidth(bounds) - CGRectGetMaxX(reference) - SIZE_MARGIN * 2, SIZE_MIN_TOUCH
@@ -105,6 +102,8 @@
         forState:UIControlStateNormal];
     [self.sendButton setTitleColor:UIColorFromHex(COLOR_HEX_APPLE_BUTTON_BLUE)
         forState:UIControlStateNormal];
+    [self.sendButton addTarget:self action:@selector(sendButtonTapped:)
+        forControlEvents:UIControlEventTouchUpInside];
     [self.footerView addSubview:self.sendButton];
 }
 
@@ -115,8 +114,15 @@
 
     [self.tableView registerClass:[UITableViewCell class]
         forCellReuseIdentifier:KEY_CELL_ID];
+}
 
-    self.tableView.tableFooterView = self.footerView;
+
+#pragma mark - Event Handlers
+
+/** @brief When send message button is tapped */
+- (void)sendButtonTapped:(UIButton *)sender
+{
+
 }
 
 
@@ -145,6 +151,19 @@
 {
     // Animated deselect fade
     [tableView deselectRowAtIndexPath:indexPath animated:true];
+}
+
+
+#pragma mark - UIScrollView
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    if (scrollView == self.inputTextView)
+    {
+        CGPoint offset = self.inputTextView.contentOffset;
+        offset.x = 0;
+        self.inputTextView.contentOffset = offset;
+    }
 }
 
 

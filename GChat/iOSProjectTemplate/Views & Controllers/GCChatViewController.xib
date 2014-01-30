@@ -28,8 +28,8 @@
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
+                <constraint firstAttribute="bottom" secondItem="lgx-Xb-h9B" secondAttribute="bottom" id="72s-4m-034"/>
                 <constraint firstItem="lgx-Xb-h9B" firstAttribute="leading" secondItem="1" secondAttribute="leading" id="Ad0-HA-6RT"/>
-                <constraint firstAttribute="bottom" secondItem="lgx-Xb-h9B" secondAttribute="bottom" id="TTF-cd-PoB"/>
                 <constraint firstItem="lgx-Xb-h9B" firstAttribute="top" secondItem="1" secondAttribute="top" id="gNL-06-wtY"/>
                 <constraint firstAttribute="trailing" secondItem="lgx-Xb-h9B" secondAttribute="trailing" id="pwo-ZD-aH9"/>
             </constraints>
