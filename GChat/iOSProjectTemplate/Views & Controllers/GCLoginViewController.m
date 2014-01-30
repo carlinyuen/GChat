@@ -8,7 +8,7 @@
 
 #import "GCLoginViewController.h"
 
-    #define TEXT_CHECKBOX @"\u2610"
+    #define TEXT_CHECKBOX @"▢"
     #define TEXT_CHECKBOX_CHECKED @"\u2611"
 
 @interface GCLoginViewController ()
@@ -29,7 +29,7 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        // Custom initialization
+        self.title = NSLocalizedString(@"LOGIN_VIEW_TITLE", nil);
     }
     return self;
 }

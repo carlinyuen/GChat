@@ -88,7 +88,7 @@
     // Login button on left
     NSString *loginTitle = [NSString stringWithFormat:@"%@%@",
         (deviceOSVersionLessThan(@"7.0") ? @"" : @" "),
-        NSLocalizedString(@"LOGIN_BUTTON_TITLE", nil)];
+        NSLocalizedString(@"APP_NAVBAR_LOGIN_BUTTON_TITLE", nil)];
     UIBarButtonItem *loginButton = [[UIBarButtonItem alloc]
         initWithTitle:loginTitle style:UIBarButtonItemStylePlain
         target:self action:@selector(loginButtonTapped:)];
@@ -124,6 +124,12 @@
 /** @brief Login button pressed */
 - (void)loginButtonTapped:(id)sender
 {
+    // Set back button on navbar
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
+        initWithTitle:NSLocalizedString(@"LOGIN_NAVBAR_BACK_BUTTON_TITLE", nil)
+        style:UIBarButtonItemStylePlain target:nil action:nil];
+
+    // Jump to login page
     [self.navigationController pushViewController:[[GCLoginViewController alloc] initWithNibName:@"GCLoginViewController" bundle:nil] animated:true];
 }
 

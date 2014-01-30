@@ -7,9 +7,16 @@
 //  Copyright (c) 2013 Carlin. All rights reserved.
 
 
-"APP_VIEW_TITLE" = "Simple GChat";
+// Main App Screen
 
-"LOGIN_BUTTON_TITLE" = "Login";
+"APP_VIEW_TITLE" = "Simple GChat";
+"APP_NAVBAR_LOGIN_BUTTON_TITLE" = "Login";
+
+
+// Login Screen
+
+"LOGIN_VIEW_TITLE" = "Login";
+"LOGIN_NAVBAR_BACK_BUTTON_TITLE" = "Back";
 "LOGIN_SIGNIN_BUTTON_TITLE" = "Sign In";
 "LOGIN_PERSIST_BUTTON_TITLE" = "Stay signed in";
 "LOGIN_USERNAME_FIELD_PLACEHOLDER" = "Email";
