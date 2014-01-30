@@ -8,7 +8,13 @@
 
 #import "GCChatViewController.h"
 
+#import <QuartzCore/QuartzCore.h>
+
     #define KEY_CELL_ID @"MessageCell"
+
+    #define SIZE_MARGIN 6
+    #define SIZE_CORNER_RADIUS 6
+    #define SIZE_BORDER_WIDTH 1
 
 @interface GCChatViewController () <
     UITableViewDataSource
@@ -63,20 +69,35 @@
 
     // Containing view
     self.footerView = [[UIView alloc] initWithFrame:CGRectMake(
-        0, 0, CGRectGetWidth(bounds), UI_SIZE_MIN_TOUCH
+        0, 0, CGRectGetWidth(bounds), SIZE_MIN_TOUCH
     )];
     self.footerView.backgroundColor = UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT);
 
     // Input field
     self.inputTextView = [[UITextView alloc] initWithFrame:CGRectMake(
-        0, 0, CGRectGetWidth(bounds) / 4 * 3, UI_SIZE_MIN_TOUCH
+        SIZE_MARGIN * 2, SIZE_MARGIN,
+        CGRectGetWidth(bounds) / 4 * 3,
+        SIZE_MIN_TOUCH - SIZE_MARGIN * 2
     )];
+    self.inputTextView.layer.borderColor = [[UIColor lightGrayColor] CGColor];
+    self.inputTextView.layer.borderWidth = SIZE_BORDER_WIDTH;
+    self.inputTextView.layer.cornerRadius = SIZE_CORNER_RADIUS;
+    if (deviceOSVersionLessThan(@"7.0")) {
+        self.inputTextView.contentInset = UIEdgeInsetsMake(
+            SIZE_MARGIN, SIZE_MARGIN, SIZE_MARGIN, SIZE_MARGIN
+        );
+    } else {
+        self.inputTextView.textContainerInset = UIEdgeInsetsMake(
+            SIZE_MARGIN, SIZE_MARGIN, SIZE_MARGIN, SIZE_MARGIN
+        );
+    }
     [self.footerView addSubview:self.inputTextView];
 
     // Send button
+    CGRect reference = self.inputTextView.frame;
     self.sendButton = [[UIButton alloc] initWithFrame:CGRectMake(
-        CGRectGetWidth(bounds) / 4 * 3, 0,
-        CGRectGetWidth(bounds) / 4, UI_SIZE_MIN_TOUCH
+        CGRectGetMaxX(reference) + SIZE_MARGIN, 0,
+        CGRectGetWidth(bounds) - CGRectGetMaxX(reference) - SIZE_MARGIN * 2, SIZE_MIN_TOUCH
     )];
     [self.sendButton setTitle:NSLocalizedString(@"CHAT_SEND_BUTTON_TITLE", nil)
         forState:UIControlStateNormal];
@@ -89,6 +110,9 @@
 - (void)setupTableView
 {
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+
+    [self.tableView registerClass:[UITableViewCell class]
+        forCellReuseIdentifier:KEY_CELL_ID];
 
     self.tableView.tableFooterView = self.footerView;
 }

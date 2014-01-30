@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 // UI
-extern float const UI_SIZE_MIN_TOUCH;
+extern float const SIZE_MIN_TOUCH;
 
 // Cached Data
 extern NSString* const CACHE_KEY_USER_SETTINGS;

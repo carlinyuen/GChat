@@ -9,7 +9,7 @@
 #import "Constants.h"
 
 // UI
-float const UI_SIZE_MIN_TOUCH = 44;
+float const SIZE_MIN_TOUCH = 44;
 
 // Cached Data
 NSString* const CACHE_KEY_USER_SETTINGS = @"cacheUserSettings";
