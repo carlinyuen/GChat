@@ -79,6 +79,8 @@
         CGRectGetWidth(bounds) / 4 * 3,
         SIZE_MIN_TOUCH - SIZE_MARGIN * 2
     )];
+    self.inputTextView.font = [UIFont fontWithName:FONT_NAME_LIGHT
+        size:FONT_SIZE_CHAT_INPUT];
     self.inputTextView.layer.borderColor = [[UIColor lightGrayColor] CGColor];
     self.inputTextView.layer.borderWidth = SIZE_BORDER_WIDTH;
     self.inputTextView.layer.cornerRadius = SIZE_CORNER_RADIUS;

@@ -27,6 +27,7 @@ extern NSString* const FONT_NAME_THINNEST;
 extern float const FONT_SIZE_TITLE;
 extern float const FONT_SIZE_NAVBAR;
 extern float const FONT_SIZE_BRANDING;
+extern float const FONT_SIZE_CHAT_INPUT;
 
 // Time
 extern int const TIME_ONE_MINUTE;
