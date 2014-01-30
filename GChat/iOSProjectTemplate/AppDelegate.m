@@ -10,6 +10,14 @@
 
 #import "AppViewController.h"
 
+    #define TIME_CONNECTION_TIMEOUT 30  // In seconds
+
+@interface AppDelegate()
+
+    @property (strong, nonatomic, readwrite) XMPPStream *xmppStream;
+
+@end
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -28,6 +36,7 @@
 */
 - (void)applicationWillResignActive:(UIApplication *)application
 {
+    [self disconnect];
 }
 
 /** @brief Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
@@ -47,6 +56,7 @@
 */
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
+    [self connect];
 }
 
 /** @brief Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
@@ -54,5 +64,64 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
 }
+
+
+#pragma mark - XMPP Setup
+
+- (void)setupStream
+{
+    self.xmppStream = [XMPPStream new];
+    [self.xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
+}
+
+- (void)goOnline
+{
+    XMPPPresence *presence = [XMPPPresence presence];
+    [self.xmppStream sendElement:presence];
+}
+
+- (void)goOffline
+{
+    XMPPPresence *presence = [XMPPPresence presenceWithType:@"unavailable"];
+    [self.xmppStream sendElement:presence];
+}
+
+- (BOOL)connect
+{
+    [self setupStream];
+
+    // If already connected, return true
+    if (![self.xmppStream isDisconnected]) {
+        return YES;
+    }
+
+    // If invalid credentials, return false
+    NSString *username = [[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_USERNAME];
+    NSString *password = [[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_PASSWORD];
+    if (username == nil || password == nil) {
+        return NO;
+    }
+
+    // Set username and try to connect
+    [self.xmppStream setMyJID:[XMPPJID jidWithString:username]];
+    NSError *error = nil;
+    if (![self.xmppStream connectWithTimeout:TIME_CONNECTION_TIMEOUT error:&error])
+    {
+        [[[UIAlertView alloc] initWithTitle:@"Error"
+                                   message:[NSString stringWithFormat:@"Can't connect to server %@", [error localizedDescription]]
+                                  delegate:nil
+                         cancelButtonTitle:@"Ok"
+                         otherButtonTitles:nil] show];
+        return NO;
+    }
+    return YES;
+}
+
+- (void)disconnect
+{
+    [self goOffline];
+    [self.xmppStream disconnect];
+}
+
 
 @end

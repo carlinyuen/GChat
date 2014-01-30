@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+#import "XMPP.h"
+
 @class AppViewController;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
@@ -15,5 +17,8 @@
 	@property (strong, nonatomic) UIWindow *window;
 
 	@property (strong, nonatomic) AppViewController *viewController;
+
+    @property (strong, nonatomic, readonly) XMPPStream *xmppStream;
+    @property (assign, nonatomic) BOOL isOpen;
 
 @end

@@ -114,6 +114,8 @@
 
     [self.tableView registerClass:[UITableViewCell class]
         forCellReuseIdentifier:KEY_CELL_ID];
+
+    self.tableView.tableFooterView = self.footerView;
 }
 
 
