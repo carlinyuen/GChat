@@ -13,6 +13,8 @@ float const UI_SIZE_MIN_TOUCH = 44;
 
 // Cached Data
 NSString* const CACHE_KEY_USER_SETTINGS = @"cacheUserSettings";
+NSString* const CACHE_KEY_LOGIN_USERNAME = @"loginUsername";
+NSString* const CACHE_KEY_LOGIN_PASSWORD = @"loginPassword";
 
 // One-time flags
 NSString* const ONCE_KEY_APP_OPENED = @"onceAppOpened";

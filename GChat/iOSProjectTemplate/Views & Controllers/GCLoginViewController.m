@@ -75,7 +75,16 @@
     [self refreshPersistButton];
 }
 
-- (IBAction)loginButtonTapped:(UIButton *)sender {
+- (IBAction)loginButtonTapped:(UIButton *)sender
+{
+    // If persist, save credentials?
+    if (self.persistButton.selected)
+    {
+        NSUserDefaults defaults = [NSUserDefaults standardUserDefaults];
+        [defaults setObject:self.usernameTextField.text forKey:CACHE_KEY_LOGIN_USERNAME];
+        [defaults setObject:self.passwordTextField.text forKey:CACHE_KEY_LOGIN_PASSWORD];
+        [defaults synchronize];
+    }
 }
 
 
