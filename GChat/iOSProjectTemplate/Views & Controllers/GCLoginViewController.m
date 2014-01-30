@@ -13,6 +13,7 @@
 
 @interface GCLoginViewController ()
 
+    @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
     @property (weak, nonatomic) IBOutlet UITextField *usernameTextField;
     @property (weak, nonatomic) IBOutlet UITextField *passwordTextField;
     @property (weak, nonatomic) IBOutlet UIButton *persistButton;
@@ -39,6 +40,9 @@
     [super viewDidLoad];
 
     // Initial setup
+    self.titleLabel.text = NSLocalizedString(@"LOGIN_VIEW_TITLE", nil);
+    self.titleLabel.font = [UIFont fontWithName:(deviceOSVersionLessThan(@"7.0")
+        ? FONT_NAME_THINNEST : FONT_NAME_THIN) size:FONT_SIZE_TITLE];
     self.usernameTextField.placeholder = NSLocalizedString(@"LOGIN_USERNAME_FIELD_PLACEHOLDER", nil);
     self.passwordTextField.placeholder = NSLocalizedString(@"LOGIN_PASSWORD_FIELD_PLACEHOLDER", nil);
     [self.loginButton setTitle:NSLocalizedString(@"LOGIN_SIGNIN_BUTTON_TITLE", nil) forState:UIControlStateNormal];
@@ -85,6 +89,8 @@
         [defaults setObject:self.passwordTextField.text forKey:CACHE_KEY_LOGIN_PASSWORD];
         [defaults synchronize];
     }
+
+    [self dismissViewControllerAnimated:true completion:nil];
 }
 
 

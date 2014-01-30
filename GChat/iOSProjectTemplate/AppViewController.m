@@ -65,6 +65,16 @@
 	[super viewWillAppear:animated];
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+
+    // Show login page if not signed in
+    if (![[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_USERNAME]) {
+        [self showLoginView];
+    }
+}
+
 /** @brief Dispose of any resources that can be recreated. */
 - (void)didReceiveMemoryWarning
 {
@@ -84,6 +94,10 @@
 {
 	// Color
 	self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
+    if (deviceOSVersionLessThan(@"7.0")) {
+        [[UINavigationBar appearance] setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
+        [[UINavigationBar appearance] setBackgroundColor:[UIColor whiteColor]];
+    }
 
     // Login button on left
     NSString *loginTitle = [NSString stringWithFormat:@"%@%@",
@@ -118,11 +132,8 @@
 
 #pragma mark - Class Functions
 
-
-#pragma mark - UI Event Handlers
-
-/** @brief Login button pressed */
-- (void)loginButtonTapped:(id)sender
+/** @brief Show login screen */
+- (void)showLoginView
 {
     // Set back button on navbar
     self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
@@ -130,7 +141,17 @@
         style:UIBarButtonItemStylePlain target:nil action:nil];
 
     // Jump to login page
-    [self.navigationController pushViewController:[[GCLoginViewController alloc] initWithNibName:@"GCLoginViewController" bundle:nil] animated:true];
+    [self presentViewController:[[GCLoginViewController alloc]
+        initWithNibName:@"GCLoginViewController" bundle:nil]
+        animated:true completion:nil];
+}
+
+
+#pragma mark - UI Event Handlers
+
+/** @brief Login button pressed */
+- (void)loginButtonTapped:(id)sender {
+    [self showLoginView];
 }
 
 /** @brief Info button pressed */

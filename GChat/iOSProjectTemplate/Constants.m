@@ -21,6 +21,9 @@ NSString* const ONCE_KEY_APP_OPENED = @"onceAppOpened";
 
 // Fonts
 NSString* const FONT_NAME_BRANDING = @"Courier New";
+NSString* const FONT_NAME_THIN = @"HelveticaNeue-Thin";
+NSString* const FONT_NAME_THINNEST = @"HelveticaNeue-UltraLight";
+float const FONT_SIZE_TITLE = 33;
 float const FONT_SIZE_BRANDING = 22;
 
 // Time

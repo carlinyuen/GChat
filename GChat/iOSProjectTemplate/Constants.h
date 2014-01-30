@@ -21,6 +21,9 @@ extern NSString* const ONCE_KEY_APP_OPENED;
 
 // Fonts
 extern NSString* const FONT_NAME_BRANDING;
+extern NSString* const FONT_NAME_THIN;
+extern NSString* const FONT_NAME_THINNEST;
+extern float const FONT_SIZE_TITLE;
 extern float const FONT_SIZE_BRANDING;
 
 // Time
