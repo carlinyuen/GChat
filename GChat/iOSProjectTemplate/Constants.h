@@ -19,6 +19,10 @@ extern NSString* const CACHE_KEY_LOGIN_PASSWORD;
 // One-time flags
 extern NSString* const ONCE_KEY_APP_OPENED;
 
+// Notifications
+extern NSString* const NOTIFICATION_PRESENCE_UPDATE;
+extern NSString* const NOTIFICATION_MESSAGE_RECEIVED;
+
 // Fonts
 extern NSString* const FONT_NAME_BRANDING;
 extern NSString* const FONT_NAME_LIGHT;

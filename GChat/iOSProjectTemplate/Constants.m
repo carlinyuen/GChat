@@ -19,6 +19,10 @@ NSString* const CACHE_KEY_LOGIN_PASSWORD = @"loginPassword";
 // One-time flags
 NSString* const ONCE_KEY_APP_OPENED = @"onceAppOpened";
 
+// Notifications
+NSString* const NOTIFICATION_PRESENCE_UPDATE = @"notificationStatusUpdate";
+NSString* const NOTIFICATION_MESSAGE_RECEIVED = @"notificationMessageReceived";
+
 // Fonts
 NSString* const FONT_NAME_BRANDING = @"Courier New";
 NSString* const FONT_NAME_LIGHT = @"HelveticaNeue-Light";

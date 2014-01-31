@@ -21,4 +21,7 @@
     @property (strong, nonatomic, readonly) XMPPStream *xmppStream;
     @property (assign, nonatomic) BOOL isOpen;
 
+    /** @brief Returns a reference to app delegate */
+    + (AppDelegate *)appDelegate;
+
 @end

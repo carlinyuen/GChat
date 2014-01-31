@@ -9,12 +9,19 @@
 
 #import "AppViewController.h"
 
+#import "AppDelegate.h"
 #import "GCLoginViewController.h"
 #import "GCChatViewController.h"
 
 	#define UI_SIZE_INFO_BUTTON_MARGIN 8
 
     #define KEY_CELL_ID @"ContactCell"
+
+    typedef enum {
+        ContactListSectionsOnline,
+        ContactListSectionsOffline,
+        ContactListSectionsCount
+    } ContactListSections;
 
 @interface AppViewController () <
     UITableViewDataSource
@@ -42,6 +49,9 @@
 		self.title = NSLocalizedString(@"APP_VIEW_TITLE", nil);
 
         _contactList = [NSMutableArray new];
+        for (NSInteger i = 0; i < ContactListSectionsCount; ++i) {
+            [_contactList addObject:[NSMutableArray new]];
+        }
     }
     return self;
 }
@@ -53,14 +63,18 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	
+
+    // View
 	self.view.backgroundColor = [UIColor whiteColor];
 
-    // Test
-    [self.contactList addObject:@{}];
-	
+    // Setup
 	[self setupNavBar];
     [self setupTableView];
+
+    // Notifications
+    [[NSNotificationCenter defaultCenter] addObserver:self
+        selector:@selector(contactPresenceChanged:)
+        name:NOTIFICATION_PRESENCE_UPDATE object:nil];
 }
 
 /** @brief Last-minute setup before view appears. */
@@ -89,6 +103,11 @@
 - (NSUInteger)supportedInterfaceOrientations
 {
 	return UIInterfaceOrientationMaskAllButUpsideDown;
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark - UI Setup
@@ -180,6 +199,32 @@
         initWithNibName:@"GCChatViewController" bundle:nil] animated:true];
 }
 
+/** @brief Sets contact in offline section */
+- (void)setContactOffline:(NSString *)username
+{
+    // Remove from online if exists
+    [self.contactList[ContactListSectionsOnline] removeObject:username];
+
+    // Add to offline
+    [self.contactList[ContactListSectionsOffline] addObject:username];
+
+    // Update tableview
+    [self.tableView reloadData];
+}
+
+/** @brief Sets contact in online section */
+- (void)setContactOnline:(NSString *)username
+{
+    // Remove from offline if exists
+    [self.contactList[ContactListSectionsOffline] removeObject:username];
+
+    // Add to online
+    [self.contactList[ContactListSectionsOnline] addObject:username];
+   
+    // Update tableview
+    [self.tableView reloadData];
+}
+
 
 #pragma mark - UI Event Handlers
 
@@ -193,21 +238,42 @@
 {
 }
 
+/** @brief When received notification that a contact's presence changed */
+- (void)contactPresenceChanged:(NSNotification *)notification
+{
+    if ([notification.userInfo[@"presence"] isEqualToString:@"unavailable"]) {
+        [self setContactOffline:notification.userInfo[@"username"]];
+    } else {
+        [self setContactOnline:notification.userInfo[@"username"]];
+    }
+}
+
 
 #pragma mark - Protocols
 #pragma mark - UITableViewDataSource
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
+    return ContactListSectionsCount;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.contactList.count;
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    switch (section)
+    {
+        case ContactListSectionsOnline:
+        case ContactListSectionsOffline:
+            return [self.contactList[section] count];
+
+        default:
+            return 0;
+    }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:KEY_CELL_ID];
+
+    cell.textLabel.text = self.contactList[indexPath.section][indexPath.row];
 
     return cell;
 }

@@ -12,7 +12,11 @@
 
     #define TIME_CONNECTION_TIMEOUT 30  // In seconds
 
-@interface AppDelegate()
+    #define GCHAT_DOMAIN @"talk.google.com"
+
+@interface AppDelegate() <
+    XMPPStreamDelegate
+>
 
     @property (strong, nonatomic, readwrite) XMPPStream *xmppStream;
 
@@ -63,6 +67,12 @@
 */
 - (void)applicationWillTerminate:(UIApplication *)application
 {
+}
+
+/** @brief Returns a reference to app delegate */
++ (AppDelegate *)appDelegate
+{
+    return (AppDelegate *)[[UIApplication sharedApplication] delegate];
 }
 
 
@@ -121,6 +131,43 @@
 {
     [self goOffline];
     [self.xmppStream disconnect];
+}
+
+
+#pragma mark - XMPPStreamDelegate
+
+- (void)xmppStreamDidConnect:(XMPPStream *)sender {
+    self.isOpen = YES;
+    NSError *error = nil;
+    [[self xmppStream] authenticateWithPassword:[[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_PASSWORD] error:&error];
+}
+
+- (void)xmppStreamDidAuthenticate:(XMPPStream *)sender {
+    [self goOnline];
+}
+
+- (void)xmppStream:(XMPPStream *)sender didReceivePresence:(XMPPPresence *)presence
+{
+    NSString *user = [[presence from] user];
+    if (![user isEqualToString:[[sender myJID] user]])
+    {
+        [[NSNotificationCenter defaultCenter]
+            postNotificationName:NOTIFICATION_PRESENCE_UPDATE
+            object:self userInfo:@{
+                @"presence":[presence type],
+                @"username":[NSString stringWithFormat:@"%@@%@", user, GCHAT_DOMAIN],
+            }];
+    }
+}
+
+- (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message
+{
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:NOTIFICATION_MESSAGE_RECEIVED
+        object:self userInfo:@{
+            @"message": [[message elementForName:@"body"] stringValue],
+            @"sender": [[message attributeForName:@"from"] stringValue],
+        }];
 }
 
 
