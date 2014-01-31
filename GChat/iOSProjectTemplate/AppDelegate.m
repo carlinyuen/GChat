@@ -117,11 +117,12 @@
     NSError *error = nil;
     if (![self.xmppStream connectWithTimeout:TIME_CONNECTION_TIMEOUT error:&error])
     {
-        [[[UIAlertView alloc] initWithTitle:@"Error"
-                                   message:[NSString stringWithFormat:@"Can't connect to server %@", [error localizedDescription]]
-                                  delegate:nil
-                         cancelButtonTitle:@"Ok"
-                         otherButtonTitles:nil] show];
+        [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"POPUP_ERROR_TITLE", nil)
+            message:NSLocalizedString(@"ERROR_CONNECT", nil)
+            delegate:nil
+            cancelButtonTitle:NSLocalizedString(@"POPUP_CONFIRM_BUTTON_TITLE", nil)
+            otherButtonTitles:nil] show];
+        NSLog(@"ERROR: %@", [error localizedDescription]);
         return NO;
     }
     return YES;

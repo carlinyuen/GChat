@@ -24,4 +24,10 @@
     /** @brief Returns a reference to app delegate */
     + (AppDelegate *)appDelegate;
 
+    /** @brief Attempt login to xmpp service */
+    - (BOOL)connect;
+
+    /** @brief Disconnect from xmpp service */
+    - (void)disconnect;
+
 @end

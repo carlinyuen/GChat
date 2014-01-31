@@ -26,3 +26,16 @@
 // Chat Screen
 
 "CHAT_SEND_BUTTON_TITLE" = "Send";
+
+
+// General
+
+"POPUP_ERROR_TITLE" = "Error";
+"POPUP_WARNING_TITLE" = "Warning";
+"POPUP_CONFIRM_BUTTON_TITLE" = "Ok";
+"POPUP_CANCEL_BUTTON_TITLE" = "Cancel";
+
+
+// Error Message
+
+"ERROR_CONNECT" = "Could not connect to server. Please check your connection.";

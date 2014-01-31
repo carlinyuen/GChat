@@ -52,6 +52,11 @@
         for (NSInteger i = 0; i < ContactListSectionsCount; ++i) {
             [_contactList addObject:[NSMutableArray new]];
         }
+
+        // Notifications
+        [[NSNotificationCenter defaultCenter] addObserver:self
+            selector:@selector(contactPresenceChanged:)
+            name:NOTIFICATION_PRESENCE_UPDATE object:nil];
     }
     return self;
 }
@@ -70,11 +75,6 @@
     // Setup
 	[self setupNavBar];
     [self setupTableView];
-
-    // Notifications
-    [[NSNotificationCenter defaultCenter] addObserver:self
-        selector:@selector(contactPresenceChanged:)
-        name:NOTIFICATION_PRESENCE_UPDATE object:nil];
 }
 
 /** @brief Last-minute setup before view appears. */
@@ -87,8 +87,13 @@
 {
     [super viewDidAppear:animated];
 
-    // Show login page if not signed in
-    if (![[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_USERNAME]) {
+    // Connect if have login credentials saved
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_USERNAME]) {
+        if ([[AppDelegate appDelegate] connect]) {
+            debugLog(@"Show Contact List");
+        }
+    }
+    else {    // Ask for login credentials
         [self showLoginView];
     }
 }
@@ -287,7 +292,9 @@
     [tableView deselectRowAtIndexPath:indexPath animated:true];
 
     // Show chat view
-    [self showChatView:self.contactList[indexPath.row]];
+    [self showChatView:@{
+        @"username":self.contactList[indexPath.section][indexPath.row]
+    }];
 }
 
 

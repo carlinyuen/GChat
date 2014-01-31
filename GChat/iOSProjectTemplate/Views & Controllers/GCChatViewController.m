@@ -10,6 +10,8 @@
 
 #import <QuartzCore/QuartzCore.h>
 
+#import "AppDelegate.h"
+
     #define KEY_CELL_ID @"MessageCell"
 
     #define SIZE_MARGIN 6
@@ -29,6 +31,8 @@
     @property (strong, nonatomic) UITextView *inputTextView;
     @property (strong, nonatomic) UIButton *sendButton;
 
+    @property (strong, nonatomic) NSMutableArray *messageList;
+
 @end
 
 @implementation GCChatViewController
@@ -39,6 +43,13 @@
     if (self)
     {
         _contactInfo = contact;
+
+        _messageList = [NSMutableArray new];
+       
+        // Notifications
+        [[NSNotificationCenter defaultCenter] addObserver:self
+            selector:@selector(messageReceived:)
+            name:NOTIFICATION_MESSAGE_RECEIVED object:nil];
     }
     return self;
 }
@@ -48,7 +59,7 @@
     [super viewDidLoad];
 
     // Title
-    self.title = @"Carlin Yuen";
+    self.title = self.contactInfo[@"username"];
 
     // Setup
     [self setupFooterView];
@@ -59,6 +70,11 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 
@@ -119,12 +135,43 @@
 }
 
 
+#pragma mark - Class Methods
+
+/** @brief Send message */
+- (void)sendMessage:(NSString *)text
+{
+    // If message text exists
+    if ([text length])
+    {
+        // Setup xmpp element
+        NSXMLElement *body = [NSXMLElement elementWithName:@"body"];
+        [body setStringValue:text];
+        NSXMLElement *message = [NSXMLElement elementWithName:@"message"];
+        [message addAttributeWithName:@"type" stringValue:@"chat"];
+        [message addAttributeWithName:@"to" stringValue:self.contactInfo[@"username"]];
+        [message addChild:body];
+
+        // Send element
+        [[[AppDelegate appDelegate] xmppStream] sendElement:message];
+
+        // Clear and refresh
+        self.inputTextView.text = @"";
+
+        [self.messageList addObject:@{
+            @"message": text,
+            @"sender": @"you",
+        }];
+        [self.tableView reloadData];
+    }
+}
+
+
 #pragma mark - Event Handlers
 
 /** @brief When send message button is tapped */
 - (void)sendButtonTapped:(UIButton *)sender
 {
-
+    [self sendMessage:self.inputTextView.text];
 }
 
 
@@ -136,12 +183,14 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 3;
+    return self.messageList.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:KEY_CELL_ID];
+
+    cell.textLabel.text = self.messageList[indexPath.row][@"message"];
 
     return cell;
 }
