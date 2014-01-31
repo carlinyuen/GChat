@@ -23,6 +23,7 @@ NSString* const ONCE_KEY_APP_OPENED = @"onceAppOpened";
 // Notifications
 NSString* const NOTIFICATION_PRESENCE_UPDATE = @"notificationStatusUpdate";
 NSString* const NOTIFICATION_MESSAGE_RECEIVED = @"notificationMessageReceived";
+NSString* const NOTIFICATION_CONNECTION_CHANGED = @"notificationConnectionChanged";
 
 // Fonts
 NSString* const FONT_NAME_BRANDING = @"Courier New";

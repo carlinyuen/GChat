@@ -23,6 +23,7 @@ extern NSString* const ONCE_KEY_APP_OPENED;
 // Notifications
 extern NSString* const NOTIFICATION_PRESENCE_UPDATE;
 extern NSString* const NOTIFICATION_MESSAGE_RECEIVED;
+extern NSString* const NOTIFICATION_CONNECTION_CHANGED;
 
 // Fonts
 extern NSString* const FONT_NAME_BRANDING;

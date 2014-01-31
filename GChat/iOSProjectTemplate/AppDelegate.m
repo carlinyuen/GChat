@@ -12,7 +12,9 @@
 
     #define TIME_CONNECTION_TIMEOUT 30  // In seconds
 
+    // Defined here https://developers.google.com/talk/open_communications
     #define GCHAT_DOMAIN @"talk.google.com"
+    #define GCHAT_PORT 5222
 
 @interface AppDelegate() <
     XMPPStreamDelegate
@@ -89,6 +91,8 @@
 - (void)setupStream
 {
     self.xmppStream = [XMPPStream new];
+    [self.xmppStream setHostName:GCHAT_DOMAIN];
+    [self.xmppStream setHostPort:GCHAT_PORT];
     [self.xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
 }
 
@@ -108,10 +112,13 @@
 
 - (BOOL)connect
 {
+    debugLog(@"connect xmpp");
+
     [self setupStream];
 
     // If already connected, return true
     if ([self isConnected]) {
+        debugLog(@"Already connected!");
         return YES;
     }
 
@@ -158,14 +165,33 @@
 {
     debugLog(@"xmppStreamDidConnect: %@", sender);
 
+    // Try to authenticate
     NSError *error = nil;
     NSString *password = [[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_PASSWORD];
     if (![[self xmppStream] authenticateWithPassword:password error:&error]) {
         debugLog(@"ERROR: Could not authenticate! %@", error);
     }
+
+    // Notify connection status change
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:NOTIFICATION_CONNECTION_CHANGE
+        object:self userInfo:@{
+            @"status": @"connecting",
+            @"timestamp": [NSDate date],
+        }];
 }
 
-- (void)xmppStreamDidAuthenticate:(XMPPStream *)sender {
+- (void)xmppStreamDidAuthenticate:(XMPPStream *)sender
+{
+    // Authenticated, notify
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:NOTIFICATION_CONNECTION_CHANGE
+        object:self userInfo:@{
+            @"status": @"connected",
+            @"timestamp": [NSDate date],
+        }];
+
+    // Update status
     [self goOnline];
 }
 

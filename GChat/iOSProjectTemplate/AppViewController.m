@@ -57,6 +57,9 @@
         [[NSNotificationCenter defaultCenter] addObserver:self
             selector:@selector(contactPresenceChanged:)
             name:NOTIFICATION_PRESENCE_UPDATE object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+            selector:@selector(connectionStatusChanged:)
+            name:NOTIFICATION_CONNECTION_CHANGE object:nil];
     }
     return self;
 }
@@ -280,6 +283,13 @@
     } else {
         [self setContactOnline:notification.userInfo[@"username"]];
     }
+}
+
+/** @brief When connection status to xmpp service changes */
+- (void)connectionStatusChanged:(NSNotification *)notification
+{
+    // Refresh login button
+    [self refreshLoginButton];
 }
 
 
