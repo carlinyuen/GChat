@@ -31,8 +31,8 @@
 
 // General
 
-"POPUP_ERROR_TITLE" = "Error";
-"POPUP_WARNING_TITLE" = "Warning";
+"POPUP_ERROR_TITLE" = "Oops!";
+"POPUP_WARNING_TITLE" = "Warning!";
 "POPUP_CONFIRM_BUTTON_TITLE" = "Ok";
 "POPUP_CANCEL_BUTTON_TITLE" = "Cancel";
 
@@ -40,3 +40,6 @@
 // Error Message
 
 "ERROR_CONNECT" = "Could not connect to server. Please check your connection.";
+"ERROR_INVALID_EMAIL" = "Invalid email";
+"ERROR_BLANK_USERNAME" = "Missing username";
+"ERROR_BLANK_PASSWORD" = "Missing password";

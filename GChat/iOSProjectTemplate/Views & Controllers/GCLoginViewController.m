@@ -84,20 +84,20 @@
         forState:UIControlStateNormal];
 }
 
-/** @brief Validate input, returns an array of errors, or nil if no errors */
-- (NSArray *)errorsFromInput
+/** @brief Validate input, returns an array of errors */
+- (NSArray *)inputValidationErrors
 {
     NSString *username = self.usernameTextField.text;
     NSString *password = self.passwordTextField.text;
     NSMutableArray *errors = [NSMutableArray new];
 
-    if (username && username.length) {
+    if (![username length]) {
         [errors addObject:NSLocalizedString(@"ERROR_BLANK_USERNAME", nil)];
     }
-    if (password && password.length) {
+    if (![password length]) {
         [errors addObject:NSLocalizedString(@"ERROR_BLANK_PASSWORD", nil)];
     }
-    if ([[NSPredicate predicateWithFormat:@"SELF MATCHES[c] %@", REGEX_EMAIL_VERIFICATION] evaluateWithObject:username]) {
+    if (![[NSPredicate predicateWithFormat:@"SELF MATCHES[c] %@", REGEX_EMAIL_VERIFICATION] evaluateWithObject:username]) {
         [errors addObject:NSLocalizedString(@"ERROR_INVALID_EMAIL", nil)];
     }
 
@@ -115,7 +115,9 @@
 
 - (IBAction)loginButtonTapped:(UIButton *)sender
 {
-    if ([self validateInput])
+    // Validate input
+    NSArray *validationErrors = [self inputValidationErrors];
+    if (!validationErrors.count)
     {
         // Save settings, will clear credentials later if not persisting
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -129,6 +131,13 @@
 
         // Hide login
         [self dismissViewControllerAnimated:true completion:nil];
+    }
+    else {    // Display errors
+        [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"POPUP_ERROR_TITLE", nil)
+            message:[validationErrors componentsJoinedByString:@"\n"]
+            delegate:nil
+            cancelButtonTitle:NSLocalizedString(@"POPUP_CONFIRM_BUTTON_TITLE", nil)
+            otherButtonTitles:nil] show];
     }
 }
 
