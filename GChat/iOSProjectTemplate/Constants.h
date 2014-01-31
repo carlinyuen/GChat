@@ -52,3 +52,5 @@ extern float const ANIMATION_DURATION_FAST;
 extern float const ANIMATION_DURATION_MED;
 extern float const ANIMATION_DURATION_SLOW;
 
+// Regex
+extern NSString* const REGEX_EMAIL_VERIFICATION;

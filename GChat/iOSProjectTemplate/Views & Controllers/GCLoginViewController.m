@@ -84,6 +84,26 @@
         forState:UIControlStateNormal];
 }
 
+/** @brief Validate input, returns an array of errors, or nil if no errors */
+- (NSArray *)errorsFromInput
+{
+    NSString *username = self.usernameTextField.text;
+    NSString *password = self.passwordTextField.text;
+    NSMutableArray *errors = [NSMutableArray new];
+
+    if (username && username.length) {
+        [errors addObject:NSLocalizedString(@"ERROR_BLANK_USERNAME", nil)];
+    }
+    if (password && password.length) {
+        [errors addObject:NSLocalizedString(@"ERROR_BLANK_PASSWORD", nil)];
+    }
+    if ([[NSPredicate predicateWithFormat:@"SELF MATCHES[c] %@", REGEX_EMAIL_VERIFICATION] evaluateWithObject:username]) {
+        [errors addObject:NSLocalizedString(@"ERROR_INVALID_EMAIL", nil)];
+    }
+
+    return errors;
+}
+
 
 #pragma mark - Event Handlers
 
@@ -95,22 +115,21 @@
 
 - (IBAction)loginButtonTapped:(UIButton *)sender
 {
-    // Save settings, will clear credentials later if not persisting
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults setObject:self.usernameTextField.text
-        forKey:CACHE_KEY_LOGIN_USERNAME];
-    [defaults setObject:self.passwordTextField.text
-        forKey:CACHE_KEY_LOGIN_PASSWORD];
-    [defaults setBool:self.persistButton.selected
-        forKey:CACHE_KEY_LOGIN_PERSIST];
-    [defaults synchronize];
+    if ([self validateInput])
+    {
+        // Save settings, will clear credentials later if not persisting
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        [defaults setObject:self.usernameTextField.text
+            forKey:CACHE_KEY_LOGIN_USERNAME];
+        [defaults setObject:self.passwordTextField.text
+            forKey:CACHE_KEY_LOGIN_PASSWORD];
+        [defaults setBool:self.persistButton.selected
+            forKey:CACHE_KEY_LOGIN_PERSIST];
+        [defaults synchronize];
 
-    // Hide login
-    [self dismissViewControllerAnimated:true completion:^{
-        if ([[AppDelegate appDelegate] connect]) {
-            debugLog(@"Show Contact List");
-        }
-    }];
+        // Hide login
+        [self dismissViewControllerAnimated:true completion:nil];
+    }
 }
 
 

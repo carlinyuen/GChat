@@ -90,11 +90,11 @@
 {
     [super viewDidAppear:animated];
 
-    // Connect if have login credentials saved
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_USERNAME]) {
-        if ([[AppDelegate appDelegate] connect]) {
-            debugLog(@"Show Contact List");
-        }
+    debugLog(@"viewDidAppear");
+
+    // Attempt to connect
+    if ([[AppDelegate appDelegate] connect]) {
+        debugLog(@"Show Contact List");
     }
     else {    // Ask for login credentials
         [self showLoginView];
