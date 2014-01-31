@@ -87,12 +87,14 @@
 - (void)goOnline
 {
     XMPPPresence *presence = [XMPPPresence presence];
+    debugLog(@"goOnline: %@", presence);
     [self.xmppStream sendElement:presence];
 }
 
 - (void)goOffline
 {
     XMPPPresence *presence = [XMPPPresence presenceWithType:@"unavailable"];
+    debugLog(@"goOffline: %@", presence);
     [self.xmppStream sendElement:presence];
 }
 
@@ -137,10 +139,15 @@
 
 #pragma mark - XMPPStreamDelegate
 
-- (void)xmppStreamDidConnect:(XMPPStream *)sender {
-    self.isOpen = YES;
+- (void)xmppStreamDidConnect:(XMPPStream *)sender
+{
+    debugLog(@"xmppStreamDidConnect: %@", sender);
+
     NSError *error = nil;
-    [[self xmppStream] authenticateWithPassword:[[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_PASSWORD] error:&error];
+    if (![[self xmppStream] authenticateWithPassword:[[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_PASSWORD] error:&error])
+    {
+        debugLog(@"ERROR: Could not authenticate! %@", error);
+    }
 }
 
 - (void)xmppStreamDidAuthenticate:(XMPPStream *)sender {
@@ -149,6 +156,8 @@
 
 - (void)xmppStream:(XMPPStream *)sender didReceivePresence:(XMPPPresence *)presence
 {
+    debugLog(@"Presence Update: %@", presence);
+
     NSString *user = [[presence from] user];
     if (![user isEqualToString:[[sender myJID] user]])
     {
@@ -163,11 +172,14 @@
 
 - (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message
 {
+    debugLog(@"Message Update: %@", message);
+
     [[NSNotificationCenter defaultCenter]
         postNotificationName:NOTIFICATION_MESSAGE_RECEIVED
         object:self userInfo:@{
             @"message": [[message elementForName:@"body"] stringValue],
             @"sender": [[message attributeForName:@"from"] stringValue],
+            @"timestamp": [NSDate date],
         }];
 }
 

@@ -207,6 +207,11 @@
 /** @brief Sets contact in offline section */
 - (void)setContactOffline:(NSString *)username
 {
+    // If already in state, return
+    if ([self.contactList[ContactListSectionsOffline] containsObject:username]) {
+        return;
+    }
+
     // Remove from online if exists
     [self.contactList[ContactListSectionsOnline] removeObject:username];
 
@@ -220,6 +225,11 @@
 /** @brief Sets contact in online section */
 - (void)setContactOnline:(NSString *)username
 {
+    // If already in state, return
+    if ([self.contactList[ContactListSectionsOnline] containsObject:username]) {
+        return;
+    }
+
     // Remove from offline if exists
     [self.contactList[ContactListSectionsOffline] removeObject:username];
 

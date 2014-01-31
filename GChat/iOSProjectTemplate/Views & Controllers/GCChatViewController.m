@@ -159,6 +159,7 @@
 
         [self.messageList addObject:@{
             @"message": text,
+            @"timestamp": [NSDate date],
             @"sender": @"you",
         }];
         [self.tableView reloadData];
@@ -172,6 +173,11 @@
 - (void)sendButtonTapped:(UIButton *)sender
 {
     [self sendMessage:self.inputTextView.text];
+}
+
+/** @brief When we get a message */
+- (void)messageReceived:(NSNotification *)notification
+{
 }
 
 
