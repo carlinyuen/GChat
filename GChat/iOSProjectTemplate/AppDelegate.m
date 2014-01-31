@@ -174,7 +174,7 @@
 
     // Notify connection status change
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:NOTIFICATION_CONNECTION_CHANGE
+        postNotificationName:NOTIFICATION_CONNECTION_CHANGED
         object:self userInfo:@{
             @"status": @"connecting",
             @"timestamp": [NSDate date],
@@ -185,7 +185,7 @@
 {
     // Authenticated, notify
     [[NSNotificationCenter defaultCenter]
-        postNotificationName:NOTIFICATION_CONNECTION_CHANGE
+        postNotificationName:NOTIFICATION_CONNECTION_CHANGED
         object:self userInfo:@{
             @"status": @"connected",
             @"timestamp": [NSDate date],
