@@ -10,8 +10,6 @@
 
 #import "AppViewController.h"
 
-    #define TIME_CONNECTION_TIMEOUT 30  // In seconds
-
     // Defined here https://developers.google.com/talk/open_communications
     #define GCHAT_DOMAIN @"talk.google.com"
     #define GCHAT_PORT 5222

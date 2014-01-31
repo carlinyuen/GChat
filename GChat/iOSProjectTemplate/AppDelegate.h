@@ -10,6 +10,8 @@
 
 #import "XMPPFramework.h"
 
+    #define TIME_CONNECTION_TIMEOUT 6  // In seconds
+
 @class AppViewController;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>

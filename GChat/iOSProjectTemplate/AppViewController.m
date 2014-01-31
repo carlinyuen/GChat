@@ -227,6 +227,11 @@
         = ([[AppDelegate appDelegate] isConnected]
             ? NSLocalizedString(@"APP_NAVBAR_LOGOUT_BUTTON_TITLE", nil)
             : NSLocalizedString(@"APP_NAVBAR_LOGIN_BUTTON_TITLE", nil));
+
+    // Only refresh if state is changed
+    if ([[self.navigationItem.leftBarButtonItem title] isEqualToString:buttonTitle]) {
+        return;
+    }
         
     // Login button on left
     NSString *loginTitle = [NSString stringWithFormat:@"%@%@",

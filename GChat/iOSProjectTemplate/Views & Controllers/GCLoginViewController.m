@@ -23,6 +23,9 @@
     @property (weak, nonatomic) IBOutlet UIButton *persistButton;
     @property (weak, nonatomic) IBOutlet UIButton *loginButton;
 
+    /** For connection timeout */
+    @property (strong, nonatomic) NSTimer *timeoutTimer;
+
     - (IBAction)persistButtonTapped:(UIButton *)sender;
     - (IBAction)loginButtonTapped:(UIButton *)sender;
 
@@ -33,8 +36,14 @@
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
+    if (self)
+    {
         self.title = NSLocalizedString(@"LOGIN_VIEW_TITLE", nil);
+
+        // Notifications
+        [[NSNotificationCenter defaultCenter] addObserver:self
+            selector:@selector(connectionStatusChanged:)
+            name:NOTIFICATION_CONNECTION_CHANGED object:nil];
     }
     return self;
 }
@@ -69,6 +78,11 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 
@@ -129,8 +143,14 @@
             forKey:CACHE_KEY_LOGIN_PERSIST];
         [defaults synchronize];
 
-        // Hide login
-        [self dismissViewControllerAnimated:true completion:nil];
+        // Try to connect, set a timeout
+        [[AppDelegate appDelegate] connect];
+        if (self.timeoutTimer) {
+            [self.timeoutTimer invalidate];
+        }
+        self.timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:TIME_CONNECTION_TIMEOUT
+            target:self selector:@selector(connectionFailed:)
+            userInfo:nil repeats:false];
     }
     else {    // Display errors
         [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"POPUP_ERROR_TITLE", nil)
@@ -139,6 +159,32 @@
             cancelButtonTitle:NSLocalizedString(@"POPUP_CONFIRM_BUTTON_TITLE", nil)
             otherButtonTitles:nil] show];
     }
+}
+
+/** @brief When connection status to xmpp service changes */
+- (void)connectionStatusChanged:(NSNotification *)notification
+{
+    // If connected, dismiss login screen
+    if ([notification.userInfo[@"status"] isEqualToString:@"connected"])
+    {
+        // Clear connection timeout timer
+        if (self.timeoutTimer) {
+            [self.timeoutTimer invalidate];
+        }
+
+        // Dismiss
+        [self dismissViewControllerAnimated:true completion:nil];
+    }
+}
+
+/** @brief When attempting to connect should time out */
+- (void)connectionFailed:(NSTimer *)timer
+{
+    [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"POPUP_ERROR_TITLE", nil)
+            message:NSLocalizedString(@"ERROR_CONNECTION_TIMEOUT", nil)
+            delegate:nil
+            cancelButtonTitle:NSLocalizedString(@"POPUP_CONFIRM_BUTTON_TITLE", nil)
+            otherButtonTitles:nil] show];
 }
 
 
