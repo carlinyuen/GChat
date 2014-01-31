@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-#import "XMPP.h"
+#import "XMPPFramework.h"
 
 @class AppViewController;
 
@@ -22,6 +22,9 @@
 
     /** @brief Returns a reference to app delegate */
     + (AppDelegate *)appDelegate;
+
+    /** @brief Clears saved credentials */
+    + (void)clearCredentials;
 
     /** @brief Attempt login to xmpp service */
     - (BOOL)connect;

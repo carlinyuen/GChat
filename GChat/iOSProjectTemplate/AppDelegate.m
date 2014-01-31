@@ -21,6 +21,7 @@
 >
 
     @property (strong, nonatomic, readwrite) XMPPStream *xmppStream;
+    @property (strong, nonatomic, readwrite) XMPPReconnect *xmppReconnect;
 
 @end
 
@@ -50,6 +51,8 @@
 */
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
+    // Perform cleanup
+    [AppDelegate cleanup];
 }
 
 /** @brief Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
@@ -69,14 +72,8 @@
 */
 - (void)applicationWillTerminate:(UIApplication *)application
 {
-    // Clear credentials
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    if (![defaults boolForKey:CACHE_KEY_LOGIN_PERSIST])
-    {
-        [defaults removeObjectForKey:CACHE_KEY_LOGIN_USERNAME];
-        [defaults removeObjectForKey:CACHE_KEY_LOGIN_PASSWORD];
-    }
-    [defaults synchronize];
+    // Perform cleanup
+    [AppDelegate cleanup];
 }
 
 /** @brief Returns a reference to app delegate */
@@ -85,15 +82,42 @@
     return (AppDelegate *)[[UIApplication sharedApplication] delegate];
 }
 
+/** @brief Perform app cleanup */
++ (void)cleanup
+{
+    debugLog(@"cleanup");
+
+    if (![[NSUserDefaults standardUserDefaults] boolForKey:CACHE_KEY_LOGIN_PERSIST]) {
+        [AppDelegate clearCredentials];
+    }
+}
+
+/** @brief Clears saved credentials */
++ (void)clearCredentials
+{
+    debugLog(@"clearCredentials");
+
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults removeObjectForKey:CACHE_KEY_LOGIN_USERNAME];
+    [defaults removeObjectForKey:CACHE_KEY_LOGIN_PASSWORD];
+    [defaults removeObjectForKey:CACHE_KEY_LOGIN_PERSIST];
+    [defaults synchronize];
+}
+
 
 #pragma mark - XMPP Setup
 
 - (void)setupStream
 {
     self.xmppStream = [XMPPStream new];
-    [self.xmppStream setHostName:GCHAT_DOMAIN];
-    [self.xmppStream setHostPort:GCHAT_PORT];
+//    [self.xmppStream setHostName:GCHAT_DOMAIN];
+//    [self.xmppStream setHostPort:GCHAT_PORT];
     [self.xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
+
+    // Modules
+    self.xmppReconnect = [XMPPReconnect new];
+    [self.xmppReconnect activate:self.xmppStream];
+    [self.xmppReconnect addDelegate:self delegateQueue:dispatch_get_main_queue()];
 }
 
 - (void)goOnline
@@ -125,9 +149,11 @@
     // If invalid credentials, return false
     NSString *username = [[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_USERNAME];
     NSString *password = [[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_PASSWORD];
-    if (username == nil || password == nil) {
+    debugLog(@"Credentials: %@ / %@", username, password);
+    if (!username || !password) {
         return NO;
     }
+    debugLog(@"username: %i", !!username);
 
     // Set username and try to connect
     [self.xmppStream setMyJID:[XMPPJID jidWithString:username]];
@@ -222,6 +248,15 @@
             @"sender": [[message attributeForName:@"from"] stringValue],
             @"timestamp": [NSDate date],
         }];
+}
+
+- (void)xmppStream:(XMPPStream *)sender willSecureWithSettings:(NSMutableDictionary *)settings
+{
+    // Allow self-signed certificates
+    [settings setObject:@YES forKey:(NSString *)kCFStreamSSLAllowsAnyRoot];
+
+    // Allow host name mismatches
+    [settings setObject:[NSNull null] forKey:(NSString *)kCFStreamSSLPeerName];
 }
 
 

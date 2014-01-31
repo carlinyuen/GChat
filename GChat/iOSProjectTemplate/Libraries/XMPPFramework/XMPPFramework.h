@@ -30,11 +30,11 @@
 //#import "XMPPBandwidthMonitor.h"
 // 
 //#import "XMPPCoreDataStorage.h"
-//
-//#import "XMPPReconnect.h"
-//
-//#import "XMPPRoster.h"
-//#import "XMPPRosterMemoryStorage.h"
+
+#import "XMPPReconnect.h"
+
+#import "XMPPRoster.h"
+#import "XMPPRosterMemoryStorage.h"
 //#import "XMPPRosterCoreDataStorage.h"
 //
 //#import "XMPPJabberRPCModule.h"
@@ -66,8 +66,8 @@
 //#import "XMPPCapabilities.h"
 //#import "XMPPCapabilitiesCoreDataStorage.h"
 //
-//#import "XMPPvCardAvatarModule.h"
-//
+#import "XMPPvCardAvatarModule.h"
+
 //#import "XMPPMessage+XEP_0184.h"
 //
 //#import "XMPPPing.h"

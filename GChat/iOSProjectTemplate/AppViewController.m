@@ -12,6 +12,7 @@
 #import "AppDelegate.h"
 #import "GCLoginViewController.h"
 #import "GCChatViewController.h"
+#import "CustomPullToRefreshControl.h"
 
 	#define UI_SIZE_INFO_BUTTON_MARGIN 8
 
@@ -26,13 +27,17 @@
 @interface AppViewController () <
     UITableViewDataSource
     , UITableViewDelegate
+    , XMPPRosterDelegate
 >
 
     /** Tableview for contact list */
     @property (weak, nonatomic) IBOutlet UITableView *tableView;
+    @property (strong, nonatomic) CustomPullToRefreshControl *pullToRefresh;
 
     /** Storage for contact list */
     @property (strong, nonatomic) NSMutableArray *contactList;
+    @property (strong, nonatomic) XMPPRoster *roster;
+    @property (strong, nonatomic) XMPPRosterMemoryStorage *rosterStorage;
 
 @end
 
@@ -45,11 +50,19 @@
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
+    if (self)
+    {
 		self.title = NSLocalizedString(@"APP_VIEW_TITLE", nil);
 
+        // Roster Setup
+        _rosterStorage = [XMPPRosterMemoryStorage new];
+        _roster = [[XMPPRoster alloc] initWithRosterStorage:_rosterStorage];
+        [_roster addDelegate:self delegateQueue:dispatch_get_main_queue()];
+        [_roster activate:[[AppDelegate appDelegate] xmppStream]];
+
+        // Contact list
         _contactList = [NSMutableArray new];
-        for (NSInteger i = 0; i < ContactListSectionsCount; ++i) {
+        for (int i = 0; i < ContactListSectionsCount; ++i) {
             [_contactList addObject:[NSMutableArray new]];
         }
 
@@ -59,7 +72,7 @@
             name:NOTIFICATION_PRESENCE_UPDATE object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self
             selector:@selector(connectionStatusChanged:)
-            name:NOTIFICATION_CONNECTION_CHANGE object:nil];
+            name:NOTIFICATION_CONNECTION_CHANGED object:nil];
     }
     return self;
 }
@@ -85,8 +98,7 @@
 {
 	[super viewWillAppear:animated];
 
-    // Update login button
-    [self refreshLoginButton];
+    debugLog(@"viewDidAppear");
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -95,11 +107,10 @@
 
     debugLog(@"viewDidAppear");
 
-    // Attempt to connect
+    // Try to connect, if fails, show login
     if ([[AppDelegate appDelegate] connect]) {
-        debugLog(@"Show Contact List");
-    }
-    else {    // Ask for login credentials
+        [self.roster fetchRoster];  // Get latest roster
+    } else {    // Ask for login credentials
         [self showLoginView];
     }
 }
@@ -167,6 +178,11 @@
 /** @brief Setup tableview */
 - (void)setupTableView
 {
+    // Pull to refresh
+    self.pullToRefresh = [[CustomPullToRefreshControl alloc] initInScrollView:self.tableView];
+    self.pullToRefresh.scrollUpToCancel = true;
+    [self.pullToRefresh addTarget:self action:@selector(pulledToRefresh:) forControlEvents:UIControlEventValueChanged];
+
     [self.tableView registerClass:[UITableViewCell class]
         forCellReuseIdentifier:KEY_CELL_ID];
 }
@@ -177,6 +193,8 @@
 /** @brief Show login screen */
 - (void)showLoginView
 {
+    debugLog(@"showLoginView");
+
     // Set back button on navbar
     self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
         initWithTitle:NSLocalizedString(@"LOGIN_NAVBAR_BACK_BUTTON_TITLE", nil)
@@ -213,10 +231,11 @@
     // Login button on left
     NSString *loginTitle = [NSString stringWithFormat:@"%@%@",
         (deviceOSVersionLessThan(@"7.0") ? @"" : @" "), buttonTitle];
-    UIBarButtonItem *loginButton = [[UIBarButtonItem alloc]
+    UIBarButtonItem *button = [[UIBarButtonItem alloc]
         initWithTitle:loginTitle style:UIBarButtonItemStylePlain
-        target:self action:@selector(loginButtonTapped:)];
-    [self.navigationItem setLeftBarButtonItem:loginButton animated:true];
+        target:self action:([[AppDelegate appDelegate] isConnected]
+            ? @selector(logoutButtonTapped:) : @selector(loginButtonTapped:))];
+    [self.navigationItem setLeftBarButtonItem:button animated:true];
 }
 
 /** @brief Sets contact in offline section */
@@ -261,10 +280,20 @@
 /** @brief Login button pressed */
 - (void)loginButtonTapped:(id)sender
 {
-    // Log out if currently logged in
-    if ([[AppDelegate appDelegate] isConnected]) {
-        [[AppDelegate appDelegate] disconnect];
-    }
+    // Show login view
+    [self showLoginView];
+}
+
+/** @brief Logout button pressed */
+- (void)logoutButtonTapped:(id)sender
+{
+    debugLog(@"Logging out");
+
+    // Disconnect xmpp service
+    [[AppDelegate appDelegate] disconnect];
+
+    // Clear credentials
+    [AppDelegate clearCredentials];
 
     // Show login view
     [self showLoginView];
@@ -292,6 +321,17 @@
     [self refreshLoginButton];
 }
 
+/** @brief When tableview is pulled to refresh */
+- (void)pulledToRefresh:(id)sender
+{
+    debugLog(@"pulledToRefresh");
+
+    debugLog(@"%@", [self.rosterStorage sortedAvailableUsersByName]);
+
+    // Get new list of roster users
+    [self.roster fetchRoster];
+}
+
 
 #pragma mark - Protocols
 #pragma mark - UITableViewDataSource
@@ -305,7 +345,10 @@
     switch (section)
     {
         case ContactListSectionsOnline:
+//            return [[self.rosterStorage sortedAvailableUsersByName] count];
+
         case ContactListSectionsOffline:
+//            return [[self.rosterStorage sortedUnavailableUsersByName] count];
             return [self.contactList[section] count];
 
         default:
@@ -317,7 +360,21 @@
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:KEY_CELL_ID];
 
-    cell.textLabel.text = self.contactList[indexPath.section][indexPath.row];
+    NSString *username;
+    switch (indexPath.section)
+    {
+        case ContactListSectionsOnline:
+//            username = [self.rosterStorage sortedAvailableUsersByName][indexPath.row];
+//            break;
+
+        case ContactListSectionsOffline:
+//            username = [self.rosterStorage sortedUnavailableUsersByName][indexPath.row];
+            username = self.contactList[indexPath.section][indexPath.row];
+            break;
+
+        default: break;
+    }
+    cell.textLabel.text = username;
 
     return cell;
 }
@@ -330,10 +387,42 @@
     // Animated deselect fade
     [tableView deselectRowAtIndexPath:indexPath animated:true];
 
+//    XMPPUserMemoryStorageObject *user;
+    NSString *username;
+    switch (indexPath.section)
+    {
+        case ContactListSectionsOnline:
+//            user = [self.rosterStorage sortedAvailableUsersByName][indexPath.row];
+//            break;
+
+        case ContactListSectionsOffline:
+//            user = [self.rosterStorage sortedUnavailableUsersByName][indexPath.row];
+            username = self.contactList[indexPath.section][indexPath.row];
+            break;
+
+        default: break;
+    }
+
     // Show chat view
     [self showChatView:@{
-        @"username":self.contactList[indexPath.section][indexPath.row]
+//        @"username":[user displayName]
+        @"username":username
     }];
+}
+
+
+#pragma mark - XMPPRosterDelegate
+
+- (void)xmppRosterDidBeginPopulating:(XMPPRoster *)sender
+{
+    debugLog(@"roster began populating");
+}
+
+- (void)xmppRosterDidEndPopulating:(XMPPRoster *)sender
+{
+    debugLog(@"roster ended populating");
+
+    [self.pullToRefresh endRefreshing];
 }
 
 

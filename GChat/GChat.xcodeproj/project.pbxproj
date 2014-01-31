@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		22A7BA94189C61D600C2D0F3 /* CustomPullToRefreshControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A7BA93189C61D600C2D0F3 /* CustomPullToRefreshControl.m */; };
 		22CE16D81898570B00D65A19 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22CE16D71898570B00D65A19 /* Images.xcassets */; };
 		22CE16DA1898580B00D65A19 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22CE16D91898580B00D65A19 /* QuartzCore.framework */; };
 		22E3CFE8189864A800678862 /* DDAbstractDatabaseLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E3CFD9189864A800678862 /* DDAbstractDatabaseLogger.m */; };
@@ -165,6 +166,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		22A7BA92189C61D600C2D0F3 /* CustomPullToRefreshControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomPullToRefreshControl.h; sourceTree = "<group>"; };
+		22A7BA93189C61D600C2D0F3 /* CustomPullToRefreshControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomPullToRefreshControl.m; sourceTree = "<group>"; };
 		22CE16D71898570B00D65A19 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		22CE16D91898580B00D65A19 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		22E3CFD8189864A800678862 /* DDAbstractDatabaseLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDAbstractDatabaseLogger.h; sourceTree = "<group>"; };
@@ -496,6 +499,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		22A7BA91189C61D600C2D0F3 /* CustomPullToRefreshControl */ = {
+			isa = PBXGroup;
+			children = (
+				22A7BA92189C61D600C2D0F3 /* CustomPullToRefreshControl.h */,
+				22A7BA93189C61D600C2D0F3 /* CustomPullToRefreshControl.m */,
+			);
+			name = CustomPullToRefreshControl;
+			path = CustomPullToRefreshControl/CustomPullToRefreshControl;
+			sourceTree = "<group>";
+		};
 		22E3CFD7189864A800678862 /* CocoaLumberjack */ = {
 			isa = PBXGroup;
 			children = (
@@ -1344,6 +1357,7 @@
 		5F7C89731790AF0800018AD7 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				22A7BA91189C61D600C2D0F3 /* CustomPullToRefreshControl */,
 				22E3D1AF18986BDE00678862 /* XMPPFramework */,
 				22E3D0101898667200678862 /* TestFlightSDK2.1.4 */,
 				22E3D009189865C500678862 /* libidn */,
@@ -1550,6 +1564,7 @@
 				22E3D30118986BDF00678862 /* XMPPRoomMemoryStorage.m in Sources */,
 				22E3D2D418986BDF00678862 /* XMPPDeprecatedPlainAuthentication.m in Sources */,
 				22E3D2F418986BDF00678862 /* XMPPIQ+JabberRPCResonse.m in Sources */,
+				22A7BA94189C61D600C2D0F3 /* CustomPullToRefreshControl.m in Sources */,
 				22E3D2F118986BDF00678862 /* XMPPRoster.m in Sources */,
 				22E3D2F518986BDF00678862 /* XMPPJabberRPCModule.m in Sources */,
 				22E3D2F218986BDF00678862 /* XMPPSystemInputActivityMonitor.m in Sources */,

@@ -1,3 +1,6 @@
 [submodule "XMPPFramework"]
 	path = XMPPFramework
 	url = https://github.com/robbiehanson/XMPPFramework.git
+[submodule "GChat/iOSProjectTemplate/Libraries/CustomPullToRefreshControl"]
+	path = GChat/iOSProjectTemplate/Libraries/CustomPullToRefreshControl
+	url = https://github.com/carlinyuen/CustomPullToRefreshControl.git
