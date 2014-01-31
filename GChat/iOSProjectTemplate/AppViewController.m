@@ -108,7 +108,7 @@
     debugLog(@"viewDidAppear");
 
     // Try to connect, if fails, show login
-    if ([[AppDelegate appDelegate] connect]) {
+    if ([[AppDelegate appDelegate] connectWithUsername:nil andPassword:nil]) {
         [self.roster fetchRoster];  // Get latest roster
     } else {    // Ask for login credentials
         [self showLoginView];

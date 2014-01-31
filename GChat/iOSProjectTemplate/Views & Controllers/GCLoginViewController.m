@@ -23,9 +23,6 @@
     @property (weak, nonatomic) IBOutlet UIButton *persistButton;
     @property (weak, nonatomic) IBOutlet UIButton *loginButton;
 
-    /** For connection timeout */
-    @property (strong, nonatomic) NSTimer *timeoutTimer;
-
     - (IBAction)persistButtonTapped:(UIButton *)sender;
     - (IBAction)loginButtonTapped:(UIButton *)sender;
 
@@ -133,24 +130,8 @@
     NSArray *validationErrors = [self inputValidationErrors];
     if (!validationErrors.count)
     {
-        // Save settings, will clear credentials later if not persisting
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        [defaults setObject:self.usernameTextField.text
-            forKey:CACHE_KEY_LOGIN_USERNAME];
-        [defaults setObject:self.passwordTextField.text
-            forKey:CACHE_KEY_LOGIN_PASSWORD];
-        [defaults setBool:self.persistButton.selected
-            forKey:CACHE_KEY_LOGIN_PERSIST];
-        [defaults synchronize];
-
-        // Try to connect, set a timeout
-        [[AppDelegate appDelegate] connect];
-        if (self.timeoutTimer) {
-            [self.timeoutTimer invalidate];
-        }
-        self.timeoutTimer = [NSTimer scheduledTimerWithTimeInterval:TIME_CONNECTION_TIMEOUT
-            target:self selector:@selector(connectionFailed:)
-            userInfo:nil repeats:false];
+        // Try to connect
+        [[AppDelegate appDelegate] connectWithUsername:self.usernameTextField.text andPassword:self.passwordTextField.text];
     }
     else {    // Display errors
         [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"POPUP_ERROR_TITLE", nil)
@@ -167,24 +148,29 @@
     // If connected, dismiss login screen
     if ([notification.userInfo[@"status"] isEqualToString:@"connected"])
     {
-        // Clear connection timeout timer
-        if (self.timeoutTimer) {
-            [self.timeoutTimer invalidate];
-        }
+        // Save settings, will clear credentials later if not persisting
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        [defaults setObject:self.usernameTextField.text
+            forKey:CACHE_KEY_LOGIN_USERNAME];
+        [defaults setObject:self.passwordTextField.text
+            forKey:CACHE_KEY_LOGIN_PASSWORD];
+        [defaults setBool:self.persistButton.selected
+            forKey:CACHE_KEY_LOGIN_PERSIST];
+        [defaults synchronize];
 
         // Dismiss
         [self dismissViewControllerAnimated:true completion:nil];
     }
-}
 
-/** @brief When attempting to connect should time out */
-- (void)connectionFailed:(NSTimer *)timer
-{
-    [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"POPUP_ERROR_TITLE", nil)
+    // If connection times out
+    else if ([notification.userInfo[@"status"] isEqualToString:@"timeout"])
+    {
+        [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"POPUP_ERROR_TITLE", nil)
             message:NSLocalizedString(@"ERROR_CONNECTION_TIMEOUT", nil)
             delegate:nil
             cancelButtonTitle:NSLocalizedString(@"POPUP_CONFIRM_BUTTON_TITLE", nil)
             otherButtonTitles:nil] show];
+    }
 }
 
 

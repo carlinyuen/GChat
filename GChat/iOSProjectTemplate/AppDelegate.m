@@ -10,6 +10,8 @@
 
 #import "AppViewController.h"
 
+    #define TIME_CONNECTION_TIMEOUT 6  // In seconds
+
     // Defined here https://developers.google.com/talk/open_communications
     #define GCHAT_DOMAIN @"talk.google.com"
     #define GCHAT_PORT 5222
@@ -19,7 +21,9 @@
 >
 
     @property (strong, nonatomic, readwrite) XMPPStream *xmppStream;
-    @property (strong, nonatomic, readwrite) XMPPReconnect *xmppReconnect;
+    @property (strong, nonatomic) XMPPReconnect *xmppReconnect;
+
+    @property (strong, nonatomic) NSTimer *connectTimeoutTimer;
 
 @end
 
@@ -63,7 +67,7 @@
 */
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
-    [self connect];
+    [self connectWithUsername:nil andPassword:nil];
 }
 
 /** @brief Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
@@ -107,15 +111,15 @@
 
 - (void)setupStream
 {
-    self.xmppStream = [XMPPStream new];
-//    [self.xmppStream setHostName:GCHAT_DOMAIN];
-//    [self.xmppStream setHostPort:GCHAT_PORT];
-    [self.xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
+    if (!self.xmppStream)
+    {
+        self.xmppStream = [XMPPStream new];
+        [self.xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
 
-    // Modules
-    self.xmppReconnect = [XMPPReconnect new];
-    [self.xmppReconnect activate:self.xmppStream];
-    [self.xmppReconnect addDelegate:self delegateQueue:dispatch_get_main_queue()];
+        // Modules
+        self.xmppReconnect = [XMPPReconnect new];
+        [self.xmppReconnect activate:self.xmppStream];
+    }
 }
 
 - (void)goOnline
@@ -132,7 +136,7 @@
     [self.xmppStream sendElement:presence];
 }
 
-- (BOOL)connect
+- (BOOL)connectWithUsername:(NSString *)username andPassword:(NSString *)password
 {
     debugLog(@"connect xmpp");
 
@@ -145,19 +149,29 @@
     }
 
     // If invalid credentials, return false
-    NSString *username = [[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_USERNAME];
-    NSString *password = [[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_PASSWORD];
+    if (!username) {
+        username = [[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_USERNAME];
+    }
+    if (!password) {
+        password = [[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_PASSWORD];
+    }
     debugLog(@"Credentials: %@ / %@", username, password);
     if (!username || !password) {
         return NO;
     }
-    debugLog(@"username: %i", !!username);
 
     // Set username and try to connect
     [self.xmppStream setMyJID:[XMPPJID jidWithString:username]];
     NSError *error = nil;
+    if (self.connectTimeoutTimer) {
+        [self.connectTimeoutTimer invalidate];
+    }
+    self.connectTimeoutTimer = [NSTimer scheduledTimerWithTimeInterval:TIME_CONNECTION_TIMEOUT
+        target:self selector:@selector(xmppStreamConnectDidTimeout:)
+        userInfo:nil repeats:false];
     if (![self.xmppStream connectWithTimeout:TIME_CONNECTION_TIMEOUT error:&error])
     {
+        debugLog(@"connect failed@");
         [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"POPUP_ERROR_TITLE", nil)
             message:NSLocalizedString(@"ERROR_CONNECT", nil)
             delegate:nil
@@ -178,6 +192,8 @@
 /** @brief Returns whether or not xmpp is connected */
 - (BOOL)isConnected
 {
+    debugLog(@"isConnected: %i", ![self.xmppStream isDisconnected]);
+
     // If stream is not disconnected, it is either establishing connection or connected
     return ![self.xmppStream isDisconnected];
 }
@@ -185,9 +201,19 @@
 
 #pragma mark - XMPPStreamDelegate
 
+- (void)xmppStream:(XMPPStream *)sender didNotRegister:(NSXMLElement *)error
+{
+    debugLog(@"XMPP REGISTER ERROR: %@", error);
+}
+
 - (void)xmppStreamDidConnect:(XMPPStream *)sender
 {
     debugLog(@"xmppStreamDidConnect: %@", sender);
+
+    // Invalidate timeout timer
+    if (self.connectTimeoutTimer) {
+        [self.connectTimeoutTimer invalidate];
+    }
 
     // Try to authenticate
     NSError *error = nil;
@@ -205,6 +231,19 @@
         }];
 }
 
+- (void)xmppStreamConnectDidTimeout:(XMPPStream *)sender
+{
+    debugLog(@"xmpp timeout");
+
+    // Notify connection status change
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:NOTIFICATION_CONNECTION_CHANGED
+        object:self userInfo:@{
+            @"status": @"timeout",
+            @"timestamp": [NSDate date],
+        }];
+}
+
 - (void)xmppStreamDidAuthenticate:(XMPPStream *)sender
 {
     // Authenticated, notify
@@ -217,6 +256,16 @@
 
     // Update status
     [self goOnline];
+}
+
+- (void)xmppStream:(XMPPStream *)sender didNotAuthenticate:(NSXMLElement *)error
+{
+    debugLog(@"XMPP AUTHENTICATE ERROR: %@", error);
+}
+
+- (void)xmppStream:(XMPPStream *)sender didReceiveError:(NSXMLElement *)error
+{
+    debugLog(@"XMPP ERROR: %@", error);
 }
 
 - (void)xmppStream:(XMPPStream *)sender didReceivePresence:(XMPPPresence *)presence

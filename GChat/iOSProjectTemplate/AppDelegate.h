@@ -10,8 +10,6 @@
 
 #import "XMPPFramework.h"
 
-    #define TIME_CONNECTION_TIMEOUT 6  // In seconds
-
 @class AppViewController;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
@@ -29,7 +27,7 @@
     + (void)clearCredentials;
 
     /** @brief Attempt login to xmpp service */
-    - (BOOL)connect;
+    - (BOOL)connectWithUsername:(NSString *)username andPassword:(NSString *)password;
 
     /** @brief Disconnect from xmpp service */
     - (void)disconnect;
