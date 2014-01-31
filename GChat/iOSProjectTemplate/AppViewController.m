@@ -81,6 +81,9 @@
 - (void)viewWillAppear:(BOOL)animated
 {
 	[super viewWillAppear:animated];
+
+    // Update login button
+    [self refreshLoginButton];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -141,15 +144,6 @@
         [[UINavigationBar appearance] setBackgroundColor:UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT)];
     }
 
-    // Login button on left
-    NSString *loginTitle = [NSString stringWithFormat:@"%@%@",
-        (deviceOSVersionLessThan(@"7.0") ? @"" : @" "),
-        NSLocalizedString(@"APP_NAVBAR_LOGIN_BUTTON_TITLE", nil)];
-    UIBarButtonItem *loginButton = [[UIBarButtonItem alloc]
-        initWithTitle:loginTitle style:UIBarButtonItemStylePlain
-        target:self action:@selector(loginButtonTapped:)];
-    [self.navigationItem setLeftBarButtonItem:loginButton animated:true];
-	
 	// Info button on right side
 	UIButton *infoButton;
     if (deviceOSVersionLessThan(@"7.0"))
@@ -204,6 +198,24 @@
         initWithNibName:@"GCChatViewController" bundle:nil] animated:true];
 }
 
+/** @brief Refreshes the login button text */
+- (void)refreshLoginButton
+{
+    // Depending on state of logged in status, change text on login button
+    NSString *buttonTitle
+        = ([[AppDelegate appDelegate] isConnected]
+            ? NSLocalizedString(@"APP_NAVBAR_LOGOUT_BUTTON_TITLE", nil)
+            : NSLocalizedString(@"APP_NAVBAR_LOGIN_BUTTON_TITLE", nil));
+        
+    // Login button on left
+    NSString *loginTitle = [NSString stringWithFormat:@"%@%@",
+        (deviceOSVersionLessThan(@"7.0") ? @"" : @" "), buttonTitle];
+    UIBarButtonItem *loginButton = [[UIBarButtonItem alloc]
+        initWithTitle:loginTitle style:UIBarButtonItemStylePlain
+        target:self action:@selector(loginButtonTapped:)];
+    [self.navigationItem setLeftBarButtonItem:loginButton animated:true];
+}
+
 /** @brief Sets contact in offline section */
 - (void)setContactOffline:(NSString *)username
 {
@@ -244,7 +256,14 @@
 #pragma mark - UI Event Handlers
 
 /** @brief Login button pressed */
-- (void)loginButtonTapped:(id)sender {
+- (void)loginButtonTapped:(id)sender
+{
+    // Log out if currently logged in
+    if ([[AppDelegate appDelegate] isConnected]) {
+        [[AppDelegate appDelegate] disconnect];
+    }
+
+    // Show login view
     [self showLoginView];
 }
 

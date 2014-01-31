@@ -67,6 +67,14 @@
 */
 - (void)applicationWillTerminate:(UIApplication *)application
 {
+    // Clear credentials
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    if (![defaults boolForKey:CACHE_KEY_LOGIN_PERSIST])
+    {
+        [defaults removeObjectForKey:CACHE_KEY_LOGIN_USERNAME];
+        [defaults removeObjectForKey:CACHE_KEY_LOGIN_PASSWORD];
+    }
+    [defaults synchronize];
 }
 
 /** @brief Returns a reference to app delegate */
@@ -103,7 +111,7 @@
     [self setupStream];
 
     // If already connected, return true
-    if (![self.xmppStream isDisconnected]) {
+    if ([self isConnected]) {
         return YES;
     }
 
@@ -136,6 +144,13 @@
     [self.xmppStream disconnect];
 }
 
+/** @brief Returns whether or not xmpp is connected */
+- (BOOL)isConnected
+{
+    // If stream is not disconnected, it is either establishing connection or connected
+    return ![self.xmppStream isDisconnected];
+}
+
 
 #pragma mark - XMPPStreamDelegate
 
@@ -144,8 +159,8 @@
     debugLog(@"xmppStreamDidConnect: %@", sender);
 
     NSError *error = nil;
-    if (![[self xmppStream] authenticateWithPassword:[[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_PASSWORD] error:&error])
-    {
+    NSString *password = [[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_PASSWORD];
+    if (![[self xmppStream] authenticateWithPassword:password error:&error]) {
         debugLog(@"ERROR: Could not authenticate! %@", error);
     }
 }

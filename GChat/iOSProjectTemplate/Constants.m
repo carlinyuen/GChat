@@ -15,6 +15,7 @@ float const SIZE_MIN_TOUCH = 44;
 NSString* const CACHE_KEY_USER_SETTINGS = @"cacheUserSettings";
 NSString* const CACHE_KEY_LOGIN_USERNAME = @"loginUsername";
 NSString* const CACHE_KEY_LOGIN_PASSWORD = @"loginPassword";
+NSString* const CACHE_KEY_LOGIN_PERSIST = @"loginPersist";
 
 // One-time flags
 NSString* const ONCE_KEY_APP_OPENED = @"onceAppOpened";

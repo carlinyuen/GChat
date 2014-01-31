@@ -8,6 +8,8 @@
 
 #import "GCLoginViewController.h"
 
+#import "AppDelegate.h"
+
     #define TEXT_CHECKBOX @"▢"
     #define TEXT_CHECKBOX_CHECKED @"\u2611"
 
@@ -93,21 +95,22 @@
 
 - (IBAction)loginButtonTapped:(UIButton *)sender
 {
-    // If persist, save credentials
+    // Save settings, will clear credentials later if not persisting
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    if (self.persistButton.selected)
-    {
-        [defaults setObject:self.usernameTextField.text forKey:CACHE_KEY_LOGIN_USERNAME];
-        [defaults setObject:self.passwordTextField.text forKey:CACHE_KEY_LOGIN_PASSWORD];
-    }
-    else    // Clear credentials
-    {
-        [defaults removeObjectForKey:CACHE_KEY_LOGIN_USERNAME];
-        [defaults removeObjectForKey:CACHE_KEY_LOGIN_PASSWORD];
-    }
+    [defaults setObject:self.usernameTextField.text
+        forKey:CACHE_KEY_LOGIN_USERNAME];
+    [defaults setObject:self.passwordTextField.text
+        forKey:CACHE_KEY_LOGIN_PASSWORD];
+    [defaults setBool:self.persistButton.selected
+        forKey:CACHE_KEY_LOGIN_PERSIST];
     [defaults synchronize];
 
-    [self dismissViewControllerAnimated:true completion:nil];
+    // Hide login
+    [self dismissViewControllerAnimated:true completion:^{
+        if ([[AppDelegate appDelegate] connect]) {
+            debugLog(@"Show Contact List");
+        }
+    }];
 }
 
 

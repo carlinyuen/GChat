@@ -29,4 +29,7 @@
     /** @brief Disconnect from xmpp service */
     - (void)disconnect;
 
+    /** @brief Returns whether or not xmpp is connected */
+    - (BOOL)isConnected;
+
 @end

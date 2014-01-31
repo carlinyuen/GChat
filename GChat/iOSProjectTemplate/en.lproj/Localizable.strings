@@ -11,6 +11,7 @@
 
 "APP_VIEW_TITLE" = "Contacts";
 "APP_NAVBAR_LOGIN_BUTTON_TITLE" = "Login";
+"APP_NAVBAR_LOGOUT_BUTTON_TITLE" = "Logout";
 
 
 // Login Screen
