@@ -212,6 +212,14 @@
 - (void)xmppStream:(XMPPStream *)sender didNotRegister:(NSXMLElement *)error
 {
     debugLog(@"XMPP REGISTER ERROR: %@", error);
+    
+    // Notify connection status change
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:NOTIFICATION_CONNECTION_CHANGED
+        object:self userInfo:@{
+            @"status": @"timeout",
+            @"timestamp": [NSDate date],
+        }];
 }
 
 - (void)xmppStreamDidConnect:(XMPPStream *)sender
@@ -269,6 +277,14 @@
 - (void)xmppStream:(XMPPStream *)sender didNotAuthenticate:(NSXMLElement *)error
 {
     debugLog(@"XMPP AUTHENTICATE ERROR: %@", error);
+
+    // Notify connection status change
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:NOTIFICATION_CONNECTION_CHANGED
+        object:self userInfo:@{
+            @"status": @"timeout",
+            @"timestamp": [NSDate date],
+        }];
 }
 
 - (void)xmppStream:(XMPPStream *)sender didReceiveError:(NSXMLElement *)error
