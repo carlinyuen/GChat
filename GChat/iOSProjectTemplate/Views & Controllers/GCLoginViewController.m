@@ -23,6 +23,8 @@
     @property (weak, nonatomic) IBOutlet UIButton *persistButton;
     @property (weak, nonatomic) IBOutlet UIButton *loginButton;
 
+    @property (strong, nonatomic) UIActivityIndicatorView *loadingIndicator;
+
     - (IBAction)persistButtonTapped:(UIButton *)sender;
     - (IBAction)loginButtonTapped:(UIButton *)sender;
 
@@ -49,13 +51,18 @@
 {
     [super viewDidLoad];
 
-    // Initial setup
+    // Initial setup of fields & buttons
     self.titleLabel.text = NSLocalizedString(@"LOGIN_VIEW_TITLE", nil);
     self.titleLabel.font = [UIFont fontWithName:(deviceOSVersionLessThan(@"7.0")
         ? FONT_NAME_THINNEST : FONT_NAME_THIN) size:FONT_SIZE_TITLE];
     self.usernameTextField.placeholder = NSLocalizedString(@"LOGIN_USERNAME_FIELD_PLACEHOLDER", nil);
     self.passwordTextField.placeholder = NSLocalizedString(@"LOGIN_PASSWORD_FIELD_PLACEHOLDER", nil);
     [self.loginButton setTitle:NSLocalizedString(@"LOGIN_SIGNIN_BUTTON_TITLE", nil) forState:UIControlStateNormal];
+
+    // Loading indicator
+    self.loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    self.loadingIndicator.color = UIColorFromHex(COLOR_HEX_APPLE_BUTTON_BLUE);
+    self.loadingIndicator.center = self.view.center;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -115,6 +122,24 @@
     return errors;
 }
 
+- (void)showLoadingIndicator:(BOOL)show
+{
+    if (show) {
+        [self.view addSubview:self.loadingIndicator];
+        [self.loadingIndicator startAnimating];
+    }
+    [UIView animateWithDuration:ANIMATION_DURATION_FAST delay:0
+        options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut
+        animations:^{
+            self.loadingIndicator.alpha = (show ? 1 : 0);
+        } completion:^(BOOL finished) {
+            if (!show) {
+                [self.loadingIndicator stopAnimating];
+                [self.loadingIndicator removeFromSuperview];
+            }
+        }];
+}
+
 
 #pragma mark - Event Handlers
 
@@ -148,6 +173,8 @@
     // If connected, dismiss login screen
     if ([notification.userInfo[@"status"] isEqualToString:@"connected"])
     {
+        [self showLoadingIndicator:false];
+
         // Save settings, will clear credentials later if not persisting
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         [defaults setObject:self.usernameTextField.text
@@ -165,11 +192,19 @@
     // If connection times out
     else if ([notification.userInfo[@"status"] isEqualToString:@"timeout"])
     {
+        [self showLoadingIndicator:false];
+
         [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"POPUP_ERROR_TITLE", nil)
             message:NSLocalizedString(@"ERROR_CONNECTION_TIMEOUT", nil)
             delegate:nil
             cancelButtonTitle:NSLocalizedString(@"POPUP_CONFIRM_BUTTON_TITLE", nil)
             otherButtonTitles:nil] show];
+    }
+
+    // If connecting, show spinner
+    else if ([notification.userInfo[@"status"] isEqualToString:@"connecting"])
+    {
+        [self showLoadingIndicator:true];
     }
 }
 

@@ -159,6 +159,14 @@
     if (!username || !password) {
         return NO;
     }
+    
+    // Notify connection status change
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:NOTIFICATION_CONNECTION_CHANGED
+        object:self userInfo:@{
+            @"status": @"connecting",
+            @"timestamp": [NSDate date],
+        }];
 
     // Set username and try to connect
     [self.xmppStream setMyJID:[XMPPJID jidWithString:username]];
@@ -215,20 +223,20 @@
         [self.connectTimeoutTimer invalidate];
     }
 
+    // Notify connection status change
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName:NOTIFICATION_CONNECTION_CHANGED
+        object:self userInfo:@{
+            @"status": @"authenticating",
+            @"timestamp": [NSDate date],
+        }];
+
     // Try to authenticate
     NSError *error = nil;
     NSString *password = [[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_PASSWORD];
     if (![[self xmppStream] authenticateWithPassword:password error:&error]) {
         debugLog(@"ERROR: Could not authenticate! %@", error);
     }
-
-    // Notify connection status change
-    [[NSNotificationCenter defaultCenter]
-        postNotificationName:NOTIFICATION_CONNECTION_CHANGED
-        object:self userInfo:@{
-            @"status": @"connecting",
-            @"timestamp": [NSDate date],
-        }];
 }
 
 - (void)xmppStreamConnectDidTimeout:(XMPPStream *)sender
