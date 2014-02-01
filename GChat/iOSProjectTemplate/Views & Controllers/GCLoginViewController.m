@@ -60,9 +60,9 @@
     [self.loginButton setTitle:NSLocalizedString(@"LOGIN_SIGNIN_BUTTON_TITLE", nil) forState:UIControlStateNormal];
 
     // Loading indicator
-    self.loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    self.loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     self.loadingIndicator.color = UIColorFromHex(COLOR_HEX_APPLE_BUTTON_BLUE);
-    self.loadingIndicator.center = self.view.center;
+    self.loadingIndicator.frame = self.loginButton.frame;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -132,6 +132,7 @@
         options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut
         animations:^{
             self.loadingIndicator.alpha = (show ? 1 : 0);
+            self.loginButton.alpha = (show ? 0 : 1);
         } completion:^(BOOL finished) {
             if (!show) {
                 [self.loadingIndicator stopAnimating];
