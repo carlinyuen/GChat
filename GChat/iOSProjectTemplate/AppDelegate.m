@@ -25,6 +25,8 @@
 
     @property (strong, nonatomic) NSTimer *connectTimeoutTimer;
 
+    @property (copy, nonatomic) NSString *tempPassword;
+
 @end
 
 @implementation AppDelegate
@@ -114,11 +116,27 @@
     if (!self.xmppStream)
     {
         self.xmppStream = [XMPPStream new];
+//        [self.xmppStream setHostName:GCHAT_DOMAIN];
+//        [self.xmppStream setHostPort:GCHAT_PORT];
         [self.xmppStream addDelegate:self delegateQueue:dispatch_get_main_queue()];
 
         // Modules
+        // Reconnect Automatically
         self.xmppReconnect = [XMPPReconnect new];
         [self.xmppReconnect activate:self.xmppStream];
+
+        // Roster Setup
+//        self.rosterStorage = [XMPPRosterMemoryStorage new];
+//        self.roster = [[XMPPRoster alloc] initWithRosterStorage:self.rosterStorage];
+//        [self.roster addDelegate:self.viewController delegateQueue:dispatch_get_main_queue()];
+//        [self.roster activate:[[AppDelegate appDelegate] xmppStream]];
+
+        // vCard
+//        self.avatarStorage = [[XMPPvCardCoreDataStorage alloc] initWithInMemoryStore];
+//        self.avatarTemp = [[XMPPvCardTempModule alloc] initWithvCardStorage:self.avatarStorage];
+//        self.avatarCards = [[XMPPvCardAvatarModule alloc] initWithvCardTempModule:self.avatarTemp];
+//        [self.avatarCards activate:[[AppDelegate appDelegate] xmppStream]];
+
     }
 }
 
@@ -148,15 +166,15 @@
         return YES;
     }
 
-    // If invalid credentials, return false
+    // Get username to use for authentication
     if (!username) {
         username = [[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_USERNAME];
     }
-    if (!password) {
-        password = [[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_PASSWORD];
-    }
-    debugLog(@"Credentials: %@ / %@", username, password);
-    if (!username || !password) {
+    self.tempPassword = (password ? password    // Store in temp variable
+        : [[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_PASSWORD]);
+
+    // If invalid credentials, return false
+    if (!username || !self.tempPassword) {
         return NO;
     }
     
@@ -241,8 +259,7 @@
 
     // Try to authenticate
     NSError *error = nil;
-    NSString *password = [[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_PASSWORD];
-    if (![[self xmppStream] authenticateWithPassword:password error:&error]) {
+    if (![[self xmppStream] authenticateWithPassword:self.tempPassword error:&error]) {
         debugLog(@"ERROR: Could not authenticate! %@", error);
     }
 }
@@ -262,6 +279,9 @@
 
 - (void)xmppStreamDidAuthenticate:(XMPPStream *)sender
 {
+    // Clear temp password
+    self.tempPassword = nil;
+
     // Authenticated, notify
     [[NSNotificationCenter defaultCenter]
         postNotificationName:NOTIFICATION_CONNECTION_CHANGED
@@ -277,6 +297,9 @@
 - (void)xmppStream:(XMPPStream *)sender didNotAuthenticate:(NSXMLElement *)error
 {
     debugLog(@"XMPP AUTHENTICATE ERROR: %@", error);
+
+    // Clear temp password
+    self.tempPassword = nil;
 
     // Notify connection status change
     [[NSNotificationCenter defaultCenter]

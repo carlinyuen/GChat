@@ -182,6 +182,7 @@
             forKey:CACHE_KEY_LOGIN_USERNAME];
         [defaults setObject:self.passwordTextField.text
             forKey:CACHE_KEY_LOGIN_PASSWORD];
+        debugLog(@"Saved password: %@", self.passwordTextField.text);
         [defaults setBool:self.persistButton.selected
             forKey:CACHE_KEY_LOGIN_PERSIST];
         [defaults synchronize];

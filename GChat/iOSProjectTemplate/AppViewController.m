@@ -36,8 +36,6 @@
 
     /** Storage for contact list */
     @property (strong, nonatomic) NSMutableArray *contactList;
-    @property (strong, nonatomic) XMPPRoster *roster;
-    @property (strong, nonatomic) XMPPRosterMemoryStorage *rosterStorage;
 
 @end
 
@@ -53,12 +51,6 @@
     if (self)
     {
 		self.title = NSLocalizedString(@"APP_VIEW_TITLE", nil);
-
-        // Roster Setup
-        _rosterStorage = [XMPPRosterMemoryStorage new];
-        _roster = [[XMPPRoster alloc] initWithRosterStorage:_rosterStorage];
-        [_roster addDelegate:self delegateQueue:dispatch_get_main_queue()];
-        [_roster activate:[[AppDelegate appDelegate] xmppStream]];
 
         // Contact list
         _contactList = [NSMutableArray new];
@@ -108,9 +100,7 @@
     debugLog(@"viewDidAppear");
 
     // Try to connect, if fails, show login
-    if ([[AppDelegate appDelegate] connectWithUsername:nil andPassword:nil]) {
-        [self.roster fetchRoster];  // Get latest roster
-    } else {    // Ask for login credentials
+    if (![[AppDelegate appDelegate] connectWithUsername:nil andPassword:nil]) {
         [self showLoginView];
     }
 }
@@ -255,7 +245,11 @@
     [self.contactList[ContactListSectionsOnline] removeObject:username];
 
     // Add to offline
-    [self.contactList[ContactListSectionsOffline] addObject:username];
+    NSArray *offlineContacts = self.contactList[ContactListSectionsOffline];
+    [self.contactList[ContactListSectionsOffline] insertObject:username
+        atIndex:[offlineContacts indexOfObject:username inSortedRange:NSMakeRange(0, offlineContacts.count) options:NSBinarySearchingInsertionIndex usingComparator:^NSComparisonResult(id obj1, id obj2) {
+                return [obj1 compare:obj2];
+            }]];
 
     // Update tableview
     [self.tableView reloadData];
@@ -273,8 +267,13 @@
     [self.contactList[ContactListSectionsOffline] removeObject:username];
 
     // Add to online
-    [self.contactList[ContactListSectionsOnline] addObject:username];
-   
+    NSArray *onlineContacts = self.contactList[ContactListSectionsOnline];
+    [self.contactList[ContactListSectionsOnline] insertObject:username
+        atIndex:[onlineContacts indexOfObject:username inSortedRange:NSMakeRange(0, onlineContacts.count) options:NSBinarySearchingInsertionIndex usingComparator:^NSComparisonResult(id obj1, id obj2) {
+                return [obj1 compare:obj2];
+            }]];
+
+
     // Update tableview
     [self.tableView reloadData];
 }
@@ -330,11 +329,6 @@
 - (void)pulledToRefresh:(id)sender
 {
     debugLog(@"pulledToRefresh");
-
-    debugLog(@"%@", [self.rosterStorage sortedAvailableUsersByName]);
-
-    // Get new list of roster users
-    [self.roster fetchRoster];
 }
 
 
@@ -350,10 +344,7 @@
     switch (section)
     {
         case ContactListSectionsOnline:
-//            return [[self.rosterStorage sortedAvailableUsersByName] count];
-
         case ContactListSectionsOffline:
-//            return [[self.rosterStorage sortedUnavailableUsersByName] count];
             return [self.contactList[section] count];
 
         default:
@@ -369,11 +360,7 @@
     switch (indexPath.section)
     {
         case ContactListSectionsOnline:
-//            username = [self.rosterStorage sortedAvailableUsersByName][indexPath.row];
-//            break;
-
         case ContactListSectionsOffline:
-//            username = [self.rosterStorage sortedUnavailableUsersByName][indexPath.row];
             username = self.contactList[indexPath.section][indexPath.row];
             break;
 
@@ -384,6 +371,20 @@
     return cell;
 }
 
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    switch (section)
+    {
+        case ContactListSectionsOnline:
+            return NSLocalizedString(@"APP_CONTACTS_ONLINE_SECTION_TITLE", nil);
+
+        case ContactListSectionsOffline:
+            return NSLocalizedString(@"APP_CONTACTS_OFFLINE_SECTION_TITLE", nil);
+
+        default: return @"";
+    }
+}
+
 
 #pragma mark - UITableViewDelegate
 
@@ -392,16 +393,11 @@
     // Animated deselect fade
     [tableView deselectRowAtIndexPath:indexPath animated:true];
 
-//    XMPPUserMemoryStorageObject *user;
     NSString *username;
     switch (indexPath.section)
     {
         case ContactListSectionsOnline:
-//            user = [self.rosterStorage sortedAvailableUsersByName][indexPath.row];
-//            break;
-
         case ContactListSectionsOffline:
-//            user = [self.rosterStorage sortedUnavailableUsersByName][indexPath.row];
             username = self.contactList[indexPath.section][indexPath.row];
             break;
 
@@ -410,7 +406,6 @@
 
     // Show chat view
     [self showChatView:@{
-//        @"username":[user displayName]
         @"username":username
     }];
 }
@@ -418,17 +413,19 @@
 
 #pragma mark - XMPPRosterDelegate
 
-- (void)xmppRosterDidBeginPopulating:(XMPPRoster *)sender
-{
-    debugLog(@"roster began populating");
-}
-
-- (void)xmppRosterDidEndPopulating:(XMPPRoster *)sender
-{
-    debugLog(@"roster ended populating");
-
-    [self.pullToRefresh endRefreshing];
-}
+//- (void)xmppRosterDidBeginPopulating:(XMPPRoster *)sender
+//{
+//    debugLog(@"roster began populating");
+//}
+//
+//- (void)xmppRosterDidEndPopulating:(XMPPRoster *)sender
+//{
+//    debugLog(@"roster ended populating");
+//
+//    [self.pullToRefresh endRefreshing];
+//
+//    [self.tableView reloadData];
+//}
 
 
 @end

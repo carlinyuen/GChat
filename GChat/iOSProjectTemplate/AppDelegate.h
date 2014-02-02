@@ -19,6 +19,11 @@
 	@property (strong, nonatomic) AppViewController *viewController;
 
     @property (strong, nonatomic, readonly) XMPPStream *xmppStream;
+    @property (strong, nonatomic) XMPPRoster *roster;
+    @property (strong, nonatomic) XMPPRosterMemoryStorage *rosterStorage;
+    @property (strong, nonatomic) XMPPvCardCoreDataStorage *avatarStorage;
+    @property (strong, nonatomic) XMPPvCardTempModule *avatarTemp;
+    @property (strong, nonatomic) XMPPvCardAvatarModule *avatarCards;
 
     /** @brief Returns a reference to app delegate */
     + (AppDelegate *)appDelegate;
