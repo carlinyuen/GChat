@@ -71,11 +71,12 @@
     [super viewWillAppear:animated];
    
     // Refresh persist button
-    self.persistButton.selected = !![[NSUserDefaults standardUserDefaults]
-        objectForKey:CACHE_KEY_LOGIN_USERNAME];
+    self.persistButton.selected = [[NSUserDefaults standardUserDefaults]
+        boolForKey:CACHE_KEY_LOGIN_PERSIST];
     [self refreshPersistButton];
 
-    // Focus on username field
+    // Put last login in and focus on username field
+    self.usernameTextField.text = [[NSUserDefaults standardUserDefaults] objectForKey:CACHE_KEY_LOGIN_USERNAME];
     [self.usernameTextField becomeFirstResponder];
 }
 
@@ -179,14 +180,19 @@
     {
         [self showLoadingIndicator:false];
 
-        // Save settings, will clear credentials later if not persisting
+        // Save login settings
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         [defaults setObject:self.usernameTextField.text
             forKey:CACHE_KEY_LOGIN_USERNAME];
-        [defaults setObject:self.passwordTextField.text
-            forKey:CACHE_KEY_LOGIN_PASSWORD];
-        [defaults setBool:self.persistButton.selected
-            forKey:CACHE_KEY_LOGIN_PERSIST];
+
+        // Save password if persisting
+        if (self.persistButton.selected)
+        {
+            [defaults setObject:self.passwordTextField.text
+                forKey:CACHE_KEY_LOGIN_PASSWORD];
+            [defaults setBool:self.persistButton.selected
+                forKey:CACHE_KEY_LOGIN_PERSIST];
+        }
         [defaults synchronize];
 
         // Dismiss

@@ -69,7 +69,7 @@
 */
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
-    [self connectWithUsername:nil andPassword:nil];
+    [self.viewController viewDidAppear:true];
 }
 
 /** @brief Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
@@ -102,9 +102,7 @@
     debugLog(@"clearCredentials");
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults removeObjectForKey:CACHE_KEY_LOGIN_USERNAME];
     [defaults removeObjectForKey:CACHE_KEY_LOGIN_PASSWORD];
-    [defaults removeObjectForKey:CACHE_KEY_LOGIN_PERSIST];
     [defaults synchronize];
 }
 
