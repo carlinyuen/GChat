@@ -171,8 +171,10 @@
 /** @brief When connection status to xmpp service changes */
 - (void)connectionStatusChanged:(NSNotification *)notification
 {
+    NSString *status = notification.userInfo[XMPP_STATUS];
+
     // If connected, dismiss login screen
-    if ([notification.userInfo[@"status"] isEqualToString:@"connected"])
+    if ([status isEqualToString:XMPP_CONNECTION_AUTH])
     {
         [self showLoadingIndicator:false];
 
@@ -182,7 +184,6 @@
             forKey:CACHE_KEY_LOGIN_USERNAME];
         [defaults setObject:self.passwordTextField.text
             forKey:CACHE_KEY_LOGIN_PASSWORD];
-        debugLog(@"Saved password: %@", self.passwordTextField.text);
         [defaults setBool:self.persistButton.selected
             forKey:CACHE_KEY_LOGIN_PERSIST];
         [defaults synchronize];
@@ -192,7 +193,7 @@
     }
 
     // If connection times out
-    else if ([notification.userInfo[@"status"] isEqualToString:@"timeout"])
+    else if ([status isEqualToString:XMPP_CONNECTION_ERROR_TIMEOUT])
     {
         [self showLoadingIndicator:false];
 
@@ -203,8 +204,20 @@
             otherButtonTitles:nil] show];
     }
 
+    // If authentication error
+    else if ([status isEqualToString:XMPP_CONNECTION_ERROR_AUTH])
+    {
+        [self showLoadingIndicator:false];
+
+        [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"POPUP_ERROR_TITLE", nil)
+            message:NSLocalizedString(@"ERROR_CONNECTION_AUTH", nil)
+            delegate:nil
+            cancelButtonTitle:NSLocalizedString(@"POPUP_CONFIRM_BUTTON_TITLE", nil)
+            otherButtonTitles:nil] show];
+    }
+
     // If connecting, show spinner
-    else if ([notification.userInfo[@"status"] isEqualToString:@"connecting"])
+    else if ([status isEqualToString:XMPP_CONNECTION_CONNECTING])
     {
         [self showLoadingIndicator:true];
     }
