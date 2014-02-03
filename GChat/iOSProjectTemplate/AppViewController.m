@@ -130,6 +130,9 @@
 	[super viewWillAppear:animated];
 
     debugLog(@"viewDidAppear");
+
+    // Setup pull to refresh when UITableView insets are set
+    [self setupPullToRefresh];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -207,15 +210,19 @@
 /** @brief Setup tableview */
 - (void)setupTableView
 {
-    // Pull to refresh
-    self.pullToRefresh = [[CustomPullToRefreshControl alloc] initInScrollView:self.tableView];
-    self.pullToRefresh.scrollUpToCancel = true;
-    [self.pullToRefresh addTarget:self action:@selector(pulledToRefresh:) forControlEvents:UIControlEventValueChanged];
-
     // TableView
     self.tableView.alpha = 0;
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
     self.tableView.separatorColor = UIColorFromHex(COLOR_HEX_WHITE_TRANSPARENT);
+}
+
+/** @brief Setup pull to refresh */
+- (void)setupPullToRefresh
+{
+    // NOTE: this needs to happen when insets are already set on UITableView
+    self.pullToRefresh = [[CustomPullToRefreshControl alloc] initInScrollView:self.tableView];
+    self.pullToRefresh.scrollUpToCancel = true;
+    [self.pullToRefresh addTarget:self action:@selector(pulledToRefresh:) forControlEvents:UIControlEventValueChanged];
 }
 
 
