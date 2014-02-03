@@ -55,6 +55,7 @@ extern int const COLOR_HEX_SHOW_ONLINE;
 extern int const COLOR_HEX_SHOW_BUSY;
 extern int const COLOR_HEX_SHOW_OFFLINE;
 extern int const COLOR_HEX_BLACK_TRANSPARENT;
+extern int const COLOR_HEX_WHITE_TRANSPARENT;
 
 // Animations
 extern float const ANIMATION_DURATION_FAST;

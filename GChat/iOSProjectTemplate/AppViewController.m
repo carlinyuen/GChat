@@ -212,7 +212,10 @@
     self.pullToRefresh.scrollUpToCancel = true;
     [self.pullToRefresh addTarget:self action:@selector(pulledToRefresh:) forControlEvents:UIControlEventValueChanged];
 
+    // TableView
     self.tableView.alpha = 0;
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+    self.tableView.separatorColor = UIColorFromHex(COLOR_HEX_WHITE_TRANSPARENT);
 }
 
 
@@ -537,6 +540,18 @@
 
         default: return @"";
     }
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    // If has status, add extra space
+    XMPPUserMemoryStorageObject *user = self.contactList[indexPath.section][indexPath.row];
+    NSString *status = [[[user primaryResource] presence] status];
+    if (status && status.length) {
+        return SIZE_MIN_TOUCH * 1.5;
+    }
+
+    return SIZE_MIN_TOUCH;
 }
 
 
