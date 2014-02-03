@@ -77,8 +77,17 @@
                 </label>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <gestureRecognizers/>
             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
+            <connections>
+                <outletCollection property="gestureRecognizers" destination="FKi-qW-ZB8" appends="YES" id="iTV-mK-KNm"/>
+            </connections>
         </view>
+        <tapGestureRecognizer id="FKi-qW-ZB8">
+            <connections>
+                <action selector="viewTapped:" destination="-1" id="G0r-ec-KN9"/>
+            </connections>
+        </tapGestureRecognizer>
     </objects>
 </document>

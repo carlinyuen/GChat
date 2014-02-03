@@ -27,6 +27,7 @@
 
     - (IBAction)persistButtonTapped:(UIButton *)sender;
     - (IBAction)loginButtonTapped:(UIButton *)sender;
+    - (IBAction)viewTapped:(UITapGestureRecognizer *)sender;
 
 @end
 
@@ -221,6 +222,12 @@
     {
         [self showLoadingIndicator:true];
     }
+}
+
+/** @brief View tapped */
+- (IBAction)viewTapped:(UITapGestureRecognizer *)gesture
+{
+    [self.view endEditing:true];
 }
 
 
