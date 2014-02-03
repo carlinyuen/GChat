@@ -208,6 +208,7 @@
         NSLocalizedString(@"APP_VIEW_TITLE_SORT_NAME", nil)]
         forState:UIControlStateNormal];
     [self.titleButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
+    [self.titleButton setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
     self.titleButton.titleLabel.font = (deviceOSVersionLessThan(iOS7))
         ? [UIFont fontWithName:FONT_NAME_LIGHT size:FONT_SIZE_NAVBAR]
         : [UIFont fontWithName:FONT_NAME_THIN size:FONT_SIZE_NAVBAR];
@@ -496,6 +497,7 @@
 /** @brief When title button is tapped to change sorting */
 - (void)titleTapped:(UIButton *)sender
 {
+    debugLog(@"titleTapped");
 }
 
 
