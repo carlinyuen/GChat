@@ -182,7 +182,7 @@
     [[NSNotificationCenter defaultCenter]
         postNotificationName:NOTIFICATION_CONNECTION_CHANGED
         object:self userInfo:@{
-            XMPP_STATUS: @"connecting",
+            XMPP_STATUS: XMPP_CONNECTION_CONNECTING,
             XMPP_TIMESTAMP: [NSDate date],
         }];
 
@@ -235,7 +235,7 @@
     [[NSNotificationCenter defaultCenter]
         postNotificationName:NOTIFICATION_CONNECTION_CHANGED
         object:self userInfo:@{
-            XMPP_STATUS: @"timeout",
+            XMPP_STATUS: XMPP_CONNECTION_ERROR_REGISTER,
             XMPP_TIMESTAMP: [NSDate date],
         }];
 }
@@ -253,7 +253,7 @@
     [[NSNotificationCenter defaultCenter]
         postNotificationName:NOTIFICATION_CONNECTION_CHANGED
         object:self userInfo:@{
-            XMPP_STATUS: @"authenticating",
+            XMPP_STATUS: XMPP_CONNECTION_AUTH,
             XMPP_TIMESTAMP: [NSDate date],
         }];
 
@@ -272,7 +272,7 @@
     [[NSNotificationCenter defaultCenter]
         postNotificationName:NOTIFICATION_CONNECTION_CHANGED
         object:self userInfo:@{
-            XMPP_STATUS: @"timeout",
+            XMPP_STATUS: XMPP_CONNECTION_ERROR_TIMEOUT,
             XMPP_TIMESTAMP: [NSDate date],
         }];
 }
@@ -286,7 +286,7 @@
     [[NSNotificationCenter defaultCenter]
         postNotificationName:NOTIFICATION_CONNECTION_CHANGED
         object:self userInfo:@{
-            XMPP_STATUS: @"connected",
+            XMPP_STATUS: XMPP_CONNECTION_OK,
             XMPP_TIMESTAMP: [NSDate date],
         }];
 
@@ -305,7 +305,7 @@
     [[NSNotificationCenter defaultCenter]
         postNotificationName:NOTIFICATION_CONNECTION_CHANGED
         object:self userInfo:@{
-            XMPP_STATUS: @"timeout",
+            XMPP_STATUS: XMPP_CONNECTION_ERROR_AUTH,
             XMPP_TIMESTAMP: [NSDate date],
         }];
 }
@@ -318,9 +318,6 @@
 - (void)xmppStream:(XMPPStream *)sender didReceivePresence:(XMPPPresence *)presence
 {
     NSString *user = [[presence from] user];
-    debugLog(@"presence: %@, %@, %@, %@, %@, %@, %@",
-        [presence type], [presence show], [presence status], user, [[presence from] domain], [NSString stringWithFormat:@"intShow: %i", [presence intShow]],
-            [NSString stringWithFormat:@"priority: %i", [presence priority]]);
     if (![user isEqualToString:[[sender myJID] user]])
     {
         [[NSNotificationCenter defaultCenter]

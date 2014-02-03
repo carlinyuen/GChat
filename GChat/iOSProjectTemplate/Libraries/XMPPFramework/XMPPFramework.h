@@ -27,6 +27,14 @@
     #define XMPP_TIMESTAMP @"timestamp"
     #define XMPP_STATUS @"status"
 
+    #define XMPP_CONNECTION_OK @"ok"
+    #define XMPP_CONNECTION_CONNECTING @"connect"
+    #define XMPP_CONNECTION_AUTH @"auth"
+    #define XMPP_CONNECTION_ERROR_AUTH @"unauth"
+    #define XMPP_CONNECTION_ERROR_TIMEOUT @"timeout"
+    #define XMPP_CONNECTION_ERROR_REGISTER @"unregistered"
+    #define XMPP_CONNECTION_ERROR @"error"
+
     #define XMPP_PRESENCE_TYPE @"type"
     #define XMPP_PRESENCE_TYPE_OFFLINE @"unavailable"
     #define XMPP_PRESENCE_TYPE_ONLINE @"available"

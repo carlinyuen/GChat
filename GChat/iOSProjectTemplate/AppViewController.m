@@ -393,11 +393,15 @@
 /** @brief When connection status to xmpp service changes */
 - (void)connectionStatusChanged:(NSNotification *)notification
 {
-    // Refresh login button
-    [self refreshLoginButton];
+    // If connected
+    if ([notification.userInfo[XMPP_STATUS] isEqualToString:XMPP_CONNECTION_OK])
+    {
+        // Refresh login button
+        [self refreshLoginButton];
 
-    // Manual pull to refresh
-    [self manualPullToRefresh];
+        // Manual pull to refresh
+        [self manualPullToRefresh];
+    }
 }
 
 /** @brief When tableview is pulled to refresh */
