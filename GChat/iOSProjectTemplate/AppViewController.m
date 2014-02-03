@@ -142,25 +142,6 @@
     if (![[AppDelegate appDelegate] connectWithUsername:nil andPassword:nil]) {
         [self showLoginView];
     }
-    else    // Refresh
-    {
-        // Show animation
-        [self.pullToRefresh beginRefreshing];
-        [UIView animateWithDuration:ANIMATION_DURATION_FAST delay:0
-            options:UIViewAnimationOptionCurveEaseInOut
-                | UIViewAnimationOptionBeginFromCurrentState
-            animations:^{
-                [self.tableView setContentOffset:CGPointMake(0, SIZE_PULLREFRESH_PULLOVER)];
-            } completion:^(BOOL finished) {
-                [UIView animateWithDuration:ANIMATION_DURATION_FAST delay: 0
-                    options:UIViewAnimationOptionCurveEaseOut
-                        | UIViewAnimationOptionBeginFromCurrentState
-                    animations:^{
-                        [self.tableView setContentOffset:CGPointMake(0, SIZE_PULLREFRESH_HEIGHT)];
-                    } completion:nil];
-            }];
-        [NSTimer scheduledTimerWithTimeInterval:TIME_REFRESH target:self selector:@selector(refreshTableView:) userInfo:nil repeats:false];
-    }
 }
 
 /** @brief Dispose of any resources that can be recreated. */
@@ -324,6 +305,27 @@
     [self.tableView reloadData];
 }
 
+/** @brief Manually initiate pull to refresh */
+- (void)manualPullToRefresh
+{
+    // Animate pull-down
+    [self.pullToRefresh beginRefreshing];
+    [UIView animateWithDuration:ANIMATION_DURATION_FAST delay:0
+        options:UIViewAnimationOptionCurveEaseInOut
+            | UIViewAnimationOptionBeginFromCurrentState
+        animations:^{
+            [self.tableView setContentOffset:CGPointMake(0, SIZE_PULLREFRESH_PULLOVER)];
+        } completion:^(BOOL finished) {
+            [UIView animateWithDuration:ANIMATION_DURATION_FAST delay: 0
+                options:UIViewAnimationOptionCurveEaseOut
+                    | UIViewAnimationOptionBeginFromCurrentState
+                animations:^{
+                    [self.tableView setContentOffset:CGPointMake(0, SIZE_PULLREFRESH_HEIGHT)];
+                } completion:nil];
+        }];
+    [NSTimer scheduledTimerWithTimeInterval:TIME_REFRESH target:self selector:@selector(refreshTableView:) userInfo:nil repeats:false];
+}
+
 /** @brief Refreshes tableview and roster data */
 - (void)refreshTableView:(id)sender
 {
@@ -393,6 +395,9 @@
 {
     // Refresh login button
     [self refreshLoginButton];
+
+    // Manual pull to refresh
+    [self manualPullToRefresh];
 }
 
 /** @brief When tableview is pulled to refresh */
