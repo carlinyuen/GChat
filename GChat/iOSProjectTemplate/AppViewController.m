@@ -22,6 +22,9 @@
 
     #define TIME_REFRESH 2  // 2 seconds
 
+    #define SIZE_PULLREFRESH_PULLOVER -64
+    #define SIZE_PULLREFRESH_HEIGHT -54
+
     typedef enum {
         ContactListSectionsOnline,
         ContactListSectionsOffline,
@@ -127,9 +130,6 @@
 	[super viewWillAppear:animated];
 
     debugLog(@"viewDidAppear");
-
-    // Refresh roster
-    [self refreshTableView:self];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -141,6 +141,25 @@
     // Try to connect, if fails, show login
     if (![[AppDelegate appDelegate] connectWithUsername:nil andPassword:nil]) {
         [self showLoginView];
+    }
+    else    // Refresh
+    {
+        // Show animation
+        [self.pullToRefresh beginRefreshing];
+        [UIView animateWithDuration:ANIMATION_DURATION_FAST delay:0
+            options:UIViewAnimationOptionCurveEaseInOut
+                | UIViewAnimationOptionBeginFromCurrentState
+            animations:^{
+                [self.tableView setContentOffset:CGPointMake(0, SIZE_PULLREFRESH_PULLOVER)];
+            } completion:^(BOOL finished) {
+                [UIView animateWithDuration:ANIMATION_DURATION_FAST delay: 0
+                    options:UIViewAnimationOptionCurveEaseOut
+                        | UIViewAnimationOptionBeginFromCurrentState
+                    animations:^{
+                        [self.tableView setContentOffset:CGPointMake(0, SIZE_PULLREFRESH_HEIGHT)];
+                    } completion:nil];
+            }];
+        [NSTimer scheduledTimerWithTimeInterval:TIME_REFRESH target:self selector:@selector(refreshTableView:) userInfo:nil repeats:false];
     }
 }
 
@@ -505,9 +524,6 @@
 {
     debugLog(@"roster ended populating");
     debugLog(@"roster: %@", [[[AppDelegate appDelegate] rosterStorage] sortedUsersByName]);
-
-    // Refresh
-    [self refreshTableView:sender];
 }
 
 - (void)xmppRoster:(XMPPRoster *)sender didReceivePresenceSubscriptionRequest:(XMPPPresence *)presence
