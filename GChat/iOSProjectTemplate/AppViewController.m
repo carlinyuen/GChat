@@ -592,6 +592,12 @@
     [self showChatView:user];
 }
 
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    // Set this so when animating selection, will not fade to white
+    cell.backgroundColor = cell.contentView.backgroundColor;
+}
+
 
 #pragma mark - XMPPRosterDelegate
 
