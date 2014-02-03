@@ -321,18 +321,19 @@
 - (void)manualPullToRefresh
 {
     // Animate pull-down
+    CGFloat originalTopInset = self.tableView.contentInset.top;
     [self.pullToRefresh beginRefreshing];
     [UIView animateWithDuration:ANIMATION_DURATION_FAST delay:0
         options:UIViewAnimationOptionCurveEaseInOut
             | UIViewAnimationOptionBeginFromCurrentState
         animations:^{
-            [self.tableView setContentOffset:CGPointMake(0, SIZE_PULLREFRESH_PULLOVER)];
+            [self.tableView setContentOffset:CGPointMake(0, SIZE_PULLREFRESH_PULLOVER - originalTopInset)];
         } completion:^(BOOL finished) {
             [UIView animateWithDuration:ANIMATION_DURATION_FAST delay: 0
                 options:UIViewAnimationOptionCurveEaseOut
                     | UIViewAnimationOptionBeginFromCurrentState
                 animations:^{
-                    [self.tableView setContentOffset:CGPointMake(0, SIZE_PULLREFRESH_HEIGHT)];
+                    [self.tableView setContentOffset:CGPointMake(0, SIZE_PULLREFRESH_HEIGHT - originalTopInset)];
                 } completion:nil];
         }];
     [NSTimer scheduledTimerWithTimeInterval:TIME_REFRESH target:self selector:@selector(refreshTableView:) userInfo:nil repeats:false];
