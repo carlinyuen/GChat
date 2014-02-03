@@ -18,11 +18,22 @@
 
     #define KEY_CELL_ID @"ContactCell"
 
+    #define XMPP_PRESENCE_SHOW_COMPARE_AWAY @"eway"
+
     typedef enum {
         ContactListSectionsOnline,
         ContactListSectionsOffline,
-        ContactListSectionsCount
+        ContactListSectionsCount,
     } ContactListSections;
+
+    // http://xmpp.org/rfcs/rfc3921.html
+    typedef enum {
+        ContactListStatusOrderChat,
+        ContactListStatusOrderDoNotDisturb,
+        ContactListStatusOrderAway,
+        ContactListStatusOrderExtendedAway,
+        ContactListStatusOrderCount,
+    } ContactListStatusOrder;
 
 @interface AppViewController () <
     UITableViewDataSource
@@ -36,6 +47,7 @@
 
     /** Storage for contact list */
     @property (strong, nonatomic) NSMutableArray *contactList;
+    @property (copy, nonatomic) NSComparisonResult(^contactComparisonBlock)(id obj1, id obj2);
 
 @end
 
@@ -57,6 +69,28 @@
         for (int i = 0; i < ContactListSectionsCount; ++i) {
             [_contactList addObject:[NSMutableArray new]];
         }
+
+        // Status order comparison
+        _contactComparisonBlock = ^NSComparisonResult(id obj1, id obj2)
+        {
+            NSDictionary *d1 = (NSDictionary *)obj1;
+            NSDictionary *d2 = (NSDictionary *)obj2;
+            NSString *s1 = d1[XMPP_PRESENCE_SHOW];
+            NSString *s2 = d2[XMPP_PRESENCE_SHOW];
+
+            // Adjust for away, set it to something between dnd and xa
+            if ([s1 isEqualToString:XMPP_PRESENCE_SHOW_AWAY]) {
+                s1 = XMPP_PRESENCE_SHOW_COMPARE_AWAY;
+            }
+            if ([s2 isEqualToString:XMPP_PRESENCE_SHOW_AWAY]) {
+                s2 = XMPP_PRESENCE_SHOW_COMPARE_AWAY;
+            }
+
+            // Compare statuses, if statuses are equal, compare names
+            NSComparisonResult statusCompare = [s1 compare:s2];
+            return (statusCompare != NSOrderedSame) ? statusCompare
+                : [d1[XMPP_PRESENCE_USERNAME] compare:d2[XMPP_PRESENCE_USERNAME]];
+        };
 
         // Notifications
         [[NSNotificationCenter defaultCenter] addObserver:self
@@ -91,6 +125,9 @@
 	[super viewWillAppear:animated];
 
     debugLog(@"viewDidAppear");
+
+    // Refresh roster
+    [self refreshTableView];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -128,7 +165,7 @@
 - (void)setupNavBar
 {
     // Text Color
-    if (deviceOSVersionLessThan(@"7.0")) {
+    if (deviceOSVersionLessThan(iOS7)) {
         [[UINavigationBar appearance] setTitleTextAttributes:@{
             UITextAttributeTextColor: [UIColor darkGrayColor],
             UITextAttributeTextShadowColor: [UIColor clearColor],
@@ -143,14 +180,14 @@
 
 	// Background Color
 	self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
-    if (deviceOSVersionLessThan(@"7.0")) {
+    if (deviceOSVersionLessThan(iOS7)) {
         [[UINavigationBar appearance] setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
         [[UINavigationBar appearance] setBackgroundColor:UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT)];
     }
 
 	// Info button on right side
 	UIButton *infoButton;
-    if (deviceOSVersionLessThan(@"7.0"))
+    if (deviceOSVersionLessThan(iOS7))
     {
         infoButton = [UIButton buttonWithType:UIButtonTypeInfoDark];
         CGRect frame = infoButton.frame;
@@ -172,9 +209,6 @@
     self.pullToRefresh = [[CustomPullToRefreshControl alloc] initInScrollView:self.tableView];
     self.pullToRefresh.scrollUpToCancel = true;
     [self.pullToRefresh addTarget:self action:@selector(pulledToRefresh:) forControlEvents:UIControlEventValueChanged];
-
-    [self.tableView registerClass:[UITableViewCell class]
-        forCellReuseIdentifier:KEY_CELL_ID];
 }
 
 
@@ -225,7 +259,7 @@
         
     // Login button on left
     NSString *loginTitle = [NSString stringWithFormat:@"%@%@",
-        (deviceOSVersionLessThan(@"7.0") ? @"" : @" "), buttonTitle];
+        (deviceOSVersionLessThan(iOS7) ? @"" : @" "), buttonTitle];
     UIBarButtonItem *button = [[UIBarButtonItem alloc]
         initWithTitle:loginTitle style:UIBarButtonItemStylePlain
         target:self action:([[AppDelegate appDelegate] isConnected]
@@ -234,48 +268,57 @@
 }
 
 /** @brief Sets contact in offline section */
-- (void)setContactOffline:(NSString *)username
+- (void)setContactOffline:(NSDictionary *)contact
 {
-    // If already in state, return
-    if ([self.contactList[ContactListSectionsOffline] containsObject:username]) {
-        return;
-    }
-
     // Remove from online if exists
-    [self.contactList[ContactListSectionsOnline] removeObject:username];
-
-    // Add to offline
-    NSArray *offlineContacts = self.contactList[ContactListSectionsOffline];
-    [self.contactList[ContactListSectionsOffline] insertObject:username
-        atIndex:[offlineContacts indexOfObject:username inSortedRange:NSMakeRange(0, offlineContacts.count) options:NSBinarySearchingInsertionIndex usingComparator:^NSComparisonResult(id obj1, id obj2) {
-                return [obj1 compare:obj2];
-            }]];
+    NSArray *contacts = self.contactList[ContactListSectionsOnline];
+    NSInteger index = [contacts indexOfObject:contact inSortedRange:NSMakeRange(0, contacts.count) options:NSBinarySearchingFirstEqual usingComparator:^NSComparisonResult(id obj1, id obj2) {
+            NSDictionary *d1 = (NSDictionary *)obj1;
+            NSDictionary *d2 = (NSDictionary *)obj2;
+            return [d1[@"name"] compare:d2[@"name"]];
+        }];
+    if (index != NSNotFound) {
+        [self.contactList[ContactListSectionsOnline] removeObjectAtIndex:index];
+    }
 
     // Update tableview
     [self.tableView reloadData];
 }
 
 /** @brief Sets contact in online section */
-- (void)setContactOnline:(NSString *)username
+- (void)setContactOnline:(NSDictionary *)contact
 {
-    // If already in state, return
-    if ([self.contactList[ContactListSectionsOnline] containsObject:username]) {
-        return;
-    }
-
-    // Remove from offline if exists
-    [self.contactList[ContactListSectionsOffline] removeObject:username];
-
     // Add to online
     NSArray *onlineContacts = self.contactList[ContactListSectionsOnline];
-    [self.contactList[ContactListSectionsOnline] insertObject:username
-        atIndex:[onlineContacts indexOfObject:username inSortedRange:NSMakeRange(0, onlineContacts.count) options:NSBinarySearchingInsertionIndex usingComparator:^NSComparisonResult(id obj1, id obj2) {
-                return [obj1 compare:obj2];
-            }]];
-
+    NSInteger index = [onlineContacts indexOfObject:contact inSortedRange:NSMakeRange(0, onlineContacts.count) options:NSBinarySearchingInsertionIndex usingComparator:^NSComparisonResult(id obj1, id obj2) {
+            NSDictionary *d1 = (NSDictionary *)obj1;
+            NSDictionary *d2 = (NSDictionary *)obj2;
+            return [d1[@"name"] compare:d2[@"name"]];
+        }];
+    [self.contactList[ContactListSectionsOnline] insertObject:contact
+        atIndex:index];
 
     // Update tableview
     [self.tableView reloadData];
+}
+
+/** @brief Refreshes tableview and roster data */
+- (void)refreshTableView
+{
+    // Get new snapshot of roster
+    XMPPRosterMemoryStorage *rosterStorage = [[AppDelegate appDelegate] rosterStorage];
+    if (rosterStorage && [rosterStorage sortedAvailableUsersByName]) {
+        self.contactList[ContactListSectionsOnline] = [rosterStorage sortedAvailableUsersByName];
+    }
+    if (rosterStorage && [rosterStorage sortedUnavailableUsersByName]) {
+        self.contactList[ContactListSectionsOffline] = [[[AppDelegate appDelegate] rosterStorage] sortedUnavailableUsersByName];
+    }
+
+    // Refresh tableview
+    [self.tableView reloadData];
+
+    // Stop refreshing if pull to refresh is running
+    [self.pullToRefresh endRefreshing];
 }
 
 
@@ -311,10 +354,15 @@
 /** @brief When received notification that a contact's presence changed */
 - (void)contactPresenceChanged:(NSNotification *)notification
 {
-    if ([notification.userInfo[@"presence"] isEqualToString:@"unavailable"]) {
-        [self setContactOffline:notification.userInfo[@"username"]];
+    debugLog(@"contactPresenceChanged: %@", notification.userInfo);
+
+    return; // Don't change for now
+
+    NSDictionary *data = notification.userInfo;
+    if ([data[@"presence"] isEqualToString:@"unavailable"]) {
+        [self setContactOffline:data];
     } else {
-        [self setContactOnline:notification.userInfo[@"username"]];
+        [self setContactOnline:data];
     }
 }
 
@@ -329,6 +377,10 @@
 - (void)pulledToRefresh:(id)sender
 {
     debugLog(@"pulledToRefresh");
+
+    // Manually fetch
+    [[[AppDelegate appDelegate] roster] fetchRoster];
+    [self refreshTableView];
 }
 
 
@@ -344,7 +396,10 @@
     switch (section)
     {
         case ContactListSectionsOnline:
+//            return [[[[AppDelegate appDelegate] rosterStorage] sortedAvailableUsersByName] count];
+
         case ContactListSectionsOffline:
+//            return [[[[AppDelegate appDelegate] rosterStorage] sortedUnavailableUsersByName] count];
             return [self.contactList[section] count];
 
         default:
@@ -356,17 +411,45 @@
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:KEY_CELL_ID];
 
-    NSString *username;
+    // Create cell if DNE
+    if (!cell)
+    {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:KEY_CELL_ID];
+    }
+
+    XMPPUserMemoryStorageObject *user;
     switch (indexPath.section)
     {
         case ContactListSectionsOnline:
         case ContactListSectionsOffline:
-            username = self.contactList[indexPath.section][indexPath.row];
+            user = self.contactList[indexPath.section][indexPath.row];
             break;
 
         default: break;
     }
-    cell.textLabel.text = username;
+    cell.textLabel.text = [user displayName];
+    cell.detailTextLabel.text = [[[user primaryResource] presence] status];
+    cell.textLabel.backgroundColor = [UIColor clearColor];
+    cell.detailTextLabel.backgroundColor = [UIColor clearColor];
+
+    // Show indicator
+    NSString *show = [[[user primaryResource] presence] show];
+    if ([show isEqualToString:XMPP_PRESENCE_SHOW_AWAY]) {
+        cell.contentView.backgroundColor = UIColorFromHex(COLOR_HEX_SHOW_AWAY);
+    } else if ([show isEqualToString:XMPP_PRESENCE_SHOW_BUSY]) {
+        cell.contentView.backgroundColor = UIColorFromHex(COLOR_HEX_SHOW_BUSY);
+    } else if ([show isEqualToString:XMPP_PRESENCE_SHOW_AWAY_EXTENDED]) {
+        cell.contentView.backgroundColor = UIColorFromHex(COLOR_HEX_SHOW_AWAY);
+    }
+    else    // Determine color based on presence type
+    {
+        NSString *type = [[[user primaryResource] presence] type];
+        if ([type isEqualToString:XMPP_PRESENCE_TYPE_OFFLINE]) {
+            cell.contentView.backgroundColor = UIColorFromHex(COLOR_HEX_SHOW_OFFLINE);
+        } else {
+            cell.contentView.backgroundColor = UIColorFromHex(COLOR_HEX_SHOW_ONLINE);
+        }
+    }
 
     return cell;
 }
@@ -393,39 +476,60 @@
     // Animated deselect fade
     [tableView deselectRowAtIndexPath:indexPath animated:true];
 
-    NSString *username;
+//    NSDictionary *user;
+    XMPPUserMemoryStorageObject *user;
     switch (indexPath.section)
     {
         case ContactListSectionsOnline:
+//            user = [[[AppDelegate appDelegate] rosterStorage] sortedAvailableUsersByName][indexPath.row];
+//            break;
+
         case ContactListSectionsOffline:
-            username = self.contactList[indexPath.section][indexPath.row];
+//            user = [[[AppDelegate appDelegate] rosterStorage] sortedUnavailableUsersByName][indexPath.row];
+            user = self.contactList[indexPath.section][indexPath.row];
             break;
 
         default: break;
     }
 
     // Show chat view
-    [self showChatView:@{
-        @"username":username
-    }];
+    debugLog(@"user: %@", user);
+    debugLog(@"userJID: %@", [user jid]);
+    debugLog(@"userAttributes: %@", [[user primaryResource] presence]);
+//    [self showChatView:user];
 }
 
 
 #pragma mark - XMPPRosterDelegate
 
-//- (void)xmppRosterDidBeginPopulating:(XMPPRoster *)sender
-//{
-//    debugLog(@"roster began populating");
-//}
-//
-//- (void)xmppRosterDidEndPopulating:(XMPPRoster *)sender
-//{
-//    debugLog(@"roster ended populating");
-//
-//    [self.pullToRefresh endRefreshing];
-//
-//    [self.tableView reloadData];
-//}
+- (void)xmppRosterDidBeginPopulating:(XMPPRoster *)sender
+{
+    debugLog(@"roster began populating");
+}
+
+- (void)xmppRosterDidEndPopulating:(XMPPRoster *)sender
+{
+    debugLog(@"roster ended populating");
+    debugLog(@"roster: %@", [[[AppDelegate appDelegate] rosterStorage] sortedUsersByName]);
+
+    // Refresh
+    [self refreshTableView];
+}
+
+- (void)xmppRoster:(XMPPRoster *)sender didReceivePresenceSubscriptionRequest:(XMPPPresence *)presence
+{
+    debugLog(@"roster received subscription request: %@", [[presence from] user]);
+}
+
+- (void)xmppRoster:(XMPPRoster *)sender didReceiveRosterPush:(XMPPIQ *)iq
+{
+    debugLog(@"roster received push: %@", iq);
+}
+
+- (void)xmppRoster:(XMPPRoster *)sender didReceiveRosterItem:(NSXMLElement *)item
+{
+    debugLog(@"roster received item: %@", item);
+}
 
 
 @end

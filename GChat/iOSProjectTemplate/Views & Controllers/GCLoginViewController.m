@@ -53,7 +53,7 @@
 
     // Initial setup of fields & buttons
     self.titleLabel.text = NSLocalizedString(@"LOGIN_VIEW_TITLE", nil);
-    self.titleLabel.font = [UIFont fontWithName:(deviceOSVersionLessThan(@"7.0")
+    self.titleLabel.font = [UIFont fontWithName:(deviceOSVersionLessThan(iOS7)
         ? FONT_NAME_THINNEST : FONT_NAME_THIN) size:FONT_SIZE_TITLE];
     self.usernameTextField.placeholder = NSLocalizedString(@"LOGIN_USERNAME_FIELD_PLACEHOLDER", nil);
     self.passwordTextField.placeholder = NSLocalizedString(@"LOGIN_PASSWORD_FIELD_PLACEHOLDER", nil);

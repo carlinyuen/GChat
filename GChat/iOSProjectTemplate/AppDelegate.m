@@ -126,16 +126,16 @@
         [self.xmppReconnect activate:self.xmppStream];
 
         // Roster Setup
-//        self.rosterStorage = [XMPPRosterMemoryStorage new];
-//        self.roster = [[XMPPRoster alloc] initWithRosterStorage:self.rosterStorage];
-//        [self.roster addDelegate:self.viewController delegateQueue:dispatch_get_main_queue()];
-//        [self.roster activate:[[AppDelegate appDelegate] xmppStream]];
+        self.rosterStorage = [XMPPRosterMemoryStorage new];
+        self.roster = [[XMPPRoster alloc] initWithRosterStorage:self.rosterStorage];
+        [self.roster addDelegate:self.viewController delegateQueue:dispatch_get_main_queue()];
+        [self.roster activate:[[AppDelegate appDelegate] xmppStream]];
 
         // vCard
-//        self.avatarStorage = [[XMPPvCardCoreDataStorage alloc] initWithInMemoryStore];
-//        self.avatarTemp = [[XMPPvCardTempModule alloc] initWithvCardStorage:self.avatarStorage];
-//        self.avatarCards = [[XMPPvCardAvatarModule alloc] initWithvCardTempModule:self.avatarTemp];
-//        [self.avatarCards activate:[[AppDelegate appDelegate] xmppStream]];
+        self.avatarStorage = [[XMPPvCardCoreDataStorage alloc] initWithDatabaseFilename:nil storeOptions:nil];
+        self.avatarTemp = [[XMPPvCardTempModule alloc] initWithvCardStorage:self.avatarStorage];
+        self.avatarCards = [[XMPPvCardAvatarModule alloc] initWithvCardTempModule:self.avatarTemp];
+        [self.avatarCards activate:[[AppDelegate appDelegate] xmppStream]];
 
     }
 }
@@ -182,8 +182,8 @@
     [[NSNotificationCenter defaultCenter]
         postNotificationName:NOTIFICATION_CONNECTION_CHANGED
         object:self userInfo:@{
-            @"status": @"connecting",
-            @"timestamp": [NSDate date],
+            XMPP_STATUS: @"connecting",
+            XMPP_TIMESTAMP: [NSDate date],
         }];
 
     // Set username and try to connect
@@ -235,8 +235,8 @@
     [[NSNotificationCenter defaultCenter]
         postNotificationName:NOTIFICATION_CONNECTION_CHANGED
         object:self userInfo:@{
-            @"status": @"timeout",
-            @"timestamp": [NSDate date],
+            XMPP_STATUS: @"timeout",
+            XMPP_TIMESTAMP: [NSDate date],
         }];
 }
 
@@ -253,8 +253,8 @@
     [[NSNotificationCenter defaultCenter]
         postNotificationName:NOTIFICATION_CONNECTION_CHANGED
         object:self userInfo:@{
-            @"status": @"authenticating",
-            @"timestamp": [NSDate date],
+            XMPP_STATUS: @"authenticating",
+            XMPP_TIMESTAMP: [NSDate date],
         }];
 
     // Try to authenticate
@@ -272,8 +272,8 @@
     [[NSNotificationCenter defaultCenter]
         postNotificationName:NOTIFICATION_CONNECTION_CHANGED
         object:self userInfo:@{
-            @"status": @"timeout",
-            @"timestamp": [NSDate date],
+            XMPP_STATUS: @"timeout",
+            XMPP_TIMESTAMP: [NSDate date],
         }];
 }
 
@@ -286,8 +286,8 @@
     [[NSNotificationCenter defaultCenter]
         postNotificationName:NOTIFICATION_CONNECTION_CHANGED
         object:self userInfo:@{
-            @"status": @"connected",
-            @"timestamp": [NSDate date],
+            XMPP_STATUS: @"connected",
+            XMPP_TIMESTAMP: [NSDate date],
         }];
 
     // Update status
@@ -305,8 +305,8 @@
     [[NSNotificationCenter defaultCenter]
         postNotificationName:NOTIFICATION_CONNECTION_CHANGED
         object:self userInfo:@{
-            @"status": @"timeout",
-            @"timestamp": [NSDate date],
+            XMPP_STATUS: @"timeout",
+            XMPP_TIMESTAMP: [NSDate date],
         }];
 }
 
@@ -317,30 +317,33 @@
 
 - (void)xmppStream:(XMPPStream *)sender didReceivePresence:(XMPPPresence *)presence
 {
-    debugLog(@"Presence Update: %@", presence);
-
     NSString *user = [[presence from] user];
+    debugLog(@"presence: %@, %@, %@, %@, %@, %@, %@",
+        [presence type], [presence show], [presence status], user, [[presence from] domain], [NSString stringWithFormat:@"intShow: %i", [presence intShow]],
+            [NSString stringWithFormat:@"priority: %i", [presence priority]]);
     if (![user isEqualToString:[[sender myJID] user]])
     {
         [[NSNotificationCenter defaultCenter]
             postNotificationName:NOTIFICATION_PRESENCE_UPDATE
             object:self userInfo:@{
-                @"presence":[presence type],
-                @"username":[NSString stringWithFormat:@"%@@%@", user, GCHAT_DOMAIN],
+                XMPP_PRESENCE_TYPE: [presence type],
+                XMPP_PRESENCE_SHOW: ([presence show] ? [presence show] : XMPP_PRESENCE_SHOW_CHAT),  // null == ready to chat
+                XMPP_PRESENCE_STATUS: ([presence status] ? [presence status] : @""),
+                XMPP_PRESENCE_USERNAME: user,
+                XMPP_PRESENCE_DOMAIN: [[presence from] domain],
+                XMPP_TIMESTAMP: [NSDate date],
             }];
     }
 }
 
 - (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message
 {
-    debugLog(@"Message Update: %@", message);
-
     [[NSNotificationCenter defaultCenter]
         postNotificationName:NOTIFICATION_MESSAGE_RECEIVED
         object:self userInfo:@{
             @"message": [[message elementForName:@"body"] stringValue],
             @"sender": [[message attributeForName:@"from"] stringValue],
-            @"timestamp": [NSDate date],
+            XMPP_TIMESTAMP: [NSDate date],
         }];
 }
 

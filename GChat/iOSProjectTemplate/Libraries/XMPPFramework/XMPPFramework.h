@@ -23,26 +23,49 @@
 //  The following is standard:
 
 #import "XMPP.h"
+
+    #define XMPP_TIMESTAMP @"timestamp"
+    #define XMPP_STATUS @"status"
+
+    #define XMPP_PRESENCE_TYPE @"type"
+    #define XMPP_PRESENCE_TYPE_OFFLINE @"unavailable"
+    #define XMPP_PRESENCE_TYPE_ONLINE @"available"
+    #define XMPP_PRESENCE_TYPE_ERROR @"error"
+    #define XMPP_PRESENCE_TYPE_UNSUB @"unsubscribe"
+    #define XMPP_PRESENCE_TYPE_UNSUBBED @"unsubscribed"
+    #define XMPP_PRESENCE_TYPE_SUB @"subscribe"
+    #define XMPP_PRESENCE_TYPE_SUBBED @"subscribed"
+    #define XMPP_PRESENCE_TYPE_PROBE @"probe"
+
+    #define XMPP_PRESENCE_STATUS @"status"
+    #define XMPP_PRESENCE_USERNAME @"username"
+    #define XMPP_PRESENCE_DOMAIN @"domain"
+
+    #define XMPP_PRESENCE_SHOW @"show"
+    #define XMPP_PRESENCE_SHOW_AWAY @"away"
+    #define XMPP_PRESENCE_SHOW_AWAY_EXTENDED @"xa"
+    #define XMPP_PRESENCE_SHOW_BUSY @"dnd"
+    #define XMPP_PRESENCE_SHOW_CHAT @"chat"
  
 // List the modules you're using here:
 // (the following may not be a complete list)
 
 //#import "XMPPBandwidthMonitor.h"
-// 
-//#import "XMPPCoreDataStorage.h"
+ 
+#import "XMPPCoreDataStorage.h"
 
 #import "XMPPReconnect.h"
 
 #import "XMPPRoster.h"
 #import "XMPPRosterMemoryStorage.h"
 //#import "XMPPRosterCoreDataStorage.h"
-//
+
 //#import "XMPPJabberRPCModule.h"
 //#import "XMPPIQ+JabberRPC.h"
 //#import "XMPPIQ+JabberRPCResponse.h"
 //
 //#import "XMPPPrivacy.h"
-//
+
 //#import "XMPPMUC.h"
 //#import "XMPPRoom.h"
 //#import "XMPPRoomMemoryStorage.h"
