@@ -257,8 +257,22 @@
 
     // Try to authenticate
     NSError *error = nil;
-    if (![[self xmppStream] authenticateWithPassword:self.tempPassword error:&error]) {
+    if (![[self xmppStream] authenticateWithPassword:self.tempPassword error:&error])
+    {
         debugLog(@"ERROR: Could not authenticate! %@", error);
+
+        // Clear temp password
+        self.tempPassword = nil;
+
+        // Notify connection status change
+        [[NSNotificationCenter defaultCenter]
+            postNotificationName:NOTIFICATION_CONNECTION_CHANGED
+            object:self userInfo:@{
+                XMPP_STATUS: XMPP_CONNECTION_ERROR_AUTH,
+                XMPP_TIMESTAMP: [NSDate date],
+            }];
+
+        [[self xmppStream] disconnect];
     }
 }
 
@@ -306,6 +320,8 @@
             XMPP_STATUS: XMPP_CONNECTION_ERROR_AUTH,
             XMPP_TIMESTAMP: [NSDate date],
         }];
+
+    [[self xmppStream] disconnect];
 }
 
 - (void)xmppStream:(XMPPStream *)sender didReceiveError:(NSXMLElement *)error

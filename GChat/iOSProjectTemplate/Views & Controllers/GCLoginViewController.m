@@ -176,7 +176,7 @@
     NSString *status = notification.userInfo[XMPP_STATUS];
 
     // If connected, dismiss login screen
-    if ([status isEqualToString:XMPP_CONNECTION_AUTH])
+    if ([status isEqualToString:XMPP_CONNECTION_OK])
     {
         [self showLoadingIndicator:false];
 
