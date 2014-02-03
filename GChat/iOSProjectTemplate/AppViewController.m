@@ -44,6 +44,7 @@
     UITableViewDataSource
     , UITableViewDelegate
     , XMPPRosterDelegate
+    , UIAlertViewDelegate
 >
 
     /** Tableview for contact list */
@@ -53,6 +54,9 @@
     /** Storage for contact list */
     @property (strong, nonatomic) NSMutableArray *contactList;
     @property (copy, nonatomic) NSComparisonResult(^contactComparisonBlock)(id obj1, id obj2);
+
+    /** Storage for subscription requests */
+    @property (strong, nonatomic) NSMutableDictionary *subscriptionRequests;
 
 @end
 
@@ -74,6 +78,9 @@
         for (int i = 0; i < ContactListSectionsCount; ++i) {
             [_contactList addObject:[NSMutableArray new]];
         }
+
+        // Subscription requests
+        _subscriptionRequests = [NSMutableDictionary new];
 
         // Status order comparison
         _contactComparisonBlock = ^NSComparisonResult(id obj1, id obj2)
@@ -614,7 +621,22 @@
 
 - (void)xmppRoster:(XMPPRoster *)sender didReceivePresenceSubscriptionRequest:(XMPPPresence *)presence
 {
-    debugLog(@"roster received subscription request: %@", [[presence from] user]);
+    // Someone asked to add you to his buddy list
+    XMPPJID *fromUser = [presence from];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"APP_CONTACTS_SUBSCRIBE_REQUEST_TITLE", nil)
+        message:[NSString stringWithFormat:@"%@@%@ %@",
+            [fromUser user], [fromUser domain],
+            NSLocalizedString(@"APP_CONTACTS_SUBSCRIBE_REQUEST_MESSAGE", nil)]
+        delegate:self
+        cancelButtonTitle:NSLocalizedString(@"APP_CONTACTS_SUBSCRIBE_REQUEST_CANCEL", nil)
+        otherButtonTitles:NSLocalizedString(@"APP_CONTACTS_SUBSCRIBE_REQUEST_OK", nil), nil];
+
+    // Hash and store request
+    alert.tag = [alert hash];
+    [self.subscriptionRequests setObject:fromUser forKey:@(alert.tag)];
+
+    // Show popup
+    [alert show];
 }
 
 - (void)xmppRoster:(XMPPRoster *)sender didReceiveRosterPush:(XMPPIQ *)iq
@@ -625,6 +647,25 @@
 - (void)xmppRoster:(XMPPRoster *)sender didReceiveRosterItem:(NSXMLElement *)item
 {
     debugLog(@"roster received item: %@", item);
+}
+
+
+#pragma mark - UIAlertViewDelegate
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    // User clicked Accept
+    if (buttonIndex)
+    {
+        [[[AppDelegate appDelegate] roster]
+            acceptPresenceSubscriptionRequestFrom:[self.subscriptionRequests objectForKey:@(alertView.tag)]
+            andAddToRoster:true];
+    }
+    else    // Reject request
+    {
+        [[[AppDelegate appDelegate] roster]
+            rejectPresenceSubscriptionRequestFrom:[self.subscriptionRequests objectForKey:@(alertView.tag)]];
+    }
 }
 
 
