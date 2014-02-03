@@ -132,7 +132,9 @@
     debugLog(@"viewDidAppear");
 
     // Setup pull to refresh when UITableView insets are set
-    [self setupPullToRefresh];
+    if (!self.pullToRefresh) {
+        [self setupPullToRefresh];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated
