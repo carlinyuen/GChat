@@ -135,6 +135,9 @@
     if (!self.pullToRefresh) {
         [self setupPullToRefresh];
     }
+
+    // Deselect from tableview if exists
+    [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:true];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -493,6 +496,8 @@
     if (!cell)
     {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:KEY_CELL_ID];
+        cell.selectionStyle = UITableViewCellSelectionStyleGray;
+        cell.selectedBackgroundView = [[UIView alloc] initWithFrame:cell.bounds];
     }
 
     XMPPUserMemoryStorageObject *user;
@@ -519,19 +524,22 @@
 
     // Show indicator
     NSString *show = [[[user primaryResource] presence] show];
-    if ([show isEqualToString:XMPP_PRESENCE_SHOW_AWAY]) {
+    if ([show isEqualToString:XMPP_PRESENCE_SHOW_AWAY]
+        || [show isEqualToString:XMPP_PRESENCE_SHOW_AWAY_EXTENDED]) {
         cell.contentView.backgroundColor = UIColorFromHex(COLOR_HEX_SHOW_AWAY);
+        cell.selectedBackgroundView.backgroundColor = UIColorFromHex(COLOR_HEX_SHOW_AWAY_SELECTED);
     } else if ([show isEqualToString:XMPP_PRESENCE_SHOW_BUSY]) {
         cell.contentView.backgroundColor = UIColorFromHex(COLOR_HEX_SHOW_BUSY);
-    } else if ([show isEqualToString:XMPP_PRESENCE_SHOW_AWAY_EXTENDED]) {
-        cell.contentView.backgroundColor = UIColorFromHex(COLOR_HEX_SHOW_AWAY);
+        cell.selectedBackgroundView.backgroundColor = UIColorFromHex(COLOR_HEX_SHOW_BUSY_SELECTED);
     }
     else    // Determine color based on presence type
     {
         if (![user primaryResource] || [[[[user primaryResource] presence] type] isEqualToString:XMPP_PRESENCE_TYPE_OFFLINE]) {
             cell.contentView.backgroundColor = UIColorFromHex(COLOR_HEX_SHOW_OFFLINE);
+            cell.selectedBackgroundView.backgroundColor = UIColorFromHex(COLOR_HEX_GREY_TRANSPARENT);
         } else {
             cell.contentView.backgroundColor = UIColorFromHex(COLOR_HEX_SHOW_ONLINE);
+            cell.selectedBackgroundView.backgroundColor = UIColorFromHex(COLOR_HEX_SHOW_ONLINE_SELECTED);
         }
     }
 
@@ -569,9 +577,6 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    // Animated deselect fade
-    [tableView deselectRowAtIndexPath:indexPath animated:true];
-
     XMPPUserMemoryStorageObject *user;
     switch (indexPath.section)
     {
