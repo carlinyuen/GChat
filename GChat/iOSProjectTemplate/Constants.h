@@ -27,13 +27,16 @@ extern NSString* const NOTIFICATION_CONNECTION_CHANGED;
 
 // Fonts
 extern NSString* const FONT_NAME_BRANDING;
-extern NSString* const FONT_NAME_LIGHT;
+extern NSString* const FONT_NAME_MEDIUM;
 extern NSString* const FONT_NAME_THIN;
+extern NSString* const FONT_NAME_LIGHT;
 extern NSString* const FONT_NAME_THINNEST;
 extern float const FONT_SIZE_TITLE;
 extern float const FONT_SIZE_NAVBAR;
 extern float const FONT_SIZE_BRANDING;
 extern float const FONT_SIZE_CHAT_INPUT;
+extern float const FONT_SIZE_CONTACT_NAME;
+extern float const FONT_SIZE_CONTACT_STATUS;
 
 // Time
 extern int const TIME_ONE_MINUTE;
@@ -51,6 +54,7 @@ extern int const COLOR_HEX_SHOW_AWAY;
 extern int const COLOR_HEX_SHOW_ONLINE;
 extern int const COLOR_HEX_SHOW_BUSY;
 extern int const COLOR_HEX_SHOW_OFFLINE;
+extern int const COLOR_HEX_BLACK_TRANSPARENT;
 
 // Animations
 extern float const ANIMATION_DURATION_FAST;

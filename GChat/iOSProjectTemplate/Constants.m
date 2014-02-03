@@ -27,13 +27,16 @@ NSString* const NOTIFICATION_CONNECTION_CHANGED = @"notificationConnectionChange
 
 // Fonts
 NSString* const FONT_NAME_BRANDING = @"Courier New";
-NSString* const FONT_NAME_LIGHT = @"HelveticaNeue-Light";
+NSString* const FONT_NAME_MEDIUM = @"HelveticaNeue-Medium";
 NSString* const FONT_NAME_THIN = @"HelveticaNeue-Thin";
+NSString* const FONT_NAME_LIGHT = @"HelveticaNeue-Light";
 NSString* const FONT_NAME_THINNEST = @"HelveticaNeue-UltraLight";
 float const FONT_SIZE_TITLE = 33;
 float const FONT_SIZE_NAVBAR = 20;
 float const FONT_SIZE_BRANDING = 22;
 float const FONT_SIZE_CHAT_INPUT = 14;
+float const FONT_SIZE_CONTACT_NAME = 22;
+float const FONT_SIZE_CONTACT_STATUS = 14;
 
 // Time
 int const TIME_ONE_MINUTE = 60;
@@ -51,6 +54,7 @@ int const COLOR_HEX_SHOW_AWAY = 0xFFAF45FF;
 int const COLOR_HEX_SHOW_ONLINE = 0x75FF80FF;
 int const COLOR_HEX_SHOW_BUSY = 0xFF9694FF;
 int const COLOR_HEX_SHOW_OFFLINE = 0xFFFFFFFF;
+int const COLOR_HEX_BLACK_TRANSPARENT = 0x00000066;
 
 // Animations
 float const ANIMATION_DURATION_FAST = 0.3;

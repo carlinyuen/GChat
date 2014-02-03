@@ -492,10 +492,17 @@
 
         default: break;
     }
+
+    // Large text field
     cell.textLabel.text = [user displayName];
-    cell.detailTextLabel.text = [[[user primaryResource] presence] status];
     cell.textLabel.backgroundColor = [UIColor clearColor];
+    cell.textLabel.font = [UIFont fontWithName:FONT_NAME_LIGHT size:FONT_SIZE_CONTACT_NAME];
+
+    // Detailed text field
+    cell.detailTextLabel.text = [[[user primaryResource] presence] status];
     cell.detailTextLabel.backgroundColor = [UIColor clearColor];
+    cell.detailTextLabel.textColor = UIColorFromHex(COLOR_HEX_BLACK_TRANSPARENT);
+    cell.detailTextLabel.font = [UIFont fontWithName:FONT_NAME_MEDIUM size:FONT_SIZE_CONTACT_STATUS];
 
     // Show indicator
     NSString *show = [[[user primaryResource] presence] show];
