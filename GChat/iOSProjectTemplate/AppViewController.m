@@ -233,7 +233,7 @@
 }
 
 /** @brief Show chat screen */
-- (void)showChatView:(NSDictionary *)contact
+- (void)showChatView:(XMPPUserMemoryStorageObject *)contact
 {
     // Set back button on navbar
     self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
@@ -241,8 +241,9 @@
         style:UIBarButtonItemStylePlain target:nil action:nil];
 
     // Jump to login page
-    [self.navigationController pushViewController:[[GCChatViewController alloc]
-        initWithNibName:@"GCChatViewController" bundle:nil] animated:true];
+    [self.navigationController
+        pushViewController:[[GCChatViewController alloc]
+            initWithContact:contact] animated:true];
 }
 
 /** @brief Refreshes the login button text */
