@@ -40,6 +40,12 @@
         ContactListStatusOrderCount,
     } ContactListStatusOrder;
 
+    typedef enum {
+        ContactListSortTypeByName,
+        ContactListSortTypeByStatus,
+        ContactListSortTypeCount,
+    } ContactListSortType;
+
 @interface AppViewController () <
     UITableViewDataSource
     , UITableViewDelegate
@@ -57,6 +63,10 @@
 
     /** Storage for subscription requests */
     @property (strong, nonatomic) NSMutableDictionary *subscriptionRequests;
+
+    /** Clickable title for navbar to change sorting */
+    @property (strong, nonatomic) UIButton *titleButton;
+    @property (assign, nonatomic) ContactListSortType sortType;
 
 @end
 
@@ -78,6 +88,9 @@
         for (int i = 0; i < ContactListSectionsCount; ++i) {
             [_contactList addObject:[NSMutableArray new]];
         }
+
+        // Default sorting
+        _sortType = [[NSUserDefaults standardUserDefaults] integerForKey:CACHE_KEY_CONTACTS_SORT_TYPE];
 
         // Subscription requests
         _subscriptionRequests = [NSMutableDictionary new];
@@ -181,26 +194,25 @@
 /** @brief Setup Nav bar */
 - (void)setupNavBar
 {
-    // Text Color
-    if (deviceOSVersionLessThan(iOS7)) {
-        [[UINavigationBar appearance] setTitleTextAttributes:@{
-            UITextAttributeTextColor: [UIColor darkGrayColor],
-            UITextAttributeTextShadowColor: [UIColor clearColor],
-            UITextAttributeFont: [UIFont fontWithName:FONT_NAME_LIGHT size:FONT_SIZE_NAVBAR],
-        }];
-    } else {
-        [[UINavigationBar appearance] setTitleTextAttributes:@{
-            NSForegroundColorAttributeName: [UIColor darkGrayColor],
-            NSFontAttributeName: [UIFont fontWithName:FONT_NAME_THIN size:FONT_SIZE_NAVBAR],
-        }];
-    }
-
 	// Background Color
 	self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
     if (deviceOSVersionLessThan(iOS7)) {
         [[UINavigationBar appearance] setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
         [[UINavigationBar appearance] setBackgroundColor:UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT)];
     }
+
+    // Clickable title for sorting
+    self.titleButton = [UIButton new];
+    [self.titleButton setTitle:[NSString stringWithFormat:@"%@ %@",
+        NSLocalizedString(@"APP_VIEW_TITLE", nil),
+        NSLocalizedString(@"APP_VIEW_TITLE_SORT_NAME", nil)]
+        forState:UIControlStateNormal];
+    [self.titleButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
+    self.titleButton.titleLabel.font = (deviceOSVersionLessThan(iOS7))
+        ? [UIFont fontWithName:FONT_NAME_LIGHT size:FONT_SIZE_NAVBAR]
+        : [UIFont fontWithName:FONT_NAME_THIN size:FONT_SIZE_NAVBAR];
+    [self.titleButton addTarget:self action:@selector(titleTapped:) forControlEvents:UIControlEventTouchUpInside];
+    self.navigationItem.titleView = self.titleButton;
 
 	// Info button on right side
 	UIButton *infoButton;
@@ -368,6 +380,13 @@
 
     // Stop refreshing if pull to refresh is running
     [self.pullToRefresh endRefreshing];
+
+    // Update screen title
+    [self.titleButton setTitle:[NSString stringWithFormat:@"%@ %@",
+        NSLocalizedString(@"APP_VIEW_TITLE", nil),
+        NSLocalizedString((self.sortType == ContactListSortTypeByName
+            ? @"APP_VIEW_TITLE_SORT_NAME" : @"APP_VIEW_TITLE_SORT_STATUS"), nil)]
+        forState:UIControlStateNormal];
 }
 
 
@@ -472,6 +491,11 @@
 
     // Refresh on delay
     [NSTimer scheduledTimerWithTimeInterval:TIME_REFRESH target:self selector:@selector(refreshTableView:) userInfo:Nil repeats:false];
+}
+
+/** @brief When title button is tapped to change sorting */
+- (void)titleTapped:(UIButton *)sender
+{
 }
 
 

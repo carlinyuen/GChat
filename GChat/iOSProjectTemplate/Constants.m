@@ -16,6 +16,7 @@ NSString* const CACHE_KEY_USER_SETTINGS = @"cacheUserSettings";
 NSString* const CACHE_KEY_LOGIN_USERNAME = @"loginUsername";
 NSString* const CACHE_KEY_LOGIN_PASSWORD = @"loginPassword";
 NSString* const CACHE_KEY_LOGIN_PERSIST = @"loginPersist";
+NSString* const CACHE_KEY_CONTACTS_SORT_TYPE = @"contactsSortType";
 
 // One-time flags
 NSString* const ONCE_KEY_APP_OPENED = @"onceAppOpened";

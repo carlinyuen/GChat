@@ -16,6 +16,7 @@ extern NSString* const CACHE_KEY_USER_SETTINGS;
 extern NSString* const CACHE_KEY_LOGIN_USERNAME;
 extern NSString* const CACHE_KEY_LOGIN_PASSWORD;
 extern NSString* const CACHE_KEY_LOGIN_PERSIST;
+extern NSString* const CACHE_KEY_CONTACTS_SORT_TYPE;
 
 // One-time flags
 extern NSString* const ONCE_KEY_APP_OPENED;
