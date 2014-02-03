@@ -193,7 +193,8 @@
     self.connectTimeoutTimer = [NSTimer scheduledTimerWithTimeInterval:TIME_CONNECTION_TIMEOUT
         target:self selector:@selector(xmppStreamConnectDidTimeout:)
         userInfo:nil repeats:false];
-    if (![self.xmppStream connectWithTimeout:TIME_CONNECTION_TIMEOUT error:&error])
+//    if (![self.xmppStream connectWithTimeout:TIME_CONNECTION_TIMEOUT error:&error])
+    if (![self.xmppStream oldSchoolSecureConnectWithTimeout:TIME_CONNECTION_TIMEOUT error:&error])
     {
         debugLog(@"connect failed@");
         [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"POPUP_ERROR_TITLE", nil)

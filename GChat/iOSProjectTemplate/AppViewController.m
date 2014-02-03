@@ -203,9 +203,7 @@
 
     // Clickable title for sorting
     self.titleButton = [UIButton new];
-    [self.titleButton setTitle:[NSString stringWithFormat:@"%@ %@",
-        NSLocalizedString(@"APP_VIEW_TITLE", nil),
-        NSLocalizedString(@"APP_VIEW_TITLE_SORT_NAME", nil)]
+    [self.titleButton setTitle:NSLocalizedString(@"APP_VIEW_TITLE", nil)
         forState:UIControlStateNormal];
     [self.titleButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
     [self.titleButton setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
@@ -381,13 +379,6 @@
 
     // Stop refreshing if pull to refresh is running
     [self.pullToRefresh endRefreshing];
-
-    // Update screen title
-    [self.titleButton setTitle:[NSString stringWithFormat:@"%@ %@",
-        NSLocalizedString(@"APP_VIEW_TITLE", nil),
-        NSLocalizedString((self.sortType == ContactListSortTypeByName
-            ? @"APP_VIEW_TITLE_SORT_NAME" : @"APP_VIEW_TITLE_SORT_STATUS"), nil)]
-        forState:UIControlStateNormal];
 }
 
 
@@ -498,6 +489,16 @@
 - (void)titleTapped:(UIButton *)sender
 {
     debugLog(@"titleTapped");
+
+    // Rotate through sort types
+    self.sortType = (self.sortType + 1) % ContactListSortTypeCount;
+
+    // Store into user settings
+    [[NSUserDefaults standardUserDefaults] setInteger:self.sortType forKey:CACHE_KEY_CONTACTS_SORT_TYPE];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+
+    // Refresh
+    [self manualPullToRefresh];
 }
 
 
