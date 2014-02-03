@@ -368,6 +368,13 @@
     // Clear credentials
     [AppDelegate clearCredentials];
 
+    // Hide tableview
+    [UIView animateWithDuration:ANIMATION_DURATION_FAST delay:0
+        options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut
+        animations:^{
+            self.tableView.alpha = 0;
+        } completion:nil];
+
     // Show login view
     [self showLoginView];
 }
@@ -501,8 +508,7 @@
     }
     else    // Determine color based on presence type
     {
-        NSString *type = [[[user primaryResource] presence] type];
-        if ([type isEqualToString:XMPP_PRESENCE_TYPE_OFFLINE]) {
+        if (![user primaryResource] || [[[[user primaryResource] presence] type] isEqualToString:XMPP_PRESENCE_TYPE_OFFLINE]) {
             cell.contentView.backgroundColor = UIColorFromHex(COLOR_HEX_SHOW_OFFLINE);
         } else {
             cell.contentView.backgroundColor = UIColorFromHex(COLOR_HEX_SHOW_ONLINE);
