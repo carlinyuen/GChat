@@ -211,6 +211,8 @@
     self.pullToRefresh = [[CustomPullToRefreshControl alloc] initInScrollView:self.tableView];
     self.pullToRefresh.scrollUpToCancel = true;
     [self.pullToRefresh addTarget:self action:@selector(pulledToRefresh:) forControlEvents:UIControlEventValueChanged];
+
+    self.tableView.alpha = 0;
 }
 
 
@@ -393,14 +395,40 @@
 /** @brief When connection status to xmpp service changes */
 - (void)connectionStatusChanged:(NSNotification *)notification
 {
+    NSString *status = notification.userInfo[XMPP_STATUS];
+
     // If connected
-    if ([notification.userInfo[XMPP_STATUS] isEqualToString:XMPP_CONNECTION_OK])
+    if ([status isEqualToString:XMPP_CONNECTION_OK])
     {
         // Refresh login button
         [self refreshLoginButton];
 
+        // Show tableview
+        [UIView animateWithDuration:ANIMATION_DURATION_FAST delay:0
+            options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut
+            animations:^{
+                self.tableView.alpha = 1;
+            } completion:nil];
+
         // Manual pull to refresh
         [self manualPullToRefresh];
+    }
+    else if ([status isEqualToString:XMPP_CONNECTION_CONNECTING])
+    {
+        // Show loading indicator where login button is
+        UIActivityIndicatorView *loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        [loadingIndicator startAnimating];
+
+        if (deviceOSVersionLessThan(iOS7))
+        {
+            CGRect frame = loadingIndicator.frame;
+            frame.size.width += UI_SIZE_INFO_BUTTON_MARGIN;
+            loadingIndicator.frame = frame;
+        }
+
+        UIBarButtonItem *barButton = [[UIBarButtonItem alloc]
+            initWithCustomView:loadingIndicator];
+        [self.navigationItem setLeftBarButtonItem:barButton animated:true];
     }
 }
 
