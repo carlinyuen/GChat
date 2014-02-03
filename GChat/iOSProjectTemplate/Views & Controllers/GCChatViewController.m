@@ -10,8 +10,6 @@
 
 #import <QuartzCore/QuartzCore.h>
 
-#import "AppDelegate.h"
-
     #define KEY_CELL_ID @"MessageCell"
 
     #define SIZE_MARGIN 6
@@ -37,12 +35,12 @@
 
 @implementation GCChatViewController
 
-- (id)initWithContact:(NSDictionary *)contact
+- (id)initWithContact:(XMPPUserMemoryStorageObject *)contact
 {
     self = [super initWithNibName:@"GCChatViewController" bundle:nil];
     if (self)
     {
-        _contactInfo = contact;
+        _contact = contact;
 
         _messageList = [NSMutableArray new];
        
@@ -59,7 +57,7 @@
     [super viewDidLoad];
 
     // Title
-    self.title = self.contactInfo[@"username"];
+    self.title = [self.contact displayName];
 
     // Setup
     [self setupFooterView];
@@ -148,7 +146,7 @@
         [body setStringValue:text];
         NSXMLElement *message = [NSXMLElement elementWithName:@"message"];
         [message addAttributeWithName:@"type" stringValue:@"chat"];
-        [message addAttributeWithName:@"to" stringValue:self.contactInfo[@"username"]];
+        [message addAttributeWithName:@"to" stringValue:[self.contact displayName]];
         [message addChild:body];
 
         // Send element

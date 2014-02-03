@@ -8,12 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
+#import "AppDelegate.h"
+
 @interface GCChatViewController : UIViewController
 
     /** Contact to initialize view for chat */
-    @property (strong, nonatomic) NSDictionary *contactInfo;
+    @property (strong, nonatomic) XMPPUserMemoryStorageObject *contact;
 
     /** @brief Init with contact to chat with */
-    - (id)initWithContact:(NSDictionary *)contact;
+    - (id)initWithContact:(XMPPUserMemoryStorageObject *)contact;
 
 @end

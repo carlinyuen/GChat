@@ -20,6 +20,8 @@
 
     #define XMPP_PRESENCE_SHOW_COMPARE_AWAY @"eway"
 
+    #define TIME_REFRESH 2  // 2 seconds
+
     typedef enum {
         ContactListSectionsOnline,
         ContactListSectionsOffline,
@@ -127,7 +129,7 @@
     debugLog(@"viewDidAppear");
 
     // Refresh roster
-    [self refreshTableView];
+    [self refreshTableView:self];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -303,7 +305,7 @@
 }
 
 /** @brief Refreshes tableview and roster data */
-- (void)refreshTableView
+- (void)refreshTableView:(id)sender
 {
     // Get new snapshot of roster
     XMPPRosterMemoryStorage *rosterStorage = [[AppDelegate appDelegate] rosterStorage];
@@ -380,7 +382,9 @@
 
     // Manually fetch
     [[[AppDelegate appDelegate] roster] fetchRoster];
-    [self refreshTableView];
+
+    // Refresh on delay
+    [NSTimer scheduledTimerWithTimeInterval:TIME_REFRESH target:self selector:@selector(refreshTableView:) userInfo:Nil repeats:false];
 }
 
 
@@ -396,10 +400,7 @@
     switch (section)
     {
         case ContactListSectionsOnline:
-//            return [[[[AppDelegate appDelegate] rosterStorage] sortedAvailableUsersByName] count];
-
         case ContactListSectionsOffline:
-//            return [[[[AppDelegate appDelegate] rosterStorage] sortedUnavailableUsersByName] count];
             return [self.contactList[section] count];
 
         default:
@@ -476,16 +477,11 @@
     // Animated deselect fade
     [tableView deselectRowAtIndexPath:indexPath animated:true];
 
-//    NSDictionary *user;
     XMPPUserMemoryStorageObject *user;
     switch (indexPath.section)
     {
         case ContactListSectionsOnline:
-//            user = [[[AppDelegate appDelegate] rosterStorage] sortedAvailableUsersByName][indexPath.row];
-//            break;
-
         case ContactListSectionsOffline:
-//            user = [[[AppDelegate appDelegate] rosterStorage] sortedUnavailableUsersByName][indexPath.row];
             user = self.contactList[indexPath.section][indexPath.row];
             break;
 
@@ -493,10 +489,7 @@
     }
 
     // Show chat view
-    debugLog(@"user: %@", user);
-    debugLog(@"userJID: %@", [user jid]);
-    debugLog(@"userAttributes: %@", [[user primaryResource] presence]);
-//    [self showChatView:user];
+    [self showChatView:user];
 }
 
 
@@ -513,7 +506,7 @@
     debugLog(@"roster: %@", [[[AppDelegate appDelegate] rosterStorage] sortedUsersByName]);
 
     // Refresh
-    [self refreshTableView];
+    [self refreshTableView:sender];
 }
 
 - (void)xmppRoster:(XMPPRoster *)sender didReceivePresenceSubscriptionRequest:(XMPPPresence *)presence
