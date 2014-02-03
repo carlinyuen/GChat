@@ -349,7 +349,7 @@
 **/
 - (NSComparisonResult)compareByName:(XMPPUserMemoryStorageObject *)another
 {
-	return [self compareByName:another options:0];
+	return [self compareByName:another options:NSCaseInsensitiveSearch];
 }
 
 /**
@@ -372,7 +372,7 @@
 **/
 - (NSComparisonResult)compareByAvailabilityName:(XMPPUserMemoryStorageObject *)another
 {
-	return [self compareByAvailabilityName:another options:0];
+	return [self compareByAvailabilityName:another options:NSCaseInsensitiveSearch];
 }
 
 /**
