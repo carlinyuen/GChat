@@ -27,6 +27,8 @@
 
     typedef enum {
         ContactListSectionsOnline,
+        ContactListSectionsBusy,
+        ContactListSectionsAway,
         ContactListSectionsOffline,
         ContactListSectionsCount,
     } ContactListSections;
@@ -587,10 +589,16 @@
         case ContactListSectionsOnline:
             return NSLocalizedString(@"APP_CONTACTS_ONLINE_SECTION_TITLE", nil);
 
+        case ContactListSectionsAway:
+            return NSLocalizedString(@"APP_CONTACTS_AWAY_SECTION_TITLE", nil);
+
+        case ContactListSectionsBusy:
+            return NSLocalizedString(@"APP_CONTACTS_BUSY_SECTION_TITLE", nil);
+
         case ContactListSectionsOffline:
             return NSLocalizedString(@"APP_CONTACTS_OFFLINE_SECTION_TITLE", nil);
 
-        default: return @"";
+        default: return nil;
     }
 }
 
