@@ -367,7 +367,11 @@
 /** @brief Silent refresh, only shows activity indicator in status bar */
 - (void)silentRefresh
 {
-    [NSTimer scheduledTimerWithTimeInterval:TIME_REFRESH target:self selector:@selector(refreshTableView:) userInfo:nil repeats:false];
+    // Show loading indicator
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:true];
+
+    // Refresh
+    [self scheduleRefresh:TIME_REFRESH overridePrevious:false];
 }
 
 /** @brief Refreshes tableview and roster data */
@@ -427,6 +431,9 @@
 
     // Stop refreshing if pull to refresh is running
     [self.pullToRefresh endRefreshing];
+
+    // Stop activity indicator if it was showing
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:false];
 }
 
 
