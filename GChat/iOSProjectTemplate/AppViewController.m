@@ -433,20 +433,9 @@
     }
 
     // Refresh tableview
-//    [self.tableView reloadData];
-//    [self.tableView reloadSections:[NSIndexSet
-//            indexSetWithIndexesInRange:NSMakeRange(0, ContactListSectionsCount)]
-//        withRowAnimation:UITableViewRowAnimationAutomatic];
-    // Fancy refresh
-    for (int i = 0; i < ContactListSectionsCount; ++i) {
-        for (int r = 0; r < [self.contactList[i] count]; ++r) {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(ANIMATION_DURATION_FAST * r * NSEC_PER_SEC)), dispatch_get_main_queue(), ^(void){
-                    [self.tableView beginUpdates];
-                    [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForItem:r inSection:i]] withRowAnimation:UITableViewRowAnimationLeft];
-                    [self.tableView endUpdates];
-                });
-        }
-    }
+    [self.tableView reloadSections:[NSIndexSet
+            indexSetWithIndexesInRange:NSMakeRange(0, ContactListSectionsCount)]
+        withRowAnimation:UITableViewRowAnimationAutomatic];
 
     // Show tableview if not already shown
     [UIView animateWithDuration:ANIMATION_DURATION_FAST
