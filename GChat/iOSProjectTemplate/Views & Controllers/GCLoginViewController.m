@@ -58,7 +58,9 @@
     self.titleLabel.font = [UIFont fontWithName:(deviceOSVersionLessThan(iOS7)
         ? FONT_NAME_THINNEST : FONT_NAME_THIN) size:FONT_SIZE_TITLE];
     self.usernameTextField.placeholder = NSLocalizedString(@"LOGIN_USERNAME_FIELD_PLACEHOLDER", nil);
+    [self.usernameTextField setKeyboardAppearance:UIKeyboardAppearanceAlert];
     self.passwordTextField.placeholder = NSLocalizedString(@"LOGIN_PASSWORD_FIELD_PLACEHOLDER", nil);
+    [self.passwordTextField setKeyboardAppearance:UIKeyboardAppearanceAlert];
     [self.loginButton setTitle:NSLocalizedString(@"LOGIN_SIGNIN_BUTTON_TITLE", nil) forState:UIControlStateNormal];
 
     // Loading indicator
