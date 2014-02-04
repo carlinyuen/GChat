@@ -20,6 +20,10 @@
 "APP_CONTACTS_SUBSCRIBE_REQUEST_MESSAGE" = "would like to add you to their contacts!";
 "APP_CONTACTS_SUBSCRIBE_REQUEST_CANCEL" = "Reject";
 "APP_CONTACTS_SUBSCRIBE_REQUEST_OK" = "Accept";
+"APP_CONTACTS_ADD_OK" = "Send Request";
+"APP_CONTACTS_ADD_TITLE" = "Add Contact";
+"APP_CONTACTS_ADD_MESSAGE" = "Enter email address you'd like to send a request to:";
+"APP_CONTACTS_ADD_CONFIRM_MESSAGE" = "Friend request sent!";
 
 
 // Login Screen

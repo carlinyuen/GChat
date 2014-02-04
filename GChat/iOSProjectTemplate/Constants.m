@@ -38,6 +38,7 @@ float const FONT_SIZE_BRANDING = 22;
 float const FONT_SIZE_CHAT_INPUT = 14;
 float const FONT_SIZE_CONTACT_NAME = 22;
 float const FONT_SIZE_CONTACT_STATUS = 14;
+float const FONT_SIZE_CROUTON = 14;
 
 // Time
 int const TIME_ONE_MINUTE = 60;

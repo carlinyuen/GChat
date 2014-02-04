@@ -14,13 +14,15 @@
 #import "GCChatViewController.h"
 #import "CustomPullToRefreshControl.h"
 
-	#define UI_SIZE_INFO_BUTTON_MARGIN 8
+	#define SIZE_INFO_BUTTON_MARGIN 8
+    #define SIZE_CROUTON_MARGIN 8
 
     #define KEY_CELL_ID @"ContactCell"
 
     #define XMPP_PRESENCE_SHOW_COMPARE_AWAY @"eway"
 
-    #define TIME_REFRESH 2  // 2 seconds
+    #define TIME_REFRESH 2      // 2 seconds
+    #define TIME_CROUTON_SHOW 2 // 2 seconds
 
     #define SIZE_PULLREFRESH_PULLOVER -64
     #define SIZE_PULLREFRESH_HEIGHT -54
@@ -48,6 +50,12 @@
         ContactListSortTypeCount,
     } ContactListSortType;
 
+    typedef enum {
+        AlertViewTypeAddContact = 1000,
+        AlertViewTypeContactRequest,
+        AlertViewTypeCount,
+    } AlertViewType;
+
 @interface AppViewController () <
     UITableViewDataSource
     , UITableViewDelegate
@@ -72,6 +80,9 @@
     /** Clickable title for navbar to change sorting */
     @property (strong, nonatomic) UIButton *titleButton;
     @property (assign, nonatomic) ContactListSortType sortType;
+
+    /** Crouton messages */
+    @property (strong, nonatomic) UILabel *croutonLabel;
 
 @end
 
@@ -237,7 +248,7 @@
     if (deviceOSVersionLessThan(iOS7))
     {
         CGRect frame = addButton.frame;
-        frame.size.width += UI_SIZE_INFO_BUTTON_MARGIN;
+        frame.size.width += SIZE_INFO_BUTTON_MARGIN;
         addButton.frame = frame;
     }
    	[addButton addTarget:self action:@selector(addButtonTapped:)
@@ -253,6 +264,18 @@
     self.tableView.alpha = 0;
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
     self.tableView.separatorColor = UIColorFromHex(COLOR_HEX_WHITE_TRANSPARENT);
+
+    // Footer for crouton messages
+    self.croutonLabel = [[UILabel alloc] initWithFrame:
+        CGRectMake(0, 0, CGRectGetWidth(self.tableView.frame), 0)];
+    self.croutonLabel.backgroundColor = [UIColor clearColor];
+    self.croutonLabel.textColor = [UIColor darkGrayColor];
+    self.croutonLabel.font = [UIFont fontWithName:FONT_NAME_THIN size:FONT_SIZE_CROUTON];
+    self.croutonLabel.textAlignment = NSTextAlignmentCenter;
+    self.croutonLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    self.croutonLabel.numberOfLines = 0;
+
+    [self.view addSubview:self.croutonLabel];
 }
 
 /** @brief Setup pull to refresh */
@@ -306,7 +329,7 @@
     {
         infoButton = [UIButton buttonWithType:UIButtonTypeInfoDark];
         CGRect frame = infoButton.frame;
-        frame.size.width += UI_SIZE_INFO_BUTTON_MARGIN;
+        frame.size.width += SIZE_INFO_BUTTON_MARGIN;
         infoButton.frame = frame;
     } else {
         infoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
@@ -469,6 +492,44 @@
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:false];
 }
 
+/** @brief Show crouton with message */
+- (void)croutonWithMessage:(NSString *)message
+{
+    debugLog(@"croutonWithMessage: %@", message);
+
+    self.croutonLabel.text = message;
+    [self showCrouton:true];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(TIME_CROUTON_SHOW * NSEC_PER_SEC)), dispatch_get_main_queue(), ^(void){
+        [self showCrouton:false];
+    });
+}
+
+/** @brief Show / hide crouton */
+- (void)showCrouton:(BOOL)show
+{
+    debugLog(@"showCrouton: %i", show);
+
+    // If showing, figure out target size
+    CGRect targetFrame = self.croutonLabel.frame;
+    [self.croutonLabel sizeToFit];
+    if (show) {
+        targetFrame.size.height = self.croutonLabel.frame.size.height + SIZE_CROUTON_MARGIN * 2;
+    } else {
+        targetFrame.size.height = 0;
+    }
+
+    // Animate
+    __block UILabel *label = self.croutonLabel;
+    [UIView animateWithDuration:ANIMATION_DURATION_FAST delay:0
+        options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut
+        animations:^{
+            label.frame = targetFrame;
+        }
+        completion:^(BOOL finished) {
+            label.alpha = (show ? 1 : 0);
+        }];
+}
+
 
 #pragma mark - UI Event Handlers
 
@@ -513,6 +574,15 @@
 /** @brief Add button pressed */
 - (void)addButtonTapped:(UIButton *)sender
 {
+   UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"APP_CONTACTS_ADD_TITLE", nil)
+        message:NSLocalizedString(@"APP_CONTACTS_ADD_MESSAGE", nil)
+        delegate:self
+        cancelButtonTitle:NSLocalizedString(@"POPUP_CANCEL_BUTTON_TITLE", nil)
+        otherButtonTitles:NSLocalizedString(@"APP_CONTACTS_ADD_OK", nil), nil];
+    alert.tag = AlertViewTypeAddContact;
+    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+
+    [alert show];
 }
 
 /** @brief When received notification that a contact's presence changed */
@@ -521,6 +591,9 @@
     debugLog(@"contactPresenceChanged: %@", notification.userInfo);
 
     // Update tableview
+    // Find row for the user with modified presence
+    // Find new location for row
+    // Make updates and animate
 }
 
 /** @brief When connection status to xmpp service changes */
@@ -546,7 +619,7 @@
         if (deviceOSVersionLessThan(iOS7))
         {
             CGRect frame = loadingIndicator.frame;
-            frame.size.width += UI_SIZE_INFO_BUTTON_MARGIN;
+            frame.size.width += SIZE_INFO_BUTTON_MARGIN;
             loadingIndicator.frame = frame;
         }
 
@@ -757,10 +830,10 @@
         delegate:self
         cancelButtonTitle:NSLocalizedString(@"APP_CONTACTS_SUBSCRIBE_REQUEST_CANCEL", nil)
         otherButtonTitles:NSLocalizedString(@"APP_CONTACTS_SUBSCRIBE_REQUEST_OK", nil), nil];
+    alert.tag = AlertViewTypeContactRequest;
 
     // Hash and store request
-    alert.tag = [alert hash];
-    [self.subscriptionRequests setObject:fromUser forKey:@(alert.tag)];
+    [self.subscriptionRequests setObject:fromUser forKey:@([alert hash])];
 
     // Show popup
     [alert show];
@@ -781,17 +854,41 @@
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    // User clicked Accept
-    if (buttonIndex)
+    XMPPRoster *roster = [[AppDelegate appDelegate] roster];
+    NSNumber *key = @([alertView hash]);
+
+    switch (alertView.tag)
     {
-        [[[AppDelegate appDelegate] roster]
-            acceptPresenceSubscriptionRequestFrom:[self.subscriptionRequests objectForKey:@(alertView.tag)]
-            andAddToRoster:true];
-    }
-    else    // Reject request
-    {
-        [[[AppDelegate appDelegate] roster]
-            rejectPresenceSubscriptionRequestFrom:[self.subscriptionRequests objectForKey:@(alertView.tag)]];
+        case AlertViewTypeContactRequest:
+        {
+            if (buttonIndex) // User clicked Accept
+            {
+                [roster acceptPresenceSubscriptionRequestFrom:[self.subscriptionRequests objectForKey:key]
+                    andAddToRoster:true];
+            }
+            else    // Reject request
+            {
+                [roster rejectPresenceSubscriptionRequestFrom:[self.subscriptionRequests objectForKey:key]];
+            }
+
+            // Clean up request from temp store
+            [self.subscriptionRequests removeObjectForKey:key];
+        } break;
+
+        case AlertViewTypeAddContact:
+        {
+            if (buttonIndex) // User clicked Add
+            {
+                // Send request
+                NSString *contactEmail = [[alertView textFieldAtIndex:0] text];
+                [roster addUser:[XMPPJID jidWithString:contactEmail] withNickname:nil];
+
+                // Notify user that request has been sent
+                [self croutonWithMessage:NSLocalizedString(@"APP_CONTACTS_ADD_CONFIRM_MESSAGE", nil)];
+            }
+        } break;
+
+        default: break;
     }
 }
 

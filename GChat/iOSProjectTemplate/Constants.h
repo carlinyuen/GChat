@@ -38,6 +38,7 @@ extern float const FONT_SIZE_BRANDING;
 extern float const FONT_SIZE_CHAT_INPUT;
 extern float const FONT_SIZE_CONTACT_NAME;
 extern float const FONT_SIZE_CONTACT_STATUS;
+extern float const FONT_SIZE_CROUTON;
 
 // Time
 extern int const TIME_ONE_MINUTE;
