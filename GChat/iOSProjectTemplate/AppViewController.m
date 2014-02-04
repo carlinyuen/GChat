@@ -784,14 +784,15 @@
     {
         debugLog(@"delete row at %@", indexPath);
 
-        NSMutableArray *section = self.contactList[indexPath.section];
-        if (section)
+        // Get list to delete user from
+        NSMutableArray *list = self.contactList[indexPath.section];
+        if (list)
         {
-            XMPPUserMemoryStorageObject *user = section[indexPath.row];
+            XMPPUserMemoryStorageObject *user = list[indexPath.row];
             if (user)
             {
                 [[[AppDelegate appDelegate] roster] removeUser:[user jid]];
-                [section removeObject:user];
+                [list removeObject:user];
                 [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationLeft];
             }
         }
