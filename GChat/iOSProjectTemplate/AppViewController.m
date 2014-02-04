@@ -584,6 +584,11 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
+    // Don't show header if no entries
+    if (![self.contactList[section] count]) {
+        return nil;
+    }
+
     switch (section)
     {
         case ContactListSectionsOnline:
