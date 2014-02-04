@@ -232,21 +232,18 @@
     [self.titleButton addTarget:self action:@selector(titleTapped:) forControlEvents:UIControlEventTouchUpInside];
     self.navigationItem.titleView = self.titleButton;
 
-	// Info button on right side
-	UIButton *infoButton;
+    // Add contact button on right side (and filter?)
+    UIButton *addButton = [UIButton buttonWithType:UIButtonTypeContactAdd];
     if (deviceOSVersionLessThan(iOS7))
     {
-        infoButton = [UIButton buttonWithType:UIButtonTypeInfoDark];
-        CGRect frame = infoButton.frame;
+        CGRect frame = addButton.frame;
         frame.size.width += UI_SIZE_INFO_BUTTON_MARGIN;
-        infoButton.frame = frame;
-    } else {
-        infoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
+        addButton.frame = frame;
     }
-	[infoButton addTarget:self action:@selector(infoButtonTapped:)
-			forControlEvents:UIControlEventTouchUpInside];
+   	[addButton addTarget:self action:@selector(addButtonTapped:)
+        forControlEvents:UIControlEventTouchUpInside];
 	[self.navigationItem setRightBarButtonItem:[[UIBarButtonItem alloc]
-			initWithCustomView:infoButton] animated:true];
+        initWithCustomView:addButton] animated:true];
 }
 
 /** @brief Setup tableview */
@@ -303,6 +300,26 @@
 /** @brief Refreshes the login button text */
 - (void)refreshLoginButton
 {
+    // Info button on left side
+	UIButton *infoButton;
+    if (deviceOSVersionLessThan(iOS7))
+    {
+        infoButton = [UIButton buttonWithType:UIButtonTypeInfoDark];
+        CGRect frame = infoButton.frame;
+        frame.size.width += UI_SIZE_INFO_BUTTON_MARGIN;
+        infoButton.frame = frame;
+    } else {
+        infoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
+    }
+//	[infoButton addTarget:self action:@selector(infoButtonTapped:)
+   	[infoButton addTarget:self action:@selector(logoutButtonTapped:)
+        forControlEvents:UIControlEventTouchUpInside];
+	[self.navigationItem setLeftBarButtonItem:[[UIBarButtonItem alloc]
+        initWithCustomView:infoButton] animated:true];
+
+    return;
+
+
     // Depending on state of logged in status, change text on login button
     NSString *buttonTitle
         = ([[AppDelegate appDelegate] isConnected]
@@ -489,7 +506,12 @@
 }
 
 /** @brief Info button pressed */
-- (void)infoButtonTapped:(id)sender
+- (void)infoButtonTapped:(UIButton *)sender
+{
+}
+
+/** @brief Add button pressed */
+- (void)addButtonTapped:(UIButton *)sender
 {
 }
 
