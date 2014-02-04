@@ -266,8 +266,10 @@
     self.tableView.separatorColor = UIColorFromHex(COLOR_HEX_WHITE_TRANSPARENT);
 
     // Footer for crouton messages
-    self.croutonLabel = [[UILabel alloc] initWithFrame:
-        CGRectMake(0, 0, CGRectGetWidth(self.tableView.frame), 0)];
+    self.croutonLabel = [[UILabel alloc] initWithFrame:CGRectMake(
+        0, CGRectGetMaxY(self.view.frame),
+        CGRectGetWidth(self.view.frame), 0
+    )];
     self.croutonLabel.backgroundColor = [UIColor clearColor];
     self.croutonLabel.textColor = [UIColor darkGrayColor];
     self.croutonLabel.font = [UIFont fontWithName:FONT_NAME_THIN size:FONT_SIZE_CROUTON];
@@ -514,9 +516,12 @@
     [self.croutonLabel sizeToFit];
     if (show) {
         targetFrame.size.height = self.croutonLabel.frame.size.height + SIZE_CROUTON_MARGIN * 2;
+        targetFrame.origin.y = CGRectGetMaxY(self.view.frame) - CGRectGetHeight(targetFrame);
     } else {
+        targetFrame.origin.y = CGRectGetMaxY(self.view.frame);
         targetFrame.size.height = 0;
     }
+    debugRect(targetFrame);
 
     // Animate
     __block UILabel *label = self.croutonLabel;
