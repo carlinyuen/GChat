@@ -196,6 +196,20 @@
 /** @brief Setup Nav bar */
 - (void)setupNavBar
 {
+    // Text Color for navbar titles
+    if (deviceOSVersionLessThan(iOS7)) {
+        [[UINavigationBar appearance] setTitleTextAttributes:@{
+            UITextAttributeTextColor: [UIColor darkGrayColor],
+            UITextAttributeTextShadowColor: [UIColor clearColor],
+            UITextAttributeFont: [UIFont fontWithName:FONT_NAME_LIGHT size:FONT_SIZE_NAVBAR],
+        }];
+    } else {
+        [[UINavigationBar appearance] setTitleTextAttributes:@{
+            NSForegroundColorAttributeName: [UIColor darkGrayColor],
+            NSFontAttributeName: [UIFont fontWithName:FONT_NAME_THIN size:FONT_SIZE_NAVBAR],
+        }];
+    }
+
 	// Background Color
 	self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
     if (deviceOSVersionLessThan(iOS7)) {
