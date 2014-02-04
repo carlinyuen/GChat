@@ -270,13 +270,12 @@
         0, CGRectGetMaxY(self.view.frame),
         CGRectGetWidth(self.view.frame), 0
     )];
-    self.croutonLabel.backgroundColor = [UIColor clearColor];
+    self.croutonLabel.backgroundColor = UIColorFromHex(COLOR_HEX_WHITE_TRANSPARENT);
     self.croutonLabel.textColor = [UIColor darkGrayColor];
     self.croutonLabel.font = [UIFont fontWithName:FONT_NAME_THIN size:FONT_SIZE_CROUTON];
     self.croutonLabel.textAlignment = NSTextAlignmentCenter;
     self.croutonLabel.lineBreakMode = NSLineBreakByWordWrapping;
     self.croutonLabel.numberOfLines = 0;
-
     [self.view addSubview:self.croutonLabel];
 }
 
@@ -509,8 +508,6 @@
 /** @brief Show / hide crouton */
 - (void)showCrouton:(BOOL)show
 {
-    debugLog(@"showCrouton: %i", show);
-
     // If showing, figure out target size
     CGRect targetFrame = self.croutonLabel.frame;
     [self.croutonLabel sizeToFit];
@@ -521,7 +518,6 @@
         targetFrame.origin.y = CGRectGetMaxY(self.view.frame);
         targetFrame.size.height = 0;
     }
-    debugRect(targetFrame);
 
     // Animate
     __block UILabel *label = self.croutonLabel;
@@ -587,6 +583,9 @@
     alert.tag = AlertViewTypeAddContact;
     alert.alertViewStyle = UIAlertViewStylePlainTextInput;
 
+    // Setup field to be email field and show
+    [[alert textFieldAtIndex:0] setKeyboardAppearance:UIKeyboardAppearanceAlert];
+    [[alert textFieldAtIndex:0] setKeyboardType:UIKeyboardTypeEmailAddress];
     [alert show];
 }
 
