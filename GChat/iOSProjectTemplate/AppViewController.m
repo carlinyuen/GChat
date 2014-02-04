@@ -66,6 +66,9 @@
     /** Storage for subscription requests */
     @property (strong, nonatomic) NSMutableDictionary *subscriptionRequests;
 
+    /** Timer for refreshing */
+    @property (strong, nonatomic) NSTimer *refreshTimer;
+
     /** Clickable title for navbar to change sorting */
     @property (strong, nonatomic) UIButton *titleButton;
     @property (assign, nonatomic) ContactListSortType sortType;
@@ -321,39 +324,22 @@
     [self.navigationItem setLeftBarButtonItem:button animated:true];
 }
 
-/** @brief Sets contact in offline section */
-- (void)setContactOffline:(NSDictionary *)contact
+/** @brief Schedules a refresh to happen, if set to override previous, then cancel existing timer if exists, otherwise will not override it and return if an existing timer already exists */
+- (void)scheduleRefresh:(NSTimeInterval)delay overridePrevious:(BOOL)override
 {
-    // Remove from online if exists
-    NSArray *contacts = self.contactList[ContactListSectionsOnline];
-    NSInteger index = [contacts indexOfObject:contact inSortedRange:NSMakeRange(0, contacts.count) options:NSBinarySearchingFirstEqual usingComparator:^NSComparisonResult(id obj1, id obj2) {
-            NSDictionary *d1 = (NSDictionary *)obj1;
-            NSDictionary *d2 = (NSDictionary *)obj2;
-            return [d1[@"name"] compare:d2[@"name"]];
-        }];
-    if (index != NSNotFound) {
-        [self.contactList[ContactListSectionsOnline] removeObjectAtIndex:index];
+    if (self.refreshTimer)
+    {
+        // If existing timer: override we cancel it, no-override we exit
+        if (override) {
+            [self.refreshTimer invalidate];
+        } else {
+            return;
+        }
     }
 
-    // Update tableview
-    [self.tableView reloadData];
-}
-
-/** @brief Sets contact in online section */
-- (void)setContactOnline:(NSDictionary *)contact
-{
-    // Add to online
-    NSArray *onlineContacts = self.contactList[ContactListSectionsOnline];
-    NSInteger index = [onlineContacts indexOfObject:contact inSortedRange:NSMakeRange(0, onlineContacts.count) options:NSBinarySearchingInsertionIndex usingComparator:^NSComparisonResult(id obj1, id obj2) {
-            NSDictionary *d1 = (NSDictionary *)obj1;
-            NSDictionary *d2 = (NSDictionary *)obj2;
-            return [d1[@"name"] compare:d2[@"name"]];
-        }];
-    [self.contactList[ContactListSectionsOnline] insertObject:contact
-        atIndex:index];
-
-    // Update tableview
-    [self.tableView reloadData];
+    self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:delay
+        target:self selector:@selector(refreshTableView:)
+        userInfo:nil repeats:false];
 }
 
 /** @brief Manually initiate pull to refresh */
@@ -375,6 +361,12 @@
                     [self.tableView setContentOffset:CGPointMake(0, SIZE_PULLREFRESH_HEIGHT - originalTopInset)];
                 } completion:nil];
         }];
+    [self scheduleRefresh:TIME_REFRESH overridePrevious:true];
+}
+
+/** @brief Silent refresh, only shows activity indicator in status bar */
+- (void)silentRefresh
+{
     [NSTimer scheduledTimerWithTimeInterval:TIME_REFRESH target:self selector:@selector(refreshTableView:) userInfo:nil repeats:false];
 }
 
@@ -479,14 +471,7 @@
 {
     debugLog(@"contactPresenceChanged: %@", notification.userInfo);
 
-    return; // Don't change for now
-
-    NSDictionary *data = notification.userInfo;
-    if ([data[@"presence"] isEqualToString:@"unavailable"]) {
-        [self setContactOffline:data];
-    } else {
-        [self setContactOnline:data];
-    }
+    // Update tableview
 }
 
 /** @brief When connection status to xmpp service changes */
@@ -538,7 +523,7 @@
     [[[AppDelegate appDelegate] roster] fetchRoster];
 
     // Refresh on delay
-    [NSTimer scheduledTimerWithTimeInterval:TIME_REFRESH target:self selector:@selector(refreshTableView:) userInfo:Nil repeats:false];
+    [self scheduleRefresh:TIME_REFRESH overridePrevious:true];
 }
 
 /** @brief When title button is tapped to change sorting */
