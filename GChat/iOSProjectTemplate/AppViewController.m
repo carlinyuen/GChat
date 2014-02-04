@@ -83,6 +83,7 @@
 
     /** Crouton messages */
     @property (strong, nonatomic) UILabel *croutonLabel;
+    @property (assign, nonatomic) BOOL croutonIsShowing;
 
 @end
 
@@ -498,28 +499,23 @@
 {
     debugLog(@"croutonWithMessage: %@", message);
 
-    self.croutonLabel.text = message;
-    [self showCrouton:true];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(TIME_CROUTON_SHOW * NSEC_PER_SEC)), dispatch_get_main_queue(), ^(void){
-        [self showCrouton:false];
-    });
-}
-
-/** @brief Show / hide crouton */
-- (void)showCrouton:(BOOL)show
-{
-    // If showing, figure out target size
-    CGRect originalFrame = self.croutonLabel.frame;
-    CGRect targetFrame = self.croutonLabel.frame;
-    [self.croutonLabel sizeToFit];
-    if (show)
-    {
-        targetFrame.size.height = self.croutonLabel.frame.size.height + SIZE_CROUTON_MARGIN * 2;
-        targetFrame.origin.y = CGRectGetMaxY(self.view.frame) - CGRectGetHeight(targetFrame);
-    } else {
-        targetFrame.origin.y = CGRectGetMaxY(self.view.frame);
-        targetFrame.size.height = 0;
+    // If already showing, don't 
+    if (self.croutonIsShowing) {
     }
+
+    self.croutonIsShowing = true;
+    self.croutonLabel.text = message;
+
+    // If showing, figure out target size
+    CGRect originalFrame = CGRectMake(0, 0, self.view.frame.size.width, 0);
+    originalFrame.origin.y = CGRectGetMaxY(self.view.frame);
+
+    CGRect targetFrame = originalFrame;
+    self.croutonLabel.frame = originalFrame;
+    [self.croutonLabel sizeToFit];
+
+    targetFrame.size.height = self.croutonLabel.frame.size.height + SIZE_CROUTON_MARGIN * 2;
+    targetFrame.origin.y = CGRectGetMaxY(self.view.frame) - CGRectGetHeight(targetFrame);
     self.croutonLabel.frame = originalFrame;
 
     // Animate
@@ -528,8 +524,18 @@
         options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut
         animations:^{
             label.frame = targetFrame;
-            label.alpha = (show ? 1 : 0);
-        } completion:nil];
+            label.alpha = 1;
+        }
+        completion:^(BOOL finished) {
+            if (finished) {
+                [UIView animateWithDuration:ANIMATION_DURATION_FAST delay:TIME_CROUTON_SHOW
+                    options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut
+                    animations:^{
+                        label.frame = originalFrame;
+                        label.alpha = 0;
+                    } completion:nil];
+            }
+        }];
 }
 
 
