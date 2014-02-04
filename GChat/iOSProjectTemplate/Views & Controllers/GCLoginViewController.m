@@ -9,6 +9,7 @@
 #import "GCLoginViewController.h"
 
 #import "AppDelegate.h"
+#import "AppViewController.h"
 
     #define TEXT_CHECKBOX @"▢"
     #define TEXT_CHECKBOX_CHECKED @"\u2611"
@@ -196,6 +197,7 @@
         [defaults synchronize];
 
         // Dismiss
+        [[[AppDelegate appDelegate] viewController] manualPullToRefresh];
         [self dismissViewControllerAnimated:true completion:nil];
     }
 

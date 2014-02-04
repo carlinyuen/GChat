@@ -154,7 +154,7 @@
 {
 	[super viewWillAppear:animated];
 
-    debugLog(@"viewDidAppear");
+    debugLog(@"viewWillAppear");
 
     // Setup pull to refresh when UITableView insets are set
     if (!self.pullToRefresh) {
@@ -374,6 +374,14 @@
     [self scheduleRefresh:TIME_REFRESH overridePrevious:false];
 }
 
+/** @brief Clears contact list and replaces contents with blank arrays */
+- (void)clearContactList
+{
+    for (int i = 0; i < ContactListSectionsCount; ++i) {
+        [self.contactList[i] removeAllObjects];
+    }
+}
+
 /** @brief Refreshes tableview and roster data */
 - (void)refreshTableView:(id)sender
 {
@@ -381,9 +389,7 @@
     XMPPRosterMemoryStorage *rosterStorage = [[AppDelegate appDelegate] rosterStorage];
 
     // Clean up contact list
-    for (int i = 0; i < ContactListSectionsCount; ++i) {
-        [self.contactList setObject:[NSMutableArray new] atIndexedSubscript:i];
-    }
+    [self clearContactList];
 
     // If sorted by name
     if (self.sortType == ContactListSortTypeByName)
@@ -429,6 +435,14 @@
     // Refresh tableview
     [self.tableView reloadData];
 
+    // Show tableview if not already shown
+    [UIView animateWithDuration:ANIMATION_DURATION_FAST
+        delay:ANIMATION_DURATION_MED
+        options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut
+        animations:^{
+            self.tableView.alpha = 1;
+        } completion:nil];
+
     // Stop refreshing if pull to refresh is running
     [self.pullToRefresh endRefreshing];
 
@@ -462,7 +476,11 @@
         options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut
         animations:^{
             self.tableView.alpha = 0;
-        } completion:nil];
+        }
+        completion:^(BOOL finished) {
+            [self clearContactList];
+            [self.tableView reloadData];
+        }];
 
     // Show login view
     [self showLoginView];
@@ -492,15 +510,8 @@
         // Refresh login button
         [self refreshLoginButton];
 
-        // Show tableview
-        [UIView animateWithDuration:ANIMATION_DURATION_FAST delay:0
-            options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut
-            animations:^{
-                self.tableView.alpha = 1;
-            } completion:nil];
-
-        // Manual pull to refresh
-        [self manualPullToRefresh];
+        // Silent refresh
+        [self silentRefresh];
     }
     else if ([status isEqualToString:XMPP_CONNECTION_CONNECTING])
     {

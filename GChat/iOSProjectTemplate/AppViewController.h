@@ -11,4 +11,7 @@
 
 @interface AppViewController : UIViewController
 
+    /** @brief Manually initiate pull to refresh */
+    - (void)manualPullToRefresh;
+
 @end
