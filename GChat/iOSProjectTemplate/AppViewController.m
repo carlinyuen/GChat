@@ -369,11 +369,51 @@
 {
     // Get new snapshot of roster
     XMPPRosterMemoryStorage *rosterStorage = [[AppDelegate appDelegate] rosterStorage];
-    if (rosterStorage && [rosterStorage sortedAvailableUsersByName]) {
-        self.contactList[ContactListSectionsOnline] = [rosterStorage sortedAvailableUsersByName];
+
+    // Clean up contact list
+    for (int i = 0; i < ContactListSectionsCount; ++i) {
+        [self.contactList setObject:[NSMutableArray new] atIndexedSubscript:i];
     }
-    if (rosterStorage && [rosterStorage sortedUnavailableUsersByName]) {
-        self.contactList[ContactListSectionsOffline] = [[[AppDelegate appDelegate] rosterStorage] sortedUnavailableUsersByName];
+
+    // If sorted by name
+    if (self.sortType == ContactListSortTypeByName)
+    {
+        debugLog(@"sortedByName");
+
+        if (rosterStorage && [rosterStorage sortedAvailableUsersByName]) {
+            self.contactList[ContactListSectionsOnline] = [rosterStorage sortedAvailableUsersByName];
+        }
+        if (rosterStorage && [rosterStorage sortedUnavailableUsersByName]) {
+            self.contactList[ContactListSectionsOffline] = [[[AppDelegate appDelegate] rosterStorage] sortedUnavailableUsersByName];
+        }
+    }
+    else if (self.sortType == ContactListSortTypeByStatus)
+    {
+        debugLog(@"sortedByStatus");
+
+        // Create easy hashmap for efficient referencing
+        NSDictionary *sections = @{
+            XMPP_PRESENCE_SHOW_AWAY: self.contactList[ContactListSectionsAway],
+            XMPP_PRESENCE_SHOW_AWAY_EXTENDED: self.contactList[ContactListSectionsAway],
+            XMPP_PRESENCE_SHOW_BUSY: self.contactList[ContactListSectionsBusy],
+            XMPP_PRESENCE_TYPE_ONLINE: self.contactList[ContactListSectionsOnline],
+            XMPP_PRESENCE_TYPE_OFFLINE: self.contactList[ContactListSectionsOffline],
+        };
+
+        // Iterate through sorted users by availability and insert
+        NSArray *sortedUsers = [rosterStorage sortedUsersByAvailabilityName];
+        NSString *show;
+        for (XMPPUserMemoryStorageObject *user in sortedUsers)
+        {
+            // If no primaryResource, is offline
+            show = ([user primaryResource]
+                ? [[[user primaryResource] presence] show]
+                : XMPP_PRESENCE_TYPE_OFFLINE);
+            show = (show ? show : XMPP_PRESENCE_TYPE_ONLINE);
+
+            // Add to appropriate section
+            [sections[show] addObject:user];
+        }
     }
 
     // Refresh tableview
@@ -516,6 +556,8 @@
     switch (section)
     {
         case ContactListSectionsOnline:
+        case ContactListSectionsBusy:
+        case ContactListSectionsAway:
         case ContactListSectionsOffline:
             return [self.contactList[section] count];
 
@@ -540,6 +582,8 @@
     switch (indexPath.section)
     {
         case ContactListSectionsOnline:
+        case ContactListSectionsBusy:
+        case ContactListSectionsAway:
         case ContactListSectionsOffline:
             user = self.contactList[indexPath.section][indexPath.row];
             break;
@@ -628,6 +672,8 @@
     switch (indexPath.section)
     {
         case ContactListSectionsOnline:
+        case ContactListSectionsBusy:
+        case ContactListSectionsAway:
         case ContactListSectionsOffline:
             user = self.contactList[indexPath.section][indexPath.row];
             break;
