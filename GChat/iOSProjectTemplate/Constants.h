@@ -61,6 +61,7 @@ extern int const COLOR_HEX_SHOW_BUSY_SELECTED;
 extern int const COLOR_HEX_SHOW_OFFLINE;
 extern int const COLOR_HEX_BLACK_TRANSPARENT;
 extern int const COLOR_HEX_WHITE_TRANSPARENT;
+extern int const COLOR_HEX_WHITE_TRANSLUCENT;
 extern int const COLOR_HEX_GREY_TRANSPARENT;
 
 // Animations

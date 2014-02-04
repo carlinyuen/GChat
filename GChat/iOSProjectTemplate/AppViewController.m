@@ -270,9 +270,9 @@
         0, CGRectGetMaxY(self.view.frame),
         CGRectGetWidth(self.view.frame), 0
     )];
-    self.croutonLabel.backgroundColor = UIColorFromHex(COLOR_HEX_WHITE_TRANSPARENT);
+    self.croutonLabel.backgroundColor = UIColorFromHex(COLOR_HEX_WHITE_TRANSLUCENT);
     self.croutonLabel.textColor = [UIColor darkGrayColor];
-    self.croutonLabel.font = [UIFont fontWithName:FONT_NAME_THIN size:FONT_SIZE_CROUTON];
+    self.croutonLabel.font = [UIFont fontWithName:FONT_NAME_MEDIUM size:FONT_SIZE_CROUTON];
     self.croutonLabel.textAlignment = NSTextAlignmentCenter;
     self.croutonLabel.lineBreakMode = NSLineBreakByWordWrapping;
     self.croutonLabel.numberOfLines = 0;
@@ -509,15 +509,18 @@
 - (void)showCrouton:(BOOL)show
 {
     // If showing, figure out target size
+    CGRect originalFrame = self.croutonLabel.frame;
     CGRect targetFrame = self.croutonLabel.frame;
     [self.croutonLabel sizeToFit];
-    if (show) {
+    if (show)
+    {
         targetFrame.size.height = self.croutonLabel.frame.size.height + SIZE_CROUTON_MARGIN * 2;
         targetFrame.origin.y = CGRectGetMaxY(self.view.frame) - CGRectGetHeight(targetFrame);
     } else {
         targetFrame.origin.y = CGRectGetMaxY(self.view.frame);
         targetFrame.size.height = 0;
     }
+    self.croutonLabel.frame = originalFrame;
 
     // Animate
     __block UILabel *label = self.croutonLabel;
@@ -525,10 +528,8 @@
         options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut
         animations:^{
             label.frame = targetFrame;
-        }
-        completion:^(BOOL finished) {
             label.alpha = (show ? 1 : 0);
-        }];
+        } completion:nil];
 }
 
 
