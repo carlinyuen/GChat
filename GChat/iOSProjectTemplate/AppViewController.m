@@ -497,45 +497,7 @@
 /** @brief Show crouton with message */
 - (void)croutonWithMessage:(NSString *)message
 {
-    debugLog(@"croutonWithMessage: %@", message);
-
-    // If already showing, don't 
-    if (self.croutonIsShowing) {
-    }
-
-    self.croutonIsShowing = true;
-    self.croutonLabel.text = message;
-
-    // If showing, figure out target size
-    CGRect originalFrame = CGRectMake(0, 0, self.view.frame.size.width, 0);
-    originalFrame.origin.y = CGRectGetMaxY(self.view.frame);
-
-    CGRect targetFrame = originalFrame;
-    self.croutonLabel.frame = originalFrame;
-    [self.croutonLabel sizeToFit];
-
-    targetFrame.size.height = self.croutonLabel.frame.size.height + SIZE_CROUTON_MARGIN * 2;
-    targetFrame.origin.y = CGRectGetMaxY(self.view.frame) - CGRectGetHeight(targetFrame);
-    self.croutonLabel.frame = originalFrame;
-
-    // Animate
-    __block UILabel *label = self.croutonLabel;
-    [UIView animateWithDuration:ANIMATION_DURATION_FAST delay:0
-        options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut
-        animations:^{
-            label.frame = targetFrame;
-            label.alpha = 1;
-        }
-        completion:^(BOOL finished) {
-            if (finished) {
-                [UIView animateWithDuration:ANIMATION_DURATION_FAST delay:TIME_CROUTON_SHOW
-                    options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut
-                    animations:^{
-                        label.frame = originalFrame;
-                        label.alpha = 0;
-                    } completion:nil];
-            }
-        }];
+    debugLog(@"crouton: %@", message);
 }
 
 
@@ -814,6 +776,26 @@
 {
     // Set this so when animating selection, will not fade to white
     cell.backgroundColor = cell.contentView.backgroundColor;
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (editingStyle == UITableViewCellEditingStyleDelete)
+    {
+        debugLog(@"delete row at %@", indexPath);
+
+        NSMutableArray *section = self.contactList[indexPath.section];
+        if (section)
+        {
+            XMPPUserMemoryStorageObject *user = section[indexPath.row];
+            if (user)
+            {
+                [[[AppDelegate appDelegate] roster] removeUser:[user jid]];
+                [section removeObject:user];
+                [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationLeft];
+            }
+        }
+    }
 }
 
 
