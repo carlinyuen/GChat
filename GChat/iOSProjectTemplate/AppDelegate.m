@@ -109,7 +109,7 @@
     debugLog(@"receivedLocalNotification: %@", notification.userInfo);
 
     UINavigationController *nav = (UINavigationController *)self.window.rootViewController;
-    [nav popToRootViewControllerAnimated:true];
+    [nav popToRootViewControllerAnimated:false];
     [self.viewController selectContact:notification.userInfo[XMPP_MESSAGE_USERNAME]];
 }
 
