@@ -203,8 +203,9 @@
 {
     NSDictionary *message = notification.userInfo;
 
-    // Only notify if not same user as we're viewing
-    if (![[[self.contact jid] bare] isEqualToString:message[XMPP_MESSAGE_USERNAME]])
+    // Only notify if not same user as we're viewing or if we're in background
+    if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateBackground
+        || ![[[self.contact jid] bare] isEqualToString:message[XMPP_MESSAGE_USERNAME]])
     {
         debugLog(@"ChatView messageReceived: %@", notification);
 
