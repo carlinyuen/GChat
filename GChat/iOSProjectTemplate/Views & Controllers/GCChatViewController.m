@@ -355,7 +355,7 @@
     CGRect frame = [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
 
     [UIView animateWithDuration:ANIMATION_DURATION_MED delay:0
-        options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionBeginFromCurrentState
+        options:UIViewAnimationOptionBeginFromCurrentState
         animations:^{
             self.footerBottomConstraint.constant = frame.size.height;
             [self.view layoutIfNeeded];
@@ -367,7 +367,7 @@
 {
     // Animate back to zero
     [UIView animateWithDuration:ANIMATION_DURATION_MED delay:0
-        options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionBeginFromCurrentState
+        options:UIViewAnimationOptionBeginFromCurrentState
         animations:^{
             self.footerBottomConstraint.constant = 0;
             [self.view layoutIfNeeded];
