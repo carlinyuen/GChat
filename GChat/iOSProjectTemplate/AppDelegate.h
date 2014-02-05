@@ -21,6 +21,8 @@
     @property (strong, nonatomic, readonly) XMPPStream *xmppStream;
     @property (strong, nonatomic) XMPPRoster *roster;
     @property (strong, nonatomic) XMPPRosterMemoryStorage *rosterStorage;
+    @property (strong, nonatomic) XMPPMessageArchiving *messageArchive;
+    @property (strong, nonatomic) XMPPMessageArchivingCoreDataStorage *messageArchiveStorage;
     @property (strong, nonatomic) XMPPvCardCoreDataStorage *avatarStorage;
     @property (strong, nonatomic) XMPPvCardTempModule *avatarTemp;
     @property (strong, nonatomic) XMPPvCardAvatarModule *avatarCards;

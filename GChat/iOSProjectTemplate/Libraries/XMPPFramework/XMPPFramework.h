@@ -93,14 +93,16 @@
 //
 //#import "XMPPDateTimeProfiles.h"
 //#import "NSDate+XMPPDateTimeProfiles.h"
-//
-//#import "XMPPMessage+XEP_0085.h"
-//
+
+#import "XMPPMessage+XEP_0085.h"
+#import "XMPPMessageArchiving.h"
+#import "XMPPMessageArchivingCoreDataStorage.h"
+
 //#import "XMPPTransports.h"
 //
 //#import "XMPPCapabilities.h"
 //#import "XMPPCapabilitiesCoreDataStorage.h"
-//
+
 #import "XMPPvCardAvatarModule.h"
 
 //#import "XMPPMessage+XEP_0184.h"

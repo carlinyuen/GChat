@@ -52,6 +52,9 @@
         [[NSNotificationCenter defaultCenter] addObserver:self
             selector:@selector(messageReceived:)
             name:NOTIFICATION_MESSAGE_RECEIVED object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+            selector:@selector(contactPresenceChanged:)
+            name:NOTIFICATION_PRESENCE_UPDATE object:nil];
     }
     return self;
 }
@@ -67,6 +70,25 @@
     [self setupNavBar];
     [self setupFooterView];
     [self setupTableView];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+
+    // Load messages
+    NSManagedObjectContext *moc = [[[AppDelegate appDelegate] messageArchiveStorage] mainThreadManagedObjectContext];
+    NSEntityDescription *entityDescription = [NSEntityDescription
+        entityForName:@"XMPPMessageArchiving_Message_CoreDataObject"
+        inManagedObjectContext:moc];
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    [request setEntity:entityDescription];
+
+    // Fetch
+    NSError *error;
+    NSArray *messages = [moc executeFetchRequest:request error:&error];
+
+    debugLog(@"messages: %@", messages);
 }
 
 - (void)didReceiveMemoryWarning
@@ -220,6 +242,20 @@
 
         // Show notification immediately
         [[UIApplication sharedApplication] presentLocalNotificationNow:pushNotification];
+    }
+}
+
+/** @brief When received notification that a contact's presence changed */
+- (void)contactPresenceChanged:(NSNotification *)notification
+{
+    NSDictionary *presence = notification.userInfo;
+
+    // Only bother if user is same as viewing
+    if ([[[self.contact jid] bare] isEqualToString:presence[XMPP_PRESENCE_USERNAME]])
+    {
+        debugLog(@"contactPresenceChanged: %@", presence);
+
+        // TODO: Notify user of change in status
     }
 }
 

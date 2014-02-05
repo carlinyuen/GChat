@@ -166,12 +166,16 @@
         [self.roster addDelegate:self.viewController delegateQueue:dispatch_get_main_queue()];
         [self.roster activate:[[AppDelegate appDelegate] xmppStream]];
 
+        // Message archive
+        self.messageArchiveStorage = [XMPPMessageArchivingCoreDataStorage sharedInstance];
+        self.messageArchive = [[XMPPMessageArchiving alloc] initWithMessageArchivingStorage:self.messageArchiveStorage];
+        [self.messageArchive activate:self.xmppStream];
+
         // vCard
-        self.avatarStorage = [[XMPPvCardCoreDataStorage alloc] initWithDatabaseFilename:nil storeOptions:nil];
+        self.avatarStorage = [XMPPvCardCoreDataStorage sharedInstance];
         self.avatarTemp = [[XMPPvCardTempModule alloc] initWithvCardStorage:self.avatarStorage];
         self.avatarCards = [[XMPPvCardAvatarModule alloc] initWithvCardTempModule:self.avatarTemp];
         [self.avatarCards activate:[[AppDelegate appDelegate] xmppStream]];
-
     }
 }
 
