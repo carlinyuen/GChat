@@ -54,6 +54,6 @@
 "ERROR_CONNECT" = "Could not connect to server. Please check your connection.";
 "ERROR_CONNECTION_TIMEOUT" = "Could not connect to server! Please check your connection and login email.";
 "ERROR_CONNECTION_AUTH" = "Could not authenticate you! Please check your email and password.";
-"ERROR_INVALID_EMAIL" = "Invalid email";
+"ERROR_INVALID_EMAIL" = "Invalid email format";
 "ERROR_BLANK_USERNAME" = "Missing username";
 "ERROR_BLANK_PASSWORD" = "Missing password";

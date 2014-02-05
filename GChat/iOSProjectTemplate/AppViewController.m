@@ -439,10 +439,12 @@
         debugLog(@"sortedByName");
 
         if (rosterStorage && [rosterStorage sortedAvailableUsersByName]) {
-            self.contactList[ContactListSectionsOnline] = [rosterStorage sortedAvailableUsersByName];
+            [self.contactList[ContactListSectionsOnline]
+                addObjectsFromArray:[rosterStorage sortedAvailableUsersByName]];
         }
         if (rosterStorage && [rosterStorage sortedUnavailableUsersByName]) {
-            self.contactList[ContactListSectionsOffline] = [[[AppDelegate appDelegate] rosterStorage] sortedUnavailableUsersByName];
+            [self.contactList[ContactListSectionsOffline]
+                addObjectsFromArray:[rosterStorage sortedUnavailableUsersByName]];
         }
     }
     else if (self.sortType == ContactListSortTypeByStatus)
@@ -791,8 +793,8 @@
             XMPPUserMemoryStorageObject *user = list[indexPath.row];
             if (user)
             {
-                [[[AppDelegate appDelegate] roster] removeUser:[user jid]];
                 [list removeObject:user];
+                [[[AppDelegate appDelegate] roster] removeUser:[user jid]];
                 [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationLeft];
             }
         }
@@ -875,6 +877,14 @@
             {
                 // Send request
                 NSString *contactEmail = [[alertView textFieldAtIndex:0] text];
+
+                // Validate email
+                if (![[NSPredicate predicateWithFormat:@"SELF MATCHES[c] %@", REGEX_EMAIL_VERIFICATION] evaluateWithObject:contactEmail]) {
+                    [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"POPUP_ERROR_TITLE", nil) message:NSLocalizedString(@"ERROR_INVALID_EMAIL", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"POPUP_CONFIRM_BUTTON_TITLE", nil) otherButtonTitles:nil] show];
+                    return;
+                }
+
+                // Add to roster
                 [roster addUser:[XMPPJID jidWithString:contactEmail] withNickname:nil];
 
                 // Notify user that request has been sent
