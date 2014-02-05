@@ -214,7 +214,7 @@
         {
             [self addMessage:@{
                 XMPP_TIMESTAMP: message.timestamp,
-                XMPP_MESSAGE_TEXT: message.messageStr,
+                XMPP_MESSAGE_TEXT: [message.message body],
                 XMPP_MESSAGE_USERNAME: (message.isOutgoing)
                     ? [[[[AppDelegate appDelegate] xmppStream] myJID] bare]
                     : message.bareJidStr,
