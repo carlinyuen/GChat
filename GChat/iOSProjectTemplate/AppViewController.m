@@ -23,6 +23,7 @@
 
     #define TIME_REFRESH 2      // 2 seconds
     #define TIME_CROUTON_SHOW 2 // 2 seconds
+    #define TIME_POLL_ROSTER 10
 
     #define SIZE_PULLREFRESH_PULLOVER -64
     #define SIZE_PULLREFRESH_HEIGHT -54
@@ -74,8 +75,9 @@
     /** Storage for subscription requests */
     @property (strong, nonatomic) NSMutableDictionary *subscriptionRequests;
 
-    /** Timer for refreshing */
+    /** Timers for refreshing */
     @property (strong, nonatomic) NSTimer *refreshTimer;
+    @property (strong, nonatomic) NSTimer *pollServerTimer;
 
     /** Clickable title for navbar to change sorting */
     @property (strong, nonatomic) UIButton *titleButton;
@@ -407,8 +409,10 @@
 }
 
 /** @brief Silent refresh, only shows activity indicator in status bar */
-- (void)silentRefresh
+- (void)silentRefresh:(id)sender
 {
+    debugLog(@"silentRefresh from %@", sender);
+
     // Show loading indicator
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:true];
 
@@ -427,73 +431,83 @@
 /** @brief Refreshes tableview and roster data */
 - (void)refreshTableView:(id)sender
 {
-    // Get new snapshot of roster
-    XMPPRosterMemoryStorage *rosterStorage = [[AppDelegate appDelegate] rosterStorage];
+    // Do this asynchronously
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
 
-    // Clean up contact list
-    [self clearContactList];
+        // Get new snapshot of roster
+        XMPPRosterMemoryStorage *rosterStorage = [[AppDelegate appDelegate] rosterStorage];
 
-    // If sorted by name
-    if (self.sortType == ContactListSortTypeByName)
-    {
-        debugLog(@"sortedByName");
+        // Clean up contact list
+        [self clearContactList];
 
-        if (rosterStorage && [rosterStorage sortedAvailableUsersByName]) {
-            [self.contactList[ContactListSectionsOnline]
-                addObjectsFromArray:[rosterStorage sortedAvailableUsersByName]];
-        }
-        if (rosterStorage && [rosterStorage sortedUnavailableUsersByName]) {
-            [self.contactList[ContactListSectionsOffline]
-                addObjectsFromArray:[rosterStorage sortedUnavailableUsersByName]];
-        }
-    }
-    else if (self.sortType == ContactListSortTypeByStatus)
-    {
-        debugLog(@"sortedByStatus");
-
-        // Create easy hashmap for efficient referencing
-        NSDictionary *sections = @{
-            XMPP_PRESENCE_SHOW_AWAY: self.contactList[ContactListSectionsAway],
-            XMPP_PRESENCE_SHOW_AWAY_EXTENDED: self.contactList[ContactListSectionsAway],
-            XMPP_PRESENCE_SHOW_BUSY: self.contactList[ContactListSectionsBusy],
-            XMPP_PRESENCE_TYPE_ONLINE: self.contactList[ContactListSectionsOnline],
-            XMPP_PRESENCE_TYPE_OFFLINE: self.contactList[ContactListSectionsOffline],
-        };
-
-        // Iterate through sorted users by availability and insert
-        NSArray *sortedUsers = [rosterStorage sortedUsersByAvailabilityName];
-        NSString *show;
-        for (XMPPUserMemoryStorageObject *user in sortedUsers)
+        // If sorted by name
+        if (self.sortType == ContactListSortTypeByName)
         {
-            // If no primaryResource, is offline
-            show = ([user primaryResource]
-                ? [[[user primaryResource] presence] show]
-                : XMPP_PRESENCE_TYPE_OFFLINE);
-            show = (show ? show : XMPP_PRESENCE_TYPE_ONLINE);
+            debugLog(@"sortedByName");
 
-            // Add to appropriate section
-            [sections[show] addObject:user];
+            if (rosterStorage && [rosterStorage sortedAvailableUsersByName]) {
+                [self.contactList[ContactListSectionsOnline]
+                    addObjectsFromArray:[rosterStorage sortedAvailableUsersByName]];
+            }
+            if (rosterStorage && [rosterStorage sortedUnavailableUsersByName]) {
+                [self.contactList[ContactListSectionsOffline]
+                    addObjectsFromArray:[rosterStorage sortedUnavailableUsersByName]];
+            }
         }
-    }
+        else if (self.sortType == ContactListSortTypeByStatus)
+        {
+            debugLog(@"sortedByStatus");
 
-    // Refresh tableview
-    [self.tableView reloadSections:[NSIndexSet
-            indexSetWithIndexesInRange:NSMakeRange(0, ContactListSectionsCount)]
-        withRowAnimation:UITableViewRowAnimationAutomatic];
+            // Create easy hashmap for efficient referencing
+            NSDictionary *sections = @{
+                XMPP_PRESENCE_SHOW_AWAY: self.contactList[ContactListSectionsAway],
+                XMPP_PRESENCE_SHOW_AWAY_EXTENDED: self.contactList[ContactListSectionsAway],
+                XMPP_PRESENCE_SHOW_BUSY: self.contactList[ContactListSectionsBusy],
+                XMPP_PRESENCE_TYPE_ONLINE: self.contactList[ContactListSectionsOnline],
+                XMPP_PRESENCE_TYPE_OFFLINE: self.contactList[ContactListSectionsOffline],
+            };
 
-    // Show tableview if not already shown
-    [UIView animateWithDuration:ANIMATION_DURATION_FAST
-        delay:ANIMATION_DURATION_MED
-        options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut
-        animations:^{
-            self.tableView.alpha = 1;
-        } completion:nil];
+            // Iterate through sorted users by availability and insert
+            NSArray *sortedUsers = [rosterStorage sortedUsersByAvailabilityName];
+            NSString *show;
+            for (XMPPUserMemoryStorageObject *user in sortedUsers)
+            {
+                // If no primaryResource, is offline
+                show = ([user primaryResource]
+                    ? [[[user primaryResource] presence] show]
+                    : XMPP_PRESENCE_TYPE_OFFLINE);
+                show = (show ? show : XMPP_PRESENCE_TYPE_ONLINE);
 
-    // Stop refreshing if pull to refresh is running
-    [self.pullToRefresh endRefreshing];
+                // Add to appropriate section
+                [sections[show] addObject:user];
+            }
+        }
 
-    // Stop activity indicator if it was showing
-    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:false];
+        // Do this on main ui thread
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            // Refresh tableview
+            [self.tableView reloadSections:[NSIndexSet
+                    indexSetWithIndexesInRange:NSMakeRange(0, ContactListSectionsCount)]
+                withRowAnimation:UITableViewRowAnimationAutomatic];
+
+            // Show tableview if not already shown
+            [UIView animateWithDuration:ANIMATION_DURATION_FAST
+                delay:ANIMATION_DURATION_MED
+                options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut
+                animations:^{
+                    self.tableView.alpha = 1;
+                } completion:nil];
+
+            // Stop refreshing if pull to refresh is running
+            [self.pullToRefresh endRefreshing];
+
+            // Stop activity indicator if it was showing
+            [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:false];
+
+            // Clear timer
+            self.refreshTimer = nil;
+        });
+    });
 }
 
 /** @brief Show crouton with message */
@@ -519,6 +533,9 @@
 
     // Disconnect xmpp service
     [[AppDelegate appDelegate] disconnect];
+
+    // Stop timer for polling
+    [self.pollServerTimer invalidate];
 
     // Clear credentials
     [AppDelegate clearCredentials];
@@ -565,7 +582,7 @@
 {
     debugLog(@"contactPresenceChanged: %@", notification.userInfo);
 
-    // Update tableview
+    // TODO: Update tableview
     // Find row for the user with modified presence
     // Find new location for row
     // Make updates and animate
@@ -583,7 +600,13 @@
         [self refreshLoginButton];
 
         // Silent refresh
-        [self silentRefresh];
+        [self silentRefresh:notification];
+
+        // Set timer to continuously poll server
+        if (self.pollServerTimer) {
+            [self.pollServerTimer invalidate];
+        }
+        self.pollServerTimer = [NSTimer scheduledTimerWithTimeInterval:TIME_POLL_ROSTER target:self selector:@selector(silentRefresh:) userInfo:nil repeats:true];
     }
     else if ([status isEqualToString:XMPP_CONNECTION_CONNECTING])
     {
