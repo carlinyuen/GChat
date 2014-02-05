@@ -58,6 +58,14 @@
         [[NSNotificationCenter defaultCenter] addObserver:self
             selector:@selector(contactPresenceChanged:)
             name:NOTIFICATION_PRESENCE_UPDATE object:nil];
+
+        // Listen for keyboard appearances and disappearances
+        [[NSNotificationCenter defaultCenter] addObserver:self 
+            selector:@selector(keyboardWillShow:)
+            name:UIKeyboardWillShowNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+            selector:@selector(keyboardDidHide:)
+            name:UIKeyboardDidHideNotification object:nil];
     }
     return self;
 }
@@ -143,6 +151,7 @@
     self.inputTextView.layer.borderWidth = SIZE_BORDER_WIDTH;
     self.inputTextView.layer.cornerRadius = SIZE_CORNER_RADIUS;
     self.inputTextView.delegate = self;
+    self.inputTextView.inputAccessoryView = self.footerView;
     [self.footerView addSubview:self.inputTextView];
 
     // Send button
@@ -317,6 +326,16 @@
 
 /** @brief When title button is tapped to change sorting */
 - (void)titleTapped:(UIButton *)sender
+{
+}
+
+/** @brief Keyboard will show */
+- (void)keyboardWillShow:(NSNotification *)notification
+{
+}
+
+/** @brief Keyboard will hide */
+- (void)keyboardWillHide:(NSNotification *)notification
 {
 }
 
