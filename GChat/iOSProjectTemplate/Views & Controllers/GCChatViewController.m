@@ -184,20 +184,42 @@
 
     self.refreshingTableView = true;
 
+    // Setup to fetch messages from CoreData
+    NSManagedObjectContext *moc = [[[AppDelegate appDelegate] messageArchiveStorage] mainThreadManagedObjectContext];
+    NSEntityDescription *entityDescription = [NSEntityDescription
+        entityForName:@"XMPPMessageArchiving_Message_CoreDataObject"
+        inManagedObjectContext:moc];
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    [request setEntity:entityDescription];
+
+    // Fetch
+    NSError *error;
+    NSArray *messages = [moc executeFetchRequest:request error:&error];
+
+    if (error)
+    {
+        self.refreshingTableView = false;
+
+        // TODO: notify user
+
+        return;
+    }
+
     // Do this on background thread
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
     {
-        // Load messages
-        NSManagedObjectContext *moc = [[[AppDelegate appDelegate] messageArchiveStorage] mainThreadManagedObjectContext];
-        NSEntityDescription *entityDescription = [NSEntityDescription
-            entityForName:@"XMPPMessageArchiving_Message_CoreDataObject"
-            inManagedObjectContext:moc];
-        NSFetchRequest *request = [[NSFetchRequest alloc] init];
-        [request setEntity:entityDescription];
-
-        // Fetch
-        NSError *error;
-        NSArray *messages = [moc executeFetchRequest:request error:&error];
+        // Clear out message list and add archived messages
+        [self.messageList removeAllObjects];
+        for (XMPPMessageArchiving_Message_CoreDataObject *message in messages)
+        {
+            [self addMessage:@{
+                XMPP_TIMESTAMP: message.timestamp,
+                XMPP_MESSAGE_TEXT: message.messageStr,
+                XMPP_MESSAGE_USERNAME: (message.isOutgoing)
+                    ? [[[[AppDelegate appDelegate] xmppStream] myJID] bare]
+                    : message.bareJidStr,
+            }];
+        }
 
         // Back to main thread
         dispatch_sync(dispatch_get_main_queue(), ^
@@ -205,14 +227,10 @@
             // Remove flag
             self.refreshingTableView = false;
 
-            if (error)
-            {
-                // TODO: do something
-            }
-            else
-            {
-                debugLog(@"messages: %@", messages);
-            }
+            debugLog(@"messages: %@", self.messageList);
+
+            // Refresh tableview
+            [self.tableView reloadData];
         });
     });
 }
@@ -230,15 +248,25 @@
         // Send element
         [[[AppDelegate appDelegate] xmppStream] sendElement:message];
 
+        // Insert into message list
+        XMPPJID *myJID = [[[AppDelegate appDelegate] xmppStream] myJID];
+        [self addMessage:@{
+            XMPP_TIMESTAMP: [NSDate date],
+            XMPP_MESSAGE_USERNAME: [myJID bare],
+            XMPP_MESSAGE_TEXT: text,
+        }];
+
         // Clear and refresh
         self.inputTextView.text = @"";
-
-        [self.messageList addObject:@{
-            @"message": text,
-            @"timestamp": [NSDate date],
-            @"sender": @"you",
-        }];
         [self.tableView reloadData];
+    }
+}
+
+/** @brief Add message to message list */
+- (void)addMessage:(NSDictionary *)message
+{
+    if (message) {
+        [self.messageList addObject:message];
     }
 }
 
@@ -311,7 +339,25 @@
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:KEY_CELL_ID];
 
-    cell.textLabel.text = self.messageList[indexPath.row][@"message"];
+    // Create cell if DNE
+    if (!cell)
+    {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:KEY_CELL_ID];
+        cell.selectionStyle = UITableViewCellSelectionStyleGray;
+    }
+
+    NSDictionary *data = self.messageList[indexPath.row];
+
+    // Large text field
+    cell.textLabel.text = data[XMPP_MESSAGE_TEXT];
+    cell.textLabel.backgroundColor = [UIColor clearColor];
+    cell.textLabel.font = [UIFont fontWithName:FONT_NAME_LIGHT size:FONT_SIZE_CONTACT_NAME];
+
+    // Detailed text field
+    cell.detailTextLabel.text = data[XMPP_MESSAGE_USERNAME];
+    cell.detailTextLabel.backgroundColor = [UIColor clearColor];
+    cell.detailTextLabel.textColor = UIColorFromHex(COLOR_HEX_BLACK_TRANSPARENT);
+    cell.detailTextLabel.font = [UIFont fontWithName:FONT_NAME_MEDIUM size:FONT_SIZE_CONTACT_STATUS];
 
     return cell;
 }
