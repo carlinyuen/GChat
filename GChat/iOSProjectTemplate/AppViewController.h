@@ -14,4 +14,7 @@
     /** @brief Manually initiate pull to refresh */
     - (void)manualPullToRefresh;
 
+    /** @brief Select and open up chat view for a specific contact */
+    - (void)selectContact:(NSString *)username;
+
 @end

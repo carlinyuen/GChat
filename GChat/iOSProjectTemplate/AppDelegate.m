@@ -49,7 +49,8 @@
     UILocalNotification *notification = [launchOptions objectForKey:UIApplicationLaunchOptionsLocalNotificationKey];
     if (notification)
     {
-       debugLog(@"launchedWithLocalNotification: %@", notification.userInfo);
+        debugLog(@"launchedWithLocalNotification: %@", notification.userInfo);
+        [self application:application didReceiveLocalNotification:notification];
     }
 
     [self.window makeKeyAndVisible];
@@ -106,6 +107,10 @@
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
 {
     debugLog(@"receivedLocalNotification: %@", notification.userInfo);
+
+    UINavigationController *nav = (UINavigationController *)self.window.rootViewController;
+    [nav popToRootViewControllerAnimated:true];
+    [self.viewController selectContact:notification.userInfo[XMPP_MESSAGE_USERNAME]];
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo

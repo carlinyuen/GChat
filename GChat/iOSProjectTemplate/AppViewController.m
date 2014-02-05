@@ -329,6 +329,18 @@
             initWithContact:contact] animated:true];
 }
 
+/** @brief Select and open up chat view for a specific contact */
+- (void)selectContact:(NSString *)username
+{
+    if (username)
+    {
+        XMPPUserMemoryStorageObject *user = [[[AppDelegate appDelegate] rosterStorage] userForJID:[XMPPJID jidWithString:username]];
+        if (user) {
+            [self showChatView:user];
+        }
+    }
+}
+
 /** @brief Refreshes the login button text */
 - (void)refreshLoginButton
 {
