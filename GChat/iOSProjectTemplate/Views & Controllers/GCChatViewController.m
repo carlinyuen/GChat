@@ -25,6 +25,10 @@
 
     @property (weak, nonatomic) IBOutlet UITableView *tableView;
 
+    /** Clickable title to change between nickname and email */
+    @property (strong, nonatomic) UIButton *titleButton;
+
+    /** Sending message input */
     @property (strong, nonatomic) UIView *footerView;
     @property (strong, nonatomic) UITextView *inputTextView;
     @property (strong, nonatomic) UIButton *sendButton;
@@ -60,6 +64,7 @@
     self.title = [self.contact displayName];
 
     // Setup
+    [self setupNavBar];
     [self setupFooterView];
     [self setupTableView];
 }
@@ -77,6 +82,26 @@
 
 
 #pragma mark - Setup
+
+/** @brief Setup navbar */
+- (void)setupNavBar
+{
+    // Clickable title for sorting
+    self.titleButton = [[UIButton alloc] initWithFrame:CGRectMake(
+        0, 0, CGRectGetWidth(self.view.frame) / 2, SIZE_MIN_TOUCH
+    )];
+    [self.titleButton setTitle:[self.contact displayName]
+        forState:UIControlStateNormal];
+    [self.titleButton setTitle:[[self.contact jid] bare]
+        forState:UIControlStateHighlighted];
+    [self.titleButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
+    [self.titleButton setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
+    self.titleButton.titleLabel.adjustsFontSizeToFitWidth = true;
+    self.titleButton.titleLabel.font = (deviceOSVersionLessThan(iOS7))
+        ? [UIFont fontWithName:FONT_NAME_LIGHT size:FONT_SIZE_NAVBAR]
+        : [UIFont fontWithName:FONT_NAME_THIN size:FONT_SIZE_NAVBAR];
+    self.navigationItem.titleView = self.titleButton;
+}
 
 /** @brief Setup footer view with message sending */
 - (void)setupFooterView
@@ -175,6 +200,11 @@
 
 /** @brief When we get a message */
 - (void)messageReceived:(NSNotification *)notification
+{
+}
+
+/** @brief When title button is tapped to change sorting */
+- (void)titleTapped:(UIButton *)sender
 {
 }
 
