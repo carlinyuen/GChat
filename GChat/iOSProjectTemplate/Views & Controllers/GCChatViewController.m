@@ -165,9 +165,6 @@
 {
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 
-    [self.tableView registerClass:[UITableViewCell class]
-        forCellReuseIdentifier:KEY_CELL_ID];
-
     self.tableView.tableFooterView = self.footerView;
 }
 
@@ -346,12 +343,13 @@
         cell.selectionStyle = UITableViewCellSelectionStyleGray;
     }
 
+    // Get data to populate with
     NSDictionary *data = self.messageList[indexPath.row];
 
     // Large text field
     cell.textLabel.text = data[XMPP_MESSAGE_TEXT];
     cell.textLabel.backgroundColor = [UIColor clearColor];
-    cell.textLabel.font = [UIFont fontWithName:FONT_NAME_LIGHT size:FONT_SIZE_CONTACT_NAME];
+    cell.textLabel.font = [UIFont fontWithName:FONT_NAME_LIGHT size:FONT_SIZE_CHAT_INPUT];
 
     // Detailed text field
     cell.detailTextLabel.text = data[XMPP_MESSAGE_USERNAME];
