@@ -665,19 +665,23 @@
 /** @brief When we get a message */
 - (void)messageReceived:(NSNotification *)notification
 {
-    debugLog(@"ContactList messageReceived: %@", notification);
-    NSDictionary *message = notification.userInfo;
+    // Only notify if we aren't presenting the chat view
+    if (!self.presentedViewController)
+    {
+        debugLog(@"ContactList messageReceived: %@", notification);
+        NSDictionary *message = notification.userInfo;
 
-    // Create local notification
-    UILocalNotification *pushNotification = [UILocalNotification new];
-    pushNotification.soundName = UILocalNotificationDefaultSoundName;
-    pushNotification.alertBody = [NSString stringWithFormat:@"%@ : %@",
-        message[XMPP_MESSAGE_USERNAME], message[XMPP_MESSAGE_TEXT]];
-    pushNotification.alertAction = NSLocalizedString(@"PN_ACTION_TITLE", nil);
-    pushNotification.applicationIconBadgeNumber = 1;
+        // Create local notification
+        UILocalNotification *pushNotification = [UILocalNotification new];
+        pushNotification.soundName = UILocalNotificationDefaultSoundName;
+        pushNotification.alertBody = [NSString stringWithFormat:@"%@ : %@",
+            message[XMPP_MESSAGE_USERNAME], message[XMPP_MESSAGE_TEXT]];
+        pushNotification.alertAction = NSLocalizedString(@"PN_ACTION_TITLE", nil);
+        pushNotification.applicationIconBadgeNumber = 1;
 
-    // Show notification immediately
-    [[UIApplication sharedApplication] presentLocalNotificationNow:pushNotification];
+        // Show notification immediately
+        [[UIApplication sharedApplication] presentLocalNotificationNow:pushNotification];
+    }
 }
 
 

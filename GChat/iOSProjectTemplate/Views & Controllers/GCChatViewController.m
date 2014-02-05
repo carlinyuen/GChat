@@ -201,12 +201,13 @@
 /** @brief When we get a message */
 - (void)messageReceived:(NSNotification *)notification
 {
-    debugLog(@"ChatView messageReceived: %@", notification);
     NSDictionary *message = notification.userInfo;
 
     // Only notify if not same user as we're viewing
     if (![[[self.contact jid] bare] isEqualToString:message[XMPP_MESSAGE_USERNAME]])
     {
+        debugLog(@"ChatView messageReceived: %@", notification);
+
         // Create local notification
         UILocalNotification *pushNotification = [UILocalNotification new];
         pushNotification.soundName = UILocalNotificationDefaultSoundName;
