@@ -484,11 +484,13 @@
         }
 
         // Do this on main ui thread
-        dispatch_sync(dispatch_get_main_queue(), ^{
+        dispatch_sync(dispatch_get_main_queue(), ^
+        {
             // Refresh tableview
-            [self.tableView reloadSections:[NSIndexSet
-                    indexSetWithIndexesInRange:NSMakeRange(0, ContactListSectionsCount)]
-                withRowAnimation:UITableViewRowAnimationAutomatic];
+            [self.tableView reloadData];
+//            [self.tableView reloadSections:[NSIndexSet
+//                    indexSetWithIndexesInRange:NSMakeRange(0, ContactListSectionsCount)]
+//                withRowAnimation:UITableViewRowAnimationAutomatic];
 
             // Show tableview if not already shown
             [UIView animateWithDuration:ANIMATION_DURATION_FAST
