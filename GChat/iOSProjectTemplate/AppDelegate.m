@@ -47,7 +47,6 @@
 */
 - (void)applicationWillResignActive:(UIApplication *)application
 {
-    [self disconnect];
 }
 
 /** @brief Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
@@ -76,6 +75,8 @@
 */
 - (void)applicationWillTerminate:(UIApplication *)application
 {
+    [self disconnect];
+
     // Perform cleanup
     [AppDelegate cleanup];
 }

@@ -21,9 +21,9 @@
 
     #define XMPP_PRESENCE_SHOW_COMPARE_AWAY @"eway"
 
-    #define TIME_REFRESH 2      // 2 seconds
-    #define TIME_CROUTON_SHOW 2 // 2 seconds
-    #define TIME_POLL_ROSTER 10
+    #define TIME_REFRESH 2          // 2 seconds
+    #define TIME_CROUTON_SHOW 2     // 2 seconds
+    #define TIME_POLL_ROSTER 20
 
     #define SIZE_PULLREFRESH_PULLOVER -64
     #define SIZE_PULLREFRESH_HEIGHT -54
@@ -143,6 +143,9 @@
         [[NSNotificationCenter defaultCenter] addObserver:self
             selector:@selector(connectionStatusChanged:)
             name:NOTIFICATION_CONNECTION_CHANGED object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+            selector:@selector(messageReceived:)
+            name:NOTIFICATION_MESSAGE_RECEIVED object:nil];
     }
     return self;
 }
@@ -655,6 +658,24 @@
 
     // Refresh
     [self manualPullToRefresh];
+}
+
+/** @brief When we get a message */
+- (void)messageReceived:(NSNotification *)notification
+{
+    debugLog(@"messageReceived: %@", notification);
+    NSDictionary *message = notification.userInfo;
+
+    // Create local notification
+    UILocalNotification *pushNotification = [UILocalNotification new];
+    pushNotification.soundName = UILocalNotificationDefaultSoundName;
+    pushNotification.alertBody = [NSString stringWithFormat:@"%@ : %@",
+        message[XMPP_MESSAGE_USERNAME], message[XMPP_MESSAGE_TEXT]];
+    pushNotification.alertAction = NSLocalizedString(@"PN_ACTION_TITLE", nil);
+    pushNotification.applicationIconBadgeNumber = 1;
+
+    // Show notification immediately
+    [[UIApplication sharedApplication] presentLocalNotificationNow:pushNotification];
 }
 
 
