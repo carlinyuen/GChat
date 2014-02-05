@@ -23,7 +23,9 @@
     , UIScrollViewDelegate
 >
 
+    /** Tableview for messages */
     @property (weak, nonatomic) IBOutlet UITableView *tableView;
+    @property (assign, nonatomic) BOOL refreshingTableView;
 
     /** Clickable title to change between nickname and email */
     @property (strong, nonatomic) UIButton *titleButton;
@@ -33,6 +35,7 @@
     @property (strong, nonatomic) UITextView *inputTextView;
     @property (strong, nonatomic) UIButton *sendButton;
 
+    /** Storage for messages */
     @property (strong, nonatomic) NSMutableArray *messageList;
 
 @end
@@ -76,19 +79,8 @@
 {
     [super viewWillAppear:animated];
 
-    // Load messages
-    NSManagedObjectContext *moc = [[[AppDelegate appDelegate] messageArchiveStorage] mainThreadManagedObjectContext];
-    NSEntityDescription *entityDescription = [NSEntityDescription
-        entityForName:@"XMPPMessageArchiving_Message_CoreDataObject"
-        inManagedObjectContext:moc];
-    NSFetchRequest *request = [[NSFetchRequest alloc] init];
-    [request setEntity:entityDescription];
-
-    // Fetch
-    NSError *error;
-    NSArray *messages = [moc executeFetchRequest:request error:&error];
-
-    debugLog(@"messages: %@", messages);
+    // Fetch and show messages
+    [self refreshTableView:self];
 }
 
 - (void)didReceiveMemoryWarning
@@ -181,6 +173,49 @@
 
 
 #pragma mark - Class Methods
+
+/** @brief Refreshes table view with messages */
+- (void)refreshTableView:(id)sender
+{
+    // Don't do it if already refreshing
+    if (self.refreshingTableView) {
+        return;
+    }
+
+    self.refreshingTableView = true;
+
+    // Do this on background thread
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
+    {
+        // Load messages
+        NSManagedObjectContext *moc = [[[AppDelegate appDelegate] messageArchiveStorage] mainThreadManagedObjectContext];
+        NSEntityDescription *entityDescription = [NSEntityDescription
+            entityForName:@"XMPPMessageArchiving_Message_CoreDataObject"
+            inManagedObjectContext:moc];
+        NSFetchRequest *request = [[NSFetchRequest alloc] init];
+        [request setEntity:entityDescription];
+
+        // Fetch
+        NSError *error;
+        NSArray *messages = [moc executeFetchRequest:request error:&error];
+
+        // Back to main thread
+        dispatch_sync(dispatch_get_main_queue(), ^
+        {
+            // Remove flag
+            self.refreshingTableView = false;
+
+            if (error)
+            {
+                // TODO: do something
+            }
+            else
+            {
+                debugLog(@"messages: %@", messages);
+            }
+        });
+    });
+}
 
 /** @brief Send message */
 - (void)sendMessage:(NSString *)text

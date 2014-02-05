@@ -67,6 +67,7 @@
     /** Tableview for contact list */
     @property (weak, nonatomic) IBOutlet UITableView *tableView;
     @property (strong, nonatomic) CustomPullToRefreshControl *pullToRefresh;
+    @property (assign, nonatomic) BOOL refreshingTableView;
 
     /** Storage for contact list */
     @property (strong, nonatomic) NSMutableArray *contactList;
@@ -448,6 +449,13 @@
 /** @brief Refreshes tableview and roster data */
 - (void)refreshTableView:(id)sender
 {
+    // Don't refresh if already refreshing
+    if (self.refreshingTableView) {
+        return;
+    }
+
+    self.refreshingTableView = true;
+
     // Do this asynchronously
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
 
@@ -503,6 +511,9 @@
         // Do this on main ui thread
         dispatch_sync(dispatch_get_main_queue(), ^
         {
+            // Clear flag
+            self.refreshingTableView = false;
+
             // Refresh tableview
             [self.tableView reloadData];
 //            [self.tableView reloadSections:[NSIndexSet
