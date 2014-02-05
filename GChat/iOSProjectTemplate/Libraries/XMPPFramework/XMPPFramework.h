@@ -27,6 +27,10 @@
     #define XMPP_TIMESTAMP @"timestamp"
     #define XMPP_STATUS @"status"
 
+    #define XMPP_MESSAGE_TEXT @"text"
+    #define XMPP_MESSAGE_USERNAME @"user"
+    #define XMPP_MESSAGE_TYPE @"type"
+
     #define XMPP_CONNECTION_OK @"ok"
     #define XMPP_CONNECTION_CONNECTING @"connect"
     #define XMPP_CONNECTION_AUTH @"auth"

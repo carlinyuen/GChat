@@ -350,13 +350,20 @@
 
 - (void)xmppStream:(XMPPStream *)sender didReceiveMessage:(XMPPMessage *)message
 {
-    [[NSNotificationCenter defaultCenter]
-        postNotificationName:NOTIFICATION_MESSAGE_RECEIVED
-        object:self userInfo:@{
-            @"message": [[message elementForName:@"body"] stringValue],
-            @"sender": [[message attributeForName:@"from"] stringValue],
-            XMPP_TIMESTAMP: [NSDate date],
-        }];
+    debugLog(@"message: %@", message);
+
+    // Only register if has message body
+    if ([message body])
+    {
+        [[NSNotificationCenter defaultCenter]
+            postNotificationName:NOTIFICATION_MESSAGE_RECEIVED
+            object:self userInfo:@{
+                XMPP_MESSAGE_TEXT: [message body],
+                XMPP_MESSAGE_USERNAME: [[message from] user],
+                XMPP_MESSAGE_TYPE: [message type],
+                XMPP_TIMESTAMP: [NSDate date],
+            }];
+    }
 }
 
 - (void)xmppStream:(XMPPStream *)sender willSecureWithSettings:(NSMutableDictionary *)settings
