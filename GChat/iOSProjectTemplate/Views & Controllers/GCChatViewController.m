@@ -31,9 +31,10 @@
     @property (strong, nonatomic) UIButton *titleButton;
 
     /** Sending message input */
-    @property (strong, nonatomic) UIView *footerView;
+    @property (strong, nonatomic) IBOutlet UIView *footerView;
     @property (strong, nonatomic) UITextView *inputTextView;
     @property (strong, nonatomic) UIButton *sendButton;
+    @property (weak, nonatomic) IBOutlet NSLayoutConstraint *footerBottomConstraint;
 
     /** Storage for messages */
     @property (strong, nonatomic) NSMutableArray *messageList;
@@ -64,7 +65,7 @@
             selector:@selector(keyboardWillShow:)
             name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self
-            selector:@selector(keyboardDidHide:)
+            selector:@selector(keyboardWillHide:)
             name:UIKeyboardDidHideNotification object:nil];
     }
     return self;
@@ -89,6 +90,14 @@
 
     // Fetch and show messages
     [self refreshTableView:self];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+
+    // Update input view
+    [self showFooterView];
 }
 
 - (void)didReceiveMemoryWarning
@@ -132,9 +141,6 @@
     CGRect reference;
 
     // Containing view
-    self.footerView = [[UIView alloc] initWithFrame:CGRectMake(
-        0, 0, CGRectGetWidth(bounds), SIZE_MIN_TOUCH
-    )];
     self.footerView.backgroundColor = UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT);
 
     // Input field
@@ -151,7 +157,6 @@
     self.inputTextView.layer.borderWidth = SIZE_BORDER_WIDTH;
     self.inputTextView.layer.cornerRadius = SIZE_CORNER_RADIUS;
     self.inputTextView.delegate = self;
-    self.inputTextView.inputAccessoryView = self.footerView;
     [self.footerView addSubview:self.inputTextView];
 
     // Send button
@@ -167,14 +172,15 @@
     [self.sendButton addTarget:self action:@selector(sendButtonTapped:)
         forControlEvents:UIControlEventTouchUpInside];
     [self.footerView addSubview:self.sendButton];
+
+    // Set to hidden first
+    self.footerView.alpha = 0;
 }
 
 /** @brief Setup tableview */
 - (void)setupTableView
 {
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-
-    self.tableView.tableFooterView = self.footerView;
 }
 
 
@@ -276,6 +282,18 @@
     }
 }
 
+/** @brief Updates the position and shows the footer view */
+- (void)showFooterView
+{
+    CGRect frame = self.footerView.frame;
+    frame.origin.y = CGRectGetMaxY(self.view.frame) - CGRectGetHeight(frame);
+    self.footerView.frame = frame;
+
+    [UIView animateWithDuration:ANIMATION_DURATION_FAST delay:0 options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut animations:^{
+            self.footerView.alpha = 1;
+        } completion:nil];
+}
+
 
 #pragma mark - Event Handlers
 
@@ -332,11 +350,24 @@
 /** @brief Keyboard will show */
 - (void)keyboardWillShow:(NSNotification *)notification
 {
+    // Determine ending height and shrink view by that size
+    NSDictionary *info = [notification userInfo];
+    CGRect frame = [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
+
+    [UIView animateWithDuration:5 animations:^{
+        self.footerBottomConstraint.constant = -frame.size.height;
+        [self.view layoutIfNeeded];
+     }];
 }
 
 /** @brief Keyboard will hide */
 - (void)keyboardWillHide:(NSNotification *)notification
 {
+    // Animate back to zero
+    [UIView animateWithDuration:5 animations:^{
+        self.footerBottomConstraint.constant = 0;
+        [self.view layoutIfNeeded];
+     }];
 }
 
 
