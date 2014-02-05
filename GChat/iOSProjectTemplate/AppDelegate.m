@@ -333,8 +333,8 @@
 
 - (void)xmppStream:(XMPPStream *)sender didReceivePresence:(XMPPPresence *)presence
 {
-    NSString *user = [[presence from] user];
-    if (![user isEqualToString:[[sender myJID] user]])
+    NSString *user = [[presence from] bare];
+    if (![user isEqualToString:[[sender myJID] bare]])
     {
         [[NSNotificationCenter defaultCenter]
             postNotificationName:NOTIFICATION_PRESENCE_UPDATE
@@ -343,7 +343,6 @@
                 XMPP_PRESENCE_SHOW: ([presence show] ? [presence show] : XMPP_PRESENCE_SHOW_CHAT),  // null == ready to chat
                 XMPP_PRESENCE_STATUS: ([presence status] ? [presence status] : @""),
                 XMPP_PRESENCE_USERNAME: user,
-                XMPP_PRESENCE_DOMAIN: [[presence from] domain],
                 XMPP_TIMESTAMP: [NSDate date],
             }];
     }
@@ -360,7 +359,7 @@
             postNotificationName:NOTIFICATION_MESSAGE_RECEIVED
             object:self userInfo:@{
                 XMPP_MESSAGE_TEXT: [message body],
-                XMPP_MESSAGE_USERNAME: [[message from] user],
+                XMPP_MESSAGE_USERNAME: [[message from] bare],
                 XMPP_MESSAGE_TYPE: [message type],
                 XMPP_TIMESTAMP: [NSDate date],
             }];
