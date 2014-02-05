@@ -27,6 +27,8 @@
     #define XMPP_TIMESTAMP @"timestamp"
     #define XMPP_STATUS @"status"
 
+    #define XMPP_MESSAGE_TO @"to"
+    #define XMPP_MESSAGE_FROM @"from"
     #define XMPP_MESSAGE_TEXT @"text"
     #define XMPP_MESSAGE_USERNAME @"user"
     #define XMPP_MESSAGE_TYPE @"type"

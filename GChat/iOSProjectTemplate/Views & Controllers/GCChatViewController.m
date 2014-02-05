@@ -189,12 +189,8 @@
     if ([text length])
     {
         // Setup xmpp element
-        NSXMLElement *body = [NSXMLElement elementWithName:@"body"];
-        [body setStringValue:text];
-        NSXMLElement *message = [NSXMLElement elementWithName:@"message"];
-        [message addAttributeWithName:@"type" stringValue:@"chat"];
-        [message addAttributeWithName:@"to" stringValue:[[self.contact jid] bare]];
-        [message addChild:body];
+        XMPPMessage *message = [[XMPPMessage alloc] initWithType:XMPP_MESSAGE_TYPE_CHAT to:[self.contact jid]];
+        [message addBody:text];
 
         // Send element
         [[[AppDelegate appDelegate] xmppStream] sendElement:message];
