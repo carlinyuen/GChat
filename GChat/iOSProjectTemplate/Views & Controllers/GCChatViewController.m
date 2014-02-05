@@ -354,20 +354,24 @@
     NSDictionary *info = [notification userInfo];
     CGRect frame = [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
 
-    [UIView animateWithDuration:5 animations:^{
-        self.footerBottomConstraint.constant = -frame.size.height;
-        [self.view layoutIfNeeded];
-     }];
+    [UIView animateWithDuration:ANIMATION_DURATION_MED delay:0
+        options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionBeginFromCurrentState
+        animations:^{
+            self.footerBottomConstraint.constant = frame.size.height;
+            [self.view layoutIfNeeded];
+        } completion:nil];
 }
 
 /** @brief Keyboard will hide */
 - (void)keyboardWillHide:(NSNotification *)notification
 {
     // Animate back to zero
-    [UIView animateWithDuration:5 animations:^{
-        self.footerBottomConstraint.constant = 0;
-        [self.view layoutIfNeeded];
-     }];
+    [UIView animateWithDuration:ANIMATION_DURATION_MED delay:0
+        options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionBeginFromCurrentState
+        animations:^{
+            self.footerBottomConstraint.constant = 0;
+            [self.view layoutIfNeeded];
+        } completion:nil];
 }
 
 
