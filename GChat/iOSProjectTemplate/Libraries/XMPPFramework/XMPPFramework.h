@@ -30,6 +30,8 @@
     #define XMPP_MESSAGE_TEXT @"text"
     #define XMPP_MESSAGE_USERNAME @"user"
     #define XMPP_MESSAGE_TYPE @"type"
+    #define XMPP_MESSAGE_TYPE_CHAT @"chat"
+    #define XMPP_MESSAGE_TYPE_ERROR @"error"
 
     #define XMPP_CONNECTION_OK @"ok"
     #define XMPP_CONNECTION_CONNECTING @"connect"

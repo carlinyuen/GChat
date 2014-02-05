@@ -193,7 +193,7 @@
         [body setStringValue:text];
         NSXMLElement *message = [NSXMLElement elementWithName:@"message"];
         [message addAttributeWithName:@"type" stringValue:@"chat"];
-        [message addAttributeWithName:@"to" stringValue:[self.contact displayName]];
+        [message addAttributeWithName:@"to" stringValue:[[self.contact jid] bare]];
         [message addChild:body];
 
         // Send element

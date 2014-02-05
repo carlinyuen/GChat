@@ -108,9 +108,13 @@
 {
     debugLog(@"receivedLocalNotification: %@", notification.userInfo);
 
-    UINavigationController *nav = (UINavigationController *)self.window.rootViewController;
-    [nav popToRootViewControllerAnimated:false];
-    [self.viewController selectContact:notification.userInfo[XMPP_MESSAGE_USERNAME]];
+    // Jump to chat screen if is a chat
+    if ([notification.userInfo[XMPP_MESSAGE_TYPE] isEqualToString:XMPP_MESSAGE_TYPE_CHAT])
+    {
+        UINavigationController *nav = (UINavigationController *)self.window.rootViewController;
+        [nav popToRootViewControllerAnimated:false];
+        [self.viewController selectContact:notification.userInfo[XMPP_MESSAGE_USERNAME]];
+    }
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
@@ -392,8 +396,8 @@
 {
     debugLog(@"message: %@", message);
 
-    // Only register if has message body
-    if ([message body])
+    // Only register if has message body and is a chat message
+    if ([message body] && [[message type] isEqualToString:XMPP_MESSAGE_TYPE_CHAT])
     {
         [[NSNotificationCenter defaultCenter]
             postNotificationName:NOTIFICATION_MESSAGE_RECEIVED
