@@ -665,8 +665,10 @@
 /** @brief When we get a message */
 - (void)messageReceived:(NSNotification *)notification
 {
-    // Only notify if we aren't presenting the chat view
-    if (!self.presentedViewController)
+    debugLog(@"%@", self.presentedViewController);
+
+    // Only notify if we are the active screen
+    if ([[self.navigationController.viewControllers lastObject] isEqual:self])
     {
         debugLog(@"ContactList messageReceived: %@", notification);
         NSDictionary *message = notification.userInfo;
@@ -678,6 +680,7 @@
             message[XMPP_MESSAGE_USERNAME], message[XMPP_MESSAGE_TEXT]];
         pushNotification.alertAction = NSLocalizedString(@"PN_ACTION_TITLE", nil);
         pushNotification.applicationIconBadgeNumber = 1;
+        pushNotification.userInfo = message;
 
         // Show notification immediately
         [[UIApplication sharedApplication] presentLocalNotificationNow:pushNotification];

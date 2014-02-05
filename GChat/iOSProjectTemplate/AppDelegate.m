@@ -42,8 +42,16 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	
     // Override point for customization after application launch.
-	self.viewController = [[AppViewController alloc] initWithNibName:@"AppViewController" bundle:nil];
+   	self.viewController = [[AppViewController alloc] initWithNibName:@"AppViewController" bundle:nil];
 	self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:self.viewController];
+
+    // Handle notifications
+    UILocalNotification *notification = [launchOptions objectForKey:UIApplicationLaunchOptionsLocalNotificationKey];
+    if (notification)
+    {
+       debugLog(@"launchedWithLocalNotification: %@", notification.userInfo);
+    }
+
     [self.window makeKeyAndVisible];
     return YES;
 }
@@ -93,6 +101,15 @@
 
     // Perform cleanup
     [AppDelegate cleanup];
+}
+
+- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
+{
+    debugLog(@"receivedLocalNotification: %@", notification.userInfo);
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
+{
 }
 
 /** @brief Returns a reference to app delegate */

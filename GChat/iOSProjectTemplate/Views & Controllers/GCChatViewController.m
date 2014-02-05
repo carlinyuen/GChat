@@ -215,6 +215,7 @@
             message[XMPP_MESSAGE_USERNAME], message[XMPP_MESSAGE_TEXT]];
         pushNotification.alertAction = NSLocalizedString(@"PN_ACTION_TITLE", nil);
         pushNotification.applicationIconBadgeNumber = 1;
+        pushNotification.userInfo = message;
 
         // Show notification immediately
         [[UIApplication sharedApplication] presentLocalNotificationNow:pushNotification];
