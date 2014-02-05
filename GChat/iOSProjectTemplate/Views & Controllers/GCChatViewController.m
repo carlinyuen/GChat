@@ -201,6 +201,23 @@
 /** @brief When we get a message */
 - (void)messageReceived:(NSNotification *)notification
 {
+    debugLog(@"ChatView messageReceived: %@", notification);
+    NSDictionary *message = notification.userInfo;
+
+    // Only notify if not same user as we're viewing
+    if (![[[self.contact jid] bare] isEqualToString:message[XMPP_MESSAGE_USERNAME]])
+    {
+        // Create local notification
+        UILocalNotification *pushNotification = [UILocalNotification new];
+        pushNotification.soundName = UILocalNotificationDefaultSoundName;
+        pushNotification.alertBody = [NSString stringWithFormat:@"%@ : %@",
+            message[XMPP_MESSAGE_USERNAME], message[XMPP_MESSAGE_TEXT]];
+        pushNotification.alertAction = NSLocalizedString(@"PN_ACTION_TITLE", nil);
+        pushNotification.applicationIconBadgeNumber = 1;
+
+        // Show notification immediately
+        [[UIApplication sharedApplication] presentLocalNotificationNow:pushNotification];
+    }
 }
 
 /** @brief When title button is tapped to change sorting */

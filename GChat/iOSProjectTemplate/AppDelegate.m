@@ -10,7 +10,7 @@
 
 #import "AppViewController.h"
 
-    #define TIME_CONNECTION_TIMEOUT 6  // In seconds
+    #define TIME_CONNECTION_TIMEOUT 8  // In seconds
 
     // Defined here https://developers.google.com/talk/open_communications
     #define GCHAT_DOMAIN @"talk.google.com"
@@ -20,12 +20,18 @@
     XMPPStreamDelegate
 >
 
+    /** XMPP stuff */
     @property (strong, nonatomic, readwrite) XMPPStream *xmppStream;
     @property (strong, nonatomic) XMPPReconnect *xmppReconnect;
 
+    /** Timer for connection timeouts */
     @property (strong, nonatomic) NSTimer *connectTimeoutTimer;
 
+    /** Temporary password storage for login */
     @property (copy, nonatomic) NSString *tempPassword;
+
+    /** To extend time we can receive local notifications */
+    @property (assign, nonatomic) UIBackgroundTaskIdentifier backgroundTask;
 
 @end
 
@@ -56,6 +62,14 @@
 {
     // Perform cleanup
     [AppDelegate cleanup];
+
+    // Kick off background task
+    self.backgroundTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler: ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [application endBackgroundTask:self.backgroundTask];
+            self.backgroundTask = UIBackgroundTaskInvalid;
+        });
+    }];
 }
 
 /** @brief Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.

@@ -191,6 +191,8 @@
     // Try to connect, if fails, show login
     if (![[AppDelegate appDelegate] connectWithUsername:nil andPassword:nil]) {
         [self showLoginView];
+    } else {    // Clear notifications
+        [[UIApplication sharedApplication] cancelAllLocalNotifications];
     }
 }
 
@@ -663,7 +665,7 @@
 /** @brief When we get a message */
 - (void)messageReceived:(NSNotification *)notification
 {
-    debugLog(@"messageReceived: %@", notification);
+    debugLog(@"ContactList messageReceived: %@", notification);
     NSDictionary *message = notification.userInfo;
 
     // Create local notification
