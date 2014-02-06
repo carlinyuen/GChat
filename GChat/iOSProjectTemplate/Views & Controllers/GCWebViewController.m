@@ -11,6 +11,13 @@
 @interface GCWebViewController ()
 
     @property (weak, nonatomic) IBOutlet UIWebView *webView;
+    @property (weak, nonatomic) IBOutlet UIToolbar *toolBar;
+    @property (weak, nonatomic) IBOutlet UIBarButtonItem *backButton;
+    @property (weak, nonatomic) IBOutlet UIBarButtonItem *nextButton;
+
+    - (IBAction)closeButtonTapped:(id)sender;
+    - (IBAction)nextButtonTapped:(id)sender;
+    - (IBAction)backButtonTapped:(id)sender;
 
 @end
 
@@ -30,7 +37,11 @@
     [super viewDidLoad];
 
     // Setup webview
-self.webView.delegate = self;
+    self.webView.delegate = self;
+
+    // Flip the back button
+    UIView *back = [self.backButton valueForKey:@"view"];
+    back.transform = CGAffineTransformMakeScale(-1, 1);
 
     [self refresh];
 }
@@ -52,6 +63,25 @@ self.webView.delegate = self;
 }
 
 
+#pragma mark - Event Handlers
+
+- (IBAction)closeButtonTapped:(id)sender {
+    [self dismissViewControllerAnimated:true completion:nil];
+}
+
+- (IBAction)nextButtonTapped:(id)sender {
+    if (self.webView.canGoForward) {
+        [self.webView goForward];
+    }
+}
+
+- (IBAction)backButtonTapped:(id)sender {
+    if (self.webView.canGoBack) {
+        [self.webView goBack];
+    }
+}
+
+
 #pragma mark - UIWebViewDelegate
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
@@ -64,6 +94,13 @@ self.webView.delegate = self;
 
     // Default to yes
     return YES;
+}
+
+- (void)webViewDidStartLoad:(UIWebView *)webView
+{
+    // Update back/forward buttons based
+    self.backButton.enabled = self.webView.canGoBack;
+    self.nextButton.enabled = self.webView.canGoForward;
 }
 
 
