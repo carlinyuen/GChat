@@ -188,6 +188,10 @@
 
     // Try to connect, if fails, show login
     if (![[AppDelegate appDelegate] connectWithUsername:nil andPassword:nil]) {
+        // Also reset inset for tableview because it's getting set twice
+        self.tableView.contentInset = UIEdgeInsetsZero;
+
+        // Show login
         [self showLoginView];
     } else {    // Clear notifications
         [[UIApplication sharedApplication] cancelAllLocalNotifications];
