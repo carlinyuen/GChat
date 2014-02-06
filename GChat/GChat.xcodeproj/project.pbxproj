@@ -10,6 +10,8 @@
 		22A7BA94189C61D600C2D0F3 /* CustomPullToRefreshControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A7BA93189C61D600C2D0F3 /* CustomPullToRefreshControl.m */; };
 		22A7BAE618A3E69300C2D0F3 /* GCWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A7BAE418A3E69300C2D0F3 /* GCWebViewController.m */; };
 		22A7BAE718A3E69300C2D0F3 /* GCWebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22A7BAE518A3E69300C2D0F3 /* GCWebViewController.xib */; };
+		22A7BAEB18A41BF800C2D0F3 /* GCContactsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A7BAE918A41BF800C2D0F3 /* GCContactsViewController.m */; };
+		22A7BAEC18A41BF900C2D0F3 /* GCContactsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22A7BAEA18A41BF800C2D0F3 /* GCContactsViewController.xib */; };
 		22CE16D81898570B00D65A19 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22CE16D71898570B00D65A19 /* Images.xcassets */; };
 		22CE16DA1898580B00D65A19 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22CE16D91898580B00D65A19 /* QuartzCore.framework */; };
 		22E3CFE8189864A800678862 /* DDAbstractDatabaseLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E3CFD9189864A800678862 /* DDAbstractDatabaseLogger.m */; };
@@ -173,6 +175,9 @@
 		22A7BAE318A3E69300C2D0F3 /* GCWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCWebViewController.h; sourceTree = "<group>"; };
 		22A7BAE418A3E69300C2D0F3 /* GCWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCWebViewController.m; sourceTree = "<group>"; };
 		22A7BAE518A3E69300C2D0F3 /* GCWebViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GCWebViewController.xib; sourceTree = "<group>"; };
+		22A7BAE818A41BF800C2D0F3 /* GCContactsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCContactsViewController.h; sourceTree = "<group>"; };
+		22A7BAE918A41BF800C2D0F3 /* GCContactsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCContactsViewController.m; sourceTree = "<group>"; };
+		22A7BAEA18A41BF800C2D0F3 /* GCContactsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GCContactsViewController.xib; sourceTree = "<group>"; };
 		22CE16D71898570B00D65A19 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		22CE16D91898580B00D65A19 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		22E3CFD8189864A800678862 /* DDAbstractDatabaseLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDAbstractDatabaseLogger.h; sourceTree = "<group>"; };
@@ -1416,6 +1421,9 @@
 				22A7BAE318A3E69300C2D0F3 /* GCWebViewController.h */,
 				22A7BAE418A3E69300C2D0F3 /* GCWebViewController.m */,
 				22A7BAE518A3E69300C2D0F3 /* GCWebViewController.xib */,
+				22A7BAE818A41BF800C2D0F3 /* GCContactsViewController.h */,
+				22A7BAE918A41BF800C2D0F3 /* GCContactsViewController.m */,
+				22A7BAEA18A41BF800C2D0F3 /* GCContactsViewController.xib */,
 			);
 			path = "Views & Controllers";
 			sourceTree = "<group>";
@@ -1480,6 +1488,7 @@
 				5F7C89391790A36700018AD7 /* InfoPlist.strings in Resources */,
 				22CE16D81898570B00D65A19 /* Images.xcassets in Resources */,
 				5F7C895F1790A65000018AD7 /* Localizable.strings in Resources */,
+				22A7BAEC18A41BF900C2D0F3 /* GCContactsViewController.xib in Resources */,
 				5F7C897D1790AF3300018AD7 /* AppViewController.xib in Resources */,
 				22E3D00E189865C500678862 /* build-libidn.sh in Resources */,
 				22E3D3E21899AEF800678862 /* GCLoginViewController.xib in Resources */,
@@ -1551,6 +1560,7 @@
 				22E3D34018986BDF00678862 /* XMPPSRVResolver.m in Sources */,
 				22E3D2DD18986BDF00678862 /* XMPPIQ.m in Sources */,
 				22E3D31218986BDF00678862 /* XMPPvCardTempModule.m in Sources */,
+				22A7BAEB18A41BF800C2D0F3 /* GCContactsViewController.m in Sources */,
 				22E3D31618986BDF00678862 /* XMPPIQ+XEP_0060.m in Sources */,
 				22E3D33818986BDF00678862 /* NSXMLElement+XEP_0297.m in Sources */,
 				22E3D0051898651100678862 /* NSString+DDXML.m in Sources */,

@@ -218,7 +218,7 @@
         [defaults synchronize];
 
         // Dismiss
-        [[[AppDelegate appDelegate] viewController] manualPullToRefresh];
+//        [[[AppDelegate appDelegate] viewController] manualPullToRefresh];
         [self dismissViewControllerAnimated:true completion:nil];
     }
 

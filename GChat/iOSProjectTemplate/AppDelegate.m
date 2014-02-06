@@ -9,6 +9,8 @@
 #import "AppDelegate.h"
 
 #import "AppViewController.h"
+#import "GCContactsViewController.h"
+#import "GCLoginViewController.h"
 
     #define TIME_CONNECTION_TIMEOUT 8  // In seconds
 
@@ -40,10 +42,11 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-	
-    // Override point for customization after application launch.
-   	self.viewController = [[AppViewController alloc] initWithNibName:@"AppViewController" bundle:nil];
-	self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:self.viewController];
+
+    // Create base view controller
+    self.viewController = [[AppViewController alloc] initWithNibName:@"AppViewController" bundle:nil];
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:self.viewController];
+	self.window.rootViewController = nav;
 
     // Handle notifications
     UILocalNotification *notification = [launchOptions objectForKey:UIApplicationLaunchOptionsLocalNotificationKey];
@@ -112,12 +115,12 @@
     debugLog(@"receivedLocalNotification: %@", notification.userInfo);
 
     // Jump to chat screen if is a chat
-    if ([notification.userInfo[XMPP_MESSAGE_TYPE] isEqualToString:XMPP_MESSAGE_TYPE_CHAT] && [[UIApplication sharedApplication] applicationState] != UIApplicationStateActive)
-    {
-        UINavigationController *nav = (UINavigationController *)self.window.rootViewController;
-        [nav popToRootViewControllerAnimated:false];
-        [self.viewController selectContact:notification.userInfo[XMPP_MESSAGE_USERNAME]];
-    }
+//    if ([notification.userInfo[XMPP_MESSAGE_TYPE] isEqualToString:XMPP_MESSAGE_TYPE_CHAT] && [[UIApplication sharedApplication] applicationState] != UIApplicationStateActive)
+//    {
+//        UINavigationController *nav = (UINavigationController *)self.window.rootViewController;
+//        [nav popToRootViewControllerAnimated:false];
+//        [self.viewController selectContact:notification.userInfo[XMPP_MESSAGE_USERNAME]];
+//    }
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
@@ -130,7 +133,7 @@
     debugLog(@"cleanup");
 
     // Disable timers
-    [self.viewController cancelPollingTimer];
+//    [self.viewController cancelPollingTimer];
 
     // Clear credentials
     if (![[NSUserDefaults standardUserDefaults] boolForKey:CACHE_KEY_LOGIN_PERSIST]) {
