@@ -891,10 +891,13 @@
         if (list)
         {
             XMPPUserMemoryStorageObject *user = list[indexPath.row];
+            XMPPRoster *roster = [[AppDelegate appDelegate] roster];
             if (user)
             {
                 [list removeObject:user];
-                [[[AppDelegate appDelegate] roster] removeUser:[user jid]];
+                [roster unsubscribePresenceFromUser:[user jid]];
+                [roster revokePresencePermissionFromUser:[user jid]];
+                [roster removeUser:[user jid]];
                 [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationLeft];
             }
         }

@@ -79,6 +79,9 @@
             self.backgroundTask = UIBackgroundTaskInvalid;
         });
     }];
+
+    // Find out how much time we have
+    debugLog(@"Background time left: %@", @([[UIApplication sharedApplication] backgroundTimeRemaining]));
 }
 
 /** @brief Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
