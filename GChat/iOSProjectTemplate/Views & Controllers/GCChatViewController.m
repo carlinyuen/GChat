@@ -228,32 +228,38 @@
     [self.messageList removeAllObjects];
 
     // Do this on background thread
+    __block GCChatViewController *this = self;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
     {
         // Add archived messages
         for (XMPPMessageArchiving_Message_CoreDataObject *message in messages)
         {
-            [self addMessage:@{
-                XMPP_TIMESTAMP: message.timestamp,
-                XMPP_MESSAGE_TEXT: [message.message body],
-                XMPP_MESSAGE_USERNAME: (message.isOutgoing)
-                    ? myJIDStr : message.bareJidStr,
-            }];
+            if (this) {
+                [this addMessage:@{
+                    XMPP_TIMESTAMP: message.timestamp,
+                    XMPP_MESSAGE_TEXT: [message.message body],
+                    XMPP_MESSAGE_USERNAME: (message.isOutgoing)
+                        ? myJIDStr : message.bareJidStr,
+                }];
+            }
         }
 
         // Back to main thread
         dispatch_sync(dispatch_get_main_queue(), ^
         {
-            // Remove flag
-            self.refreshingTableView = false;
+            if (this)
+            {
+                // Remove flag
+                this.refreshingTableView = false;
 
-            debugLog(@"messages: %@", self.messageList);
+                debugLog(@"messages: %@", this.messageList);
 
-            // Refresh tableview
-            [self.tableView reloadData];
+                // Refresh tableview
+                [this.tableView reloadData];
 
-            // Scroll to bottom
-            [self scrollToBottom];
+                // Scroll to bottom
+                [this scrollToBottom];
+            }
         });
     });
 }

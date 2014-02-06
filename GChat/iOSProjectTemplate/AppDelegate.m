@@ -112,7 +112,7 @@
     debugLog(@"receivedLocalNotification: %@", notification.userInfo);
 
     // Jump to chat screen if is a chat
-    if ([notification.userInfo[XMPP_MESSAGE_TYPE] isEqualToString:XMPP_MESSAGE_TYPE_CHAT])
+    if ([notification.userInfo[XMPP_MESSAGE_TYPE] isEqualToString:XMPP_MESSAGE_TYPE_CHAT] && [[UIApplication sharedApplication] applicationState] != UIApplicationStateActive)
     {
         UINavigationController *nav = (UINavigationController *)self.window.rootViewController;
         [nav popToRootViewControllerAnimated:false];
