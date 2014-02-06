@@ -10,6 +10,7 @@
 
 @interface GCWebViewController ()
 
+    @property (weak, nonatomic) IBOutlet NSLayoutConstraint *webViewTopConstraint;
     @property (weak, nonatomic) IBOutlet UIWebView *webView;
     @property (weak, nonatomic) IBOutlet UIToolbar *toolBar;
     @property (weak, nonatomic) IBOutlet UIBarButtonItem *backButton;
@@ -37,6 +38,10 @@
     [super viewDidLoad];
 
     // Setup webview
+    if (!deviceOSVersionLessThan(iOS7)) {
+        self.webViewTopConstraint.constant = 20;
+        [self.webView setNeedsLayout];
+    }
     self.webView.delegate = self;
 
     // Flip the back button
