@@ -468,12 +468,6 @@
         offset.x = 0;
         self.inputTextView.contentOffset = offset;
     }
-    else if (scrollView == self.tableView)
-    {
-        if ([self.inputTextView isFirstResponder]) {
-            [self.inputTextView resignFirstResponder];
-        }
-    }
 }
 
 
