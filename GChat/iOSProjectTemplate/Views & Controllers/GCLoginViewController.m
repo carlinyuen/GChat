@@ -10,9 +10,12 @@
 
 #import "AppDelegate.h"
 #import "AppViewController.h"
+#import "GCWebViewController.h"
 
     #define TEXT_CHECKBOX @"▢"
     #define TEXT_CHECKBOX_CHECKED @"\u2611"
+
+    #define URL_TWOFACTOR_SUPPORT @"https://support.google.com/accounts/answer/185833"
 
 @interface GCLoginViewController () <
     UITextFieldDelegate
@@ -23,6 +26,7 @@
     @property (weak, nonatomic) IBOutlet UITextField *passwordTextField;
     @property (weak, nonatomic) IBOutlet UIButton *persistButton;
     @property (weak, nonatomic) IBOutlet UIButton *loginButton;
+    @property (weak, nonatomic) IBOutlet UIButton *twoFactorButton;
 
     @property (strong, nonatomic) UIActivityIndicatorView *loadingIndicator;
 
@@ -57,11 +61,26 @@
     self.titleLabel.text = NSLocalizedString(@"LOGIN_VIEW_TITLE", nil);
     self.titleLabel.font = [UIFont fontWithName:(deviceOSVersionLessThan(iOS7)
         ? FONT_NAME_THINNEST : FONT_NAME_THIN) size:FONT_SIZE_TITLE];
+
     self.usernameTextField.placeholder = NSLocalizedString(@"LOGIN_USERNAME_FIELD_PLACEHOLDER", nil);
     [self.usernameTextField setKeyboardAppearance:UIKeyboardAppearanceAlert];
+
     self.passwordTextField.placeholder = NSLocalizedString(@"LOGIN_PASSWORD_FIELD_PLACEHOLDER", nil);
     [self.passwordTextField setKeyboardAppearance:UIKeyboardAppearanceAlert];
-    [self.loginButton setTitle:NSLocalizedString(@"LOGIN_SIGNIN_BUTTON_TITLE", nil) forState:UIControlStateNormal];
+
+    [self.loginButton setTitle:NSLocalizedString(@"LOGIN_SIGNIN_BUTTON_TITLE", nil)
+        forState:UIControlStateNormal];
+    [self.loginButton setTitleColor:UIColorFromHex(COLOR_HEX_APPLE_BUTTON_BLUE)
+        forState:UIControlStateNormal];
+    [self.loginButton setTitleColor:UIColorFromHex(COLOR_HEX_APPLE_BUTTON_BLUE_SELECTED)
+        forState:UIControlStateHighlighted];
+
+    [self.twoFactorButton setTitle:NSLocalizedString(@"LOGIN_TWOFACTOR_BUTTON_TITLE", nil) forState:UIControlStateNormal];
+    [self.twoFactorButton setTitleColor:UIColorFromHex(COLOR_HEX_APPLE_BUTTON_BLUE)
+        forState:UIControlStateNormal];
+    [self.twoFactorButton setTitleColor:UIColorFromHex(COLOR_HEX_APPLE_BUTTON_BLUE_SELECTED)
+        forState:UIControlStateHighlighted];
+    [self.twoFactorButton addTarget:self action:@selector(twoFactorButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
 
     // Loading indicator
     self.loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
@@ -238,6 +257,13 @@
 - (IBAction)viewTapped:(UITapGestureRecognizer *)gesture
 {
     [self.view endEditing:true];
+}
+
+/** @brief Two-Factor Auth Button Pressed */
+- (void)twoFactorButtonTapped:(UIButton *)sender
+{
+    GCWebViewController *webVC = [[GCWebViewController alloc] initWithURLString:URL_TWOFACTOR_SUPPORT];
+    [self presentViewController:webVC animated:true completion:nil];
 }
 
 

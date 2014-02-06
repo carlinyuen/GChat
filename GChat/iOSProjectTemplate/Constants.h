@@ -52,6 +52,7 @@ extern int const COLOR_HEX_BACKGROUND_LIGHT;
 extern int const COLOR_HEX_COPY_DARK;
 extern int const COLOR_HEX_COPY_LIGHT;
 extern int const COLOR_HEX_APPLE_BUTTON_BLUE;
+extern int const COLOR_HEX_APPLE_BUTTON_BLUE_SELECTED;
 extern int const COLOR_HEX_SHOW_AWAY;
 extern int const COLOR_HEX_SHOW_AWAY_SELECTED;
 extern int const COLOR_HEX_SHOW_ONLINE;

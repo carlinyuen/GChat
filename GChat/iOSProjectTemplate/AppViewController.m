@@ -68,6 +68,7 @@
     @property (weak, nonatomic) IBOutlet UITableView *tableView;
     @property (strong, nonatomic) CustomPullToRefreshControl *pullToRefresh;
     @property (assign, nonatomic) BOOL refreshingTableView;
+    @property (assign, nonatomic) BOOL presentingLoginView;
 
     /** Storage for contact list */
     @property (strong, nonatomic) NSMutableArray *contactList;
@@ -305,6 +306,13 @@
 {
     debugLog(@"showLoginView");
 
+    // Don't do it again if multiple calls
+    if (self.presentingLoginView) {
+        return;
+    }
+
+    self.presentingLoginView = true;
+
     // Set back button on navbar
     self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
         initWithTitle:NSLocalizedString(@"LOGIN_NAVBAR_BACK_BUTTON_TITLE", nil)
@@ -313,7 +321,9 @@
     // Jump to login page
     [self presentViewController:[[GCLoginViewController alloc]
         initWithNibName:@"GCLoginViewController" bundle:nil]
-        animated:true completion:nil];
+        animated:true completion:^{
+            self.presentingLoginView = false;
+        }];
 }
 
 /** @brief Show chat screen */
