@@ -219,19 +219,25 @@
         return;
     }
 
+    // Clear out message list and continue if my jid is setup
+    NSString *myJIDStr = [[[[AppDelegate appDelegate] xmppStream] myJID] bare];
+    if (!myJIDStr) {
+        return;
+    }
+    
+    [self.messageList removeAllObjects];
+
     // Do this on background thread
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
     {
-        // Clear out message list and add archived messages
-        [self.messageList removeAllObjects];
+        // Add archived messages
         for (XMPPMessageArchiving_Message_CoreDataObject *message in messages)
         {
             [self addMessage:@{
                 XMPP_TIMESTAMP: message.timestamp,
                 XMPP_MESSAGE_TEXT: [message.message body],
                 XMPP_MESSAGE_USERNAME: (message.isOutgoing)
-                    ? [[[[AppDelegate appDelegate] xmppStream] myJID] bare]
-                    : message.bareJidStr,
+                    ? myJIDStr : message.bareJidStr,
             }];
         }
 
@@ -381,9 +387,11 @@
 
     [UIView animateWithDuration:ANIMATION_DURATION_MED delay:0
         options:UIViewAnimationOptionBeginFromCurrentState
+            | UIViewAnimationCurveEaseOut
         animations:^{
             self.footerBottomConstraint.constant = frame.size.height;
             [self.view layoutIfNeeded];
+            [self scrollToBottom];
         } completion:nil];
 }
 
@@ -393,6 +401,7 @@
     // Animate back to zero
     [UIView animateWithDuration:ANIMATION_DURATION_MED delay:0
         options:UIViewAnimationOptionBeginFromCurrentState
+            | UIViewAnimationCurveEaseOut
         animations:^{
             self.footerBottomConstraint.constant = 0;
             [self.view layoutIfNeeded];
@@ -458,6 +467,12 @@
         CGPoint offset = self.inputTextView.contentOffset;
         offset.x = 0;
         self.inputTextView.contentOffset = offset;
+    }
+    else if (scrollView == self.tableView)
+    {
+        if ([self.inputTextView isFirstResponder]) {
+            [self.inputTextView resignFirstResponder];
+        }
     }
 }
 
