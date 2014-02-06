@@ -309,12 +309,12 @@
 - (void)messageReceived:(NSNotification *)notification
 {
     NSDictionary *message = notification.userInfo;
+    debugLog(@"ChatView messageReceived: %@", message);
 
     // Only notify if not same user as we're viewing or if we're in background
     if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateBackground
         || ![[[self.contact jid] bare] isEqualToString:message[XMPP_MESSAGE_USERNAME]])
     {
-        debugLog(@"ChatView messageReceived: %@", notification);
 
         // Create local notification
         UILocalNotification *pushNotification = [UILocalNotification new];
@@ -327,6 +327,15 @@
 
         // Show notification immediately
         [[UIApplication sharedApplication] presentLocalNotificationNow:pushNotification];
+    }
+    else    // Message from currently viewing person
+    {
+        // Add message and display
+        [self addMessage:@{
+            XMPP_TIMESTAMP: message[XMPP_TIMESTAMP],
+            XMPP_MESSAGE_USERNAME: message[XMPP_MESSAGE_USERNAME],
+            XMPP_MESSAGE_TEXT: message[XMPP_MESSAGE_TEXT],
+        }];
     }
 }
 
