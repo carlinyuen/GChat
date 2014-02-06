@@ -182,8 +182,6 @@
     //  If we're not signed in, AppDelegate will handle
     if ([[AppDelegate appDelegate] connectWithUsername:nil andPassword:nil]) {
         [[UIApplication sharedApplication] cancelAllLocalNotifications];
-    } else {    // Show loading indicator
-        [self setLoadingIndicator];
     }
 }
 
@@ -233,6 +231,9 @@
         [[UINavigationBar appearance] setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
         [[UINavigationBar appearance] setBackgroundColor:UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT)];
     }
+
+    // Setup loading indicator
+    [self setLoadingIndicator];
 
     // Clickable title for sorting
     self.titleButton = [UIButton new];
@@ -351,6 +352,7 @@
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     UIActivityIndicatorView *loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     [loadingIndicator startAnimating];
+    button.frame = loadingIndicator.frame;
     [button addSubview:loadingIndicator];
 
     if (deviceOSVersionLessThan(iOS7))
