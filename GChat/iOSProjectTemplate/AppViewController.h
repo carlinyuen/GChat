@@ -9,6 +9,10 @@
 
 #import <UIKit/UIKit.h>
 
+#import "GCContactsViewController.h"
+
 @interface AppViewController : UIViewController
+
+    @property (strong, nonatomic) GCContactsViewController *contactsVC;
 
 @end

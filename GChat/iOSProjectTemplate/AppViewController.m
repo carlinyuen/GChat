@@ -15,6 +15,8 @@
 
 @interface AppViewController ()
 
+    @property (assign, nonatomic) BOOL initialRun;
+
 @end
 
 
@@ -44,6 +46,11 @@
 
     // View
 	self.view.backgroundColor = [UIColor whiteColor];
+    self.initialRun = true;
+
+    // Contacts View
+    self.contactsVC = [[GCContactsViewController alloc] initWithNibName:@"GCContactsViewController" bundle:nil];
+    [[[AppDelegate appDelegate] roster] addDelegate:self.contactsVC delegateQueue:dispatch_get_main_queue()];
 }
 
 /** @brief Last-minute setup before view appears. */
@@ -52,7 +59,15 @@
 	[super viewWillAppear:animated];
 
     debugLog(@"viewWillAppear");
-
+ 
+    // Try to connect and show appropriate views
+    if ([[AppDelegate appDelegate] connectWithUsername:nil andPassword:nil]) {
+        [self.navigationController pushViewController:self.contactsVC animated:true];
+    } else {    // Can't auto connect, need to show login screen
+        [self presentViewController:[[GCLoginViewController alloc] initWithNibName:@"GCLoginViewController" bundle:nil] animated:!self.initialRun completion:^{
+                self.initialRun = false;
+            }];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -60,13 +75,7 @@
     [super viewDidAppear:animated];
 
     debugLog(@"viewDidAppear");
-    
-    // Try to connect and show appropriate views
-    if ([[AppDelegate appDelegate] connectWithUsername:nil andPassword:nil]) {
-        [self.navigationController pushViewController:[[GCContactsViewController alloc] initWithNibName:@"GCContactsViewController" bundle:nil] animated:true];
-    } else {    // Can't auto connect, need to show login screen
-        [self presentViewController:[[GCLoginViewController alloc] initWithNibName:@"GCLoginViewController" bundle:nil] animated:true completion:nil];
-    }
+
 }
 
 /** @brief Dispose of any resources that can be recreated. */

@@ -207,6 +207,9 @@
 /** @brief Setup Nav bar */
 - (void)setupNavBar
 {
+    // Display
+    self.navigationController.navigationBarHidden = false;
+
     // Text Color for navbar titles
     if (deviceOSVersionLessThan(iOS7)) {
         [[UINavigationBar appearance] setTitleTextAttributes:@{
@@ -227,6 +230,21 @@
         [[UINavigationBar appearance] setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
         [[UINavigationBar appearance] setBackgroundColor:UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT)];
     }
+
+    // Show loading indicator where login button is
+    UIActivityIndicatorView *loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    [loadingIndicator startAnimating];
+
+    if (deviceOSVersionLessThan(iOS7))
+    {
+        CGRect frame = loadingIndicator.frame;
+        frame.size.width += SIZE_INFO_BUTTON_MARGIN;
+        loadingIndicator.frame = frame;
+    }
+
+    UIBarButtonItem *barButton = [[UIBarButtonItem alloc]
+        initWithCustomView:loadingIndicator];
+    [self.navigationItem setLeftBarButtonItem:barButton animated:true];
 
     // Clickable title for sorting
     self.titleButton = [UIButton new];
@@ -606,20 +624,7 @@
     }
     else if ([status isEqualToString:XMPP_CONNECTION_CONNECTING])
     {
-        // Show loading indicator where login button is
-        UIActivityIndicatorView *loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-        [loadingIndicator startAnimating];
 
-        if (deviceOSVersionLessThan(iOS7))
-        {
-            CGRect frame = loadingIndicator.frame;
-            frame.size.width += SIZE_INFO_BUTTON_MARGIN;
-            loadingIndicator.frame = frame;
-        }
-
-        UIBarButtonItem *barButton = [[UIBarButtonItem alloc]
-            initWithCustomView:loadingIndicator];
-        [self.navigationItem setLeftBarButtonItem:barButton animated:true];
     }
 }
 

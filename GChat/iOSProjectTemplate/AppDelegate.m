@@ -26,9 +26,6 @@
     @property (strong, nonatomic, readwrite) XMPPStream *xmppStream;
     @property (strong, nonatomic) XMPPReconnect *xmppReconnect;
 
-    /** Timer for connection timeouts */
-    @property (strong, nonatomic) NSTimer *connectTimeoutTimer;
-
     /** Temporary password storage for login */
     @property (copy, nonatomic) NSString *tempPassword;
 
@@ -241,15 +238,8 @@
 
     // Set username and try to connect
     [self.xmppStream setMyJID:[XMPPJID jidWithString:username]];
-    NSError *error = nil;
-    if (self.connectTimeoutTimer) {
-        [self.connectTimeoutTimer invalidate];
-    }
-    self.connectTimeoutTimer = [NSTimer scheduledTimerWithTimeInterval:TIME_CONNECTION_TIMEOUT
-        target:self selector:@selector(xmppStreamConnectDidTimeout:)
-        userInfo:nil repeats:false];
+    NSError *error;
     if (![self.xmppStream connectWithTimeout:TIME_CONNECTION_TIMEOUT error:&error])
-//    if (![self.xmppStream oldSchoolSecureConnectWithTimeout:TIME_CONNECTION_TIMEOUT error:&error])
     {
         debugLog(@"connect failed@");
         [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"POPUP_ERROR_TITLE", nil)
@@ -297,11 +287,6 @@
 - (void)xmppStreamDidConnect:(XMPPStream *)sender
 {
     debugLog(@"xmppStreamDidConnect: %@", sender);
-
-    // Invalidate timeout timer
-    if (self.connectTimeoutTimer) {
-        [self.connectTimeoutTimer invalidate];
-    }
 
     // Notify connection status change
     [[NSNotificationCenter defaultCenter]
