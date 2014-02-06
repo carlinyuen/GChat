@@ -247,10 +247,7 @@
             [self.tableView reloadData];
 
             // Scroll to bottom
-            [self.tableView scrollToRowAtIndexPath:[NSIndexPath
-                    indexPathForItem:[self.tableView numberOfRowsInSection:[self.tableView numberOfSections] - 1] - 1
-                    inSection:[self.tableView numberOfSections] - 1]
-                atScrollPosition:UITableViewScrollPositionBottom animated:true];
+            [self scrollToBottom];
         });
     });
 }
@@ -279,6 +276,7 @@
         // Clear and refresh
         self.inputTextView.text = @"";
         [self.tableView reloadData];
+        [self scrollToBottom];
     }
 }
 
@@ -300,6 +298,16 @@
     [UIView animateWithDuration:ANIMATION_DURATION_FAST delay:0 options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut animations:^{
             self.footerView.alpha = 1;
         } completion:nil];
+}
+
+/** @brief Scroll tableview to bottom */
+- (void)scrollToBottom
+{
+    NSInteger section = [self.tableView numberOfSections] - 1;
+    NSInteger row = [self.tableView numberOfRowsInSection:section] - 1;
+    [self.tableView scrollToRowAtIndexPath:[NSIndexPath
+            indexPathForItem:row inSection:section]
+        atScrollPosition:UITableViewScrollPositionBottom animated:true];
 }
 
 
