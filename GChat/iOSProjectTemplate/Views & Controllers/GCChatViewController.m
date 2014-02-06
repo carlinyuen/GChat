@@ -317,9 +317,13 @@
 {
     NSInteger section = [self.tableView numberOfSections] - 1;
     NSInteger row = [self.tableView numberOfRowsInSection:section] - 1;
-    [self.tableView scrollToRowAtIndexPath:[NSIndexPath
-            indexPathForItem:row inSection:section]
-        atScrollPosition:UITableViewScrollPositionBottom animated:true];
+
+    // Only scroll if has rows
+    if (row > 0) {
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath
+                indexPathForItem:row inSection:section]
+            atScrollPosition:UITableViewScrollPositionBottom animated:true];
+    }
 }
 
 
