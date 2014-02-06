@@ -174,7 +174,6 @@
         // Roster Setup
         self.rosterStorage = [XMPPRosterMemoryStorage new];
         self.roster = [[XMPPRoster alloc] initWithRosterStorage:self.rosterStorage];
-        [self.roster addDelegate:self.viewController delegateQueue:dispatch_get_main_queue()];
         [self.roster activate:[[AppDelegate appDelegate] xmppStream]];
 
         // Message archive

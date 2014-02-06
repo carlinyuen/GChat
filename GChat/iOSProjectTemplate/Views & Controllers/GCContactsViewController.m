@@ -182,6 +182,8 @@
     //  If we're not signed in, AppDelegate will handle
     if ([[AppDelegate appDelegate] connectWithUsername:nil andPassword:nil]) {
         [[UIApplication sharedApplication] cancelAllLocalNotifications];
+    } else {    // Show loading indicator
+        [self setLoadingIndicator];
     }
 }
 
@@ -209,6 +211,7 @@
 {
     // Display
     self.navigationController.navigationBarHidden = false;
+    self.navigationItem.hidesBackButton = true;
 
     // Text Color for navbar titles
     if (deviceOSVersionLessThan(iOS7)) {
@@ -230,21 +233,6 @@
         [[UINavigationBar appearance] setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
         [[UINavigationBar appearance] setBackgroundColor:UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT)];
     }
-
-    // Show loading indicator where login button is
-    UIActivityIndicatorView *loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    [loadingIndicator startAnimating];
-
-    if (deviceOSVersionLessThan(iOS7))
-    {
-        CGRect frame = loadingIndicator.frame;
-        frame.size.width += SIZE_INFO_BUTTON_MARGIN;
-        loadingIndicator.frame = frame;
-    }
-
-    UIBarButtonItem *barButton = [[UIBarButtonItem alloc]
-        initWithCustomView:loadingIndicator];
-    [self.navigationItem setLeftBarButtonItem:barButton animated:true];
 
     // Clickable title for sorting
     self.titleButton = [UIButton new];
@@ -332,10 +320,10 @@
     }
 }
 
-/** @brief Refreshes the login button text */
-- (void)refreshLoginButton
+/** @brief Set info button into navbar */
+- (void)setInfoButton
 {
-    debugLog(@"refreshLoginButton");
+    debugLog(@"setInfoButton");
 
     // Info button on left side
 	UIButton *infoButton;
@@ -348,11 +336,33 @@
     } else {
         infoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
     }
+
 //	[infoButton addTarget:self action:@selector(infoButtonTapped:)
    	[infoButton addTarget:self action:@selector(logoutButtonTapped:)
         forControlEvents:UIControlEventTouchUpInside];
 	[self.navigationItem setLeftBarButtonItem:[[UIBarButtonItem alloc]
         initWithCustomView:infoButton] animated:true];
+}
+
+/** @brief Set loading indicator into navbar */
+- (void)setLoadingIndicator
+{
+    // Show loading indicator where login button is
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    UIActivityIndicatorView *loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    [loadingIndicator startAnimating];
+    [button addSubview:loadingIndicator];
+
+    if (deviceOSVersionLessThan(iOS7))
+    {
+        CGRect frame = button.frame;
+        frame.size.width += SIZE_INFO_BUTTON_MARGIN;
+        button.frame = frame;
+    }
+
+    [button addTarget:self action:@selector(logoutButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    [self.navigationItem setLeftBarButtonItem:[[UIBarButtonItem alloc]
+        initWithCustomView:button] animated:true];
 }
 
 /** @brief Schedules a refresh to happen, if set to override previous, then cancel existing timer if exists, otherwise will not override it and return if an existing timer already exists */
@@ -547,6 +557,21 @@
     // Clear credentials
     [AppDelegate clearCredentials];
 
+    // Clear data
+    __block GCContactsViewController *this = self;
+    [UIView animateWithDuration:ANIMATION_DURATION_FAST delay:0
+        options:UIViewAnimationOptionCurveEaseInOut
+        animations:^{
+            if (this) {
+                this.tableView.alpha = 0;
+            }
+        } completion:^(BOOL finished) {
+            if (this) {
+                [this.contactList removeAllObjects];
+                [this.tableView reloadData];
+            }
+        }];
+
     // Leave screen
     [self.navigationController popViewControllerAnimated:true];
 }
@@ -592,8 +617,8 @@
     // If connected
     if ([status isEqualToString:XMPP_CONNECTION_OK])
     {
-        // Refresh login button
-        [self refreshLoginButton];
+        // Set info button into where loading indicator is 
+        [self setInfoButton];
 
         // Silent refresh
         [self silentRefresh:notification];
@@ -673,7 +698,7 @@
 #pragma mark - UITableViewDataSource
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return ContactListSectionsCount;
+    return self.contactList.count;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section

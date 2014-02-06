@@ -61,7 +61,8 @@
     debugLog(@"viewWillAppear");
  
     // Try to connect and show appropriate views
-    if ([[AppDelegate appDelegate] connectWithUsername:nil andPassword:nil]) {
+    if ([[AppDelegate appDelegate] connectWithUsername:nil andPassword:nil])
+    {
         [self.navigationController pushViewController:self.contactsVC animated:true];
     } else {    // Can't auto connect, need to show login screen
         [self presentViewController:[[GCLoginViewController alloc] initWithNibName:@"GCLoginViewController" bundle:nil] animated:!self.initialRun completion:nil];
