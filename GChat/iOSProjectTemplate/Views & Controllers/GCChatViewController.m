@@ -245,6 +245,12 @@
 
             // Refresh tableview
             [self.tableView reloadData];
+
+            // Scroll to bottom
+            [self.tableView scrollToRowAtIndexPath:[NSIndexPath
+                    indexPathForItem:[self.tableView numberOfRowsInSection:[self.tableView numberOfSections] - 1] - 1
+                    inSection:[self.tableView numberOfSections] - 1]
+                atScrollPosition:UITableViewScrollPositionBottom animated:true];
         });
     });
 }
@@ -417,7 +423,7 @@
     cell.textLabel.font = [UIFont fontWithName:FONT_NAME_LIGHT size:FONT_SIZE_CHAT_INPUT];
 
     // Detailed text field
-    cell.detailTextLabel.text = data[XMPP_MESSAGE_USERNAME];
+    cell.detailTextLabel.text = ([data[XMPP_MESSAGE_USERNAME] isEqualToString:[[self.contact jid] bare]]) ? [self.contact displayName] : NSLocalizedString(@"CHAT_FROM_ME_TEXT", nil);
     cell.detailTextLabel.backgroundColor = [UIColor clearColor];
     cell.detailTextLabel.textColor = UIColorFromHex(COLOR_HEX_BLACK_TRANSPARENT);
     cell.detailTextLabel.font = [UIFont fontWithName:FONT_NAME_MEDIUM size:FONT_SIZE_CONTACT_STATUS];

@@ -40,6 +40,7 @@
 // Chat Screen
 
 "CHAT_SEND_BUTTON_TITLE" = "Send";
+"CHAT_FROM_ME_TEXT" = "Me";
 
 
 // General
