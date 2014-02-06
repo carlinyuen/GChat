@@ -127,7 +127,7 @@
     if (self.initialLoad)
     {
         [self.loadingIndicator startAnimating];
-        [self.view addSubview:self.loadingIndicator];
+        [self.view insertSubview:self.loadingIndicator belowSubview:self.toolBar];
         [UIView animateWithDuration:ANIMATION_DURATION_FAST delay:0
             options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut
             animations:^{
