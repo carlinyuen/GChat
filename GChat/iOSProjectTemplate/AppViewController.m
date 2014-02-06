@@ -64,10 +64,9 @@
     if ([[AppDelegate appDelegate] connectWithUsername:nil andPassword:nil]) {
         [self.navigationController pushViewController:self.contactsVC animated:true];
     } else {    // Can't auto connect, need to show login screen
-        [self presentViewController:[[GCLoginViewController alloc] initWithNibName:@"GCLoginViewController" bundle:nil] animated:!self.initialRun completion:^{
-                self.initialRun = false;
-            }];
+        [self presentViewController:[[GCLoginViewController alloc] initWithNibName:@"GCLoginViewController" bundle:nil] animated:!self.initialRun completion:nil];
     }
+    self.initialRun = false;
 }
 
 - (void)viewDidAppear:(BOOL)animated

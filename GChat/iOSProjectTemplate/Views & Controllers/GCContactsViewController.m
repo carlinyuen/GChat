@@ -335,6 +335,8 @@
 /** @brief Refreshes the login button text */
 - (void)refreshLoginButton
 {
+    debugLog(@"refreshLoginButton");
+
     // Info button on left side
 	UIButton *infoButton;
     if (deviceOSVersionLessThan(iOS7))
@@ -351,29 +353,6 @@
         forControlEvents:UIControlEventTouchUpInside];
 	[self.navigationItem setLeftBarButtonItem:[[UIBarButtonItem alloc]
         initWithCustomView:infoButton] animated:true];
-
-    return;
-
-
-    // Depending on state of logged in status, change text on login button
-    NSString *buttonTitle
-        = ([[AppDelegate appDelegate] isConnected]
-            ? NSLocalizedString(@"APP_NAVBAR_LOGOUT_BUTTON_TITLE", nil)
-            : NSLocalizedString(@"APP_NAVBAR_LOGIN_BUTTON_TITLE", nil));
-
-    // Only refresh if state is changed
-    if ([[self.navigationItem.leftBarButtonItem title] isEqualToString:buttonTitle]) {
-        return;
-    }
-        
-    // Login button on left
-    NSString *loginTitle = [NSString stringWithFormat:@"%@%@",
-        (deviceOSVersionLessThan(iOS7) ? @"" : @" "), buttonTitle];
-    UIBarButtonItem *button = [[UIBarButtonItem alloc]
-        initWithTitle:loginTitle style:UIBarButtonItemStylePlain
-        target:self action:([[AppDelegate appDelegate] isConnected]
-            ? @selector(logoutButtonTapped:) : @selector(loginButtonTapped:))];
-    [self.navigationItem setLeftBarButtonItem:button animated:true];
 }
 
 /** @brief Schedules a refresh to happen, if set to override previous, then cancel existing timer if exists, otherwise will not override it and return if an existing timer already exists */
@@ -624,7 +603,15 @@
     }
     else if ([status isEqualToString:XMPP_CONNECTION_CONNECTING])
     {
-
+    }
+    else if ([status isEqualToString:XMPP_CONNECTION_ERROR_TIMEOUT])
+    {
+    }
+    else if ([status isEqualToString:XMPP_CONNECTION_AUTH])
+    {
+    }
+    else if ([status isEqualToString:XMPP_CONNECTION_ERROR])
+    {
     }
 }
 
