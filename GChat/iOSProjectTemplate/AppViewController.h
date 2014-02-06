@@ -16,5 +16,11 @@
 
     /** @brief Select and open up chat view for a specific contact */
     - (void)selectContact:(NSString *)username;
+   
+    /** @brief Start polling timer */
+    - (void)startPollingTimer;
+
+    /** @brief Cancel polling timer */
+    - (void)cancelPollingTimer;
 
 @end

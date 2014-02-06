@@ -166,6 +166,7 @@
     // Setup
 	[self setupNavBar];
     [self setupTableView];
+    [self setupPullToRefresh];
 }
 
 /** @brief Last-minute setup before view appears. */
@@ -174,11 +175,6 @@
 	[super viewWillAppear:animated];
 
     debugLog(@"viewWillAppear");
-
-    // Setup pull to refresh when UITableView insets are set
-    if (!self.pullToRefresh) {
-        [self setupPullToRefresh];
-    }
 
     // Deselect from tableview if exists
     [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:true];
@@ -555,6 +551,21 @@
 {
     debugLog(@"crouton: %@", message);
 }
+ 
+/** @brief Start polling timer */
+- (void)startPollingTimer
+{
+    [self cancelPollingTimer];
+    self.pollServerTimer = [NSTimer scheduledTimerWithTimeInterval:TIME_POLL_ROSTER target:self selector:@selector(silentRefresh:) userInfo:nil repeats:true];
+}
+
+/** @brief Cancel polling timer */
+- (void)cancelPollingTimer
+{
+    if (self.pollServerTimer) {
+        [self.pollServerTimer invalidate];
+    }
+}
 
 
 #pragma mark - UI Event Handlers
@@ -575,7 +586,7 @@
     [[AppDelegate appDelegate] disconnect];
 
     // Stop timer for polling
-    [self.pollServerTimer invalidate];
+    [self cancelPollingTimer];
 
     // Clear credentials
     [AppDelegate clearCredentials];
@@ -643,10 +654,7 @@
         [self silentRefresh:notification];
 
         // Set timer to continuously poll server
-        if (self.pollServerTimer) {
-            [self.pollServerTimer invalidate];
-        }
-        self.pollServerTimer = [NSTimer scheduledTimerWithTimeInterval:TIME_POLL_ROSTER target:self selector:@selector(silentRefresh:) userInfo:nil repeats:true];
+        [self startPollingTimer];
     }
     else if ([status isEqualToString:XMPP_CONNECTION_CONNECTING])
     {

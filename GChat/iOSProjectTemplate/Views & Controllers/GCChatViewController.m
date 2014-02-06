@@ -201,8 +201,10 @@
     NSEntityDescription *entityDescription = [NSEntityDescription
         entityForName:@"XMPPMessageArchiving_Message_CoreDataObject"
         inManagedObjectContext:moc];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"bareJidStr == %@", [[self.contact jid] bare]];
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     [request setEntity:entityDescription];
+    [request setPredicate:predicate];
 
     // Fetch
     NSError *error;

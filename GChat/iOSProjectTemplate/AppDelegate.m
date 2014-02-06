@@ -70,7 +70,7 @@
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
     // Perform cleanup
-    [AppDelegate cleanup];
+    [self cleanup];
 
     // Kick off background task
     self.backgroundTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler: ^{
@@ -101,7 +101,7 @@
     [self disconnect];
 
     // Perform cleanup
-    [AppDelegate cleanup];
+    [self cleanup];
 }
 
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
@@ -121,20 +121,24 @@
 {
 }
 
+/** @brief Perform app cleanup */
+- (void)cleanup
+{
+    debugLog(@"cleanup");
+
+    // Disable timers
+    [self.viewController cancelPollingTimer];
+
+    // Clear credentials
+    if (![[NSUserDefaults standardUserDefaults] boolForKey:CACHE_KEY_LOGIN_PERSIST]) {
+        [AppDelegate clearCredentials];
+    }
+}
+
 /** @brief Returns a reference to app delegate */
 + (AppDelegate *)appDelegate
 {
     return (AppDelegate *)[[UIApplication sharedApplication] delegate];
-}
-
-/** @brief Perform app cleanup */
-+ (void)cleanup
-{
-    debugLog(@"cleanup");
-
-    if (![[NSUserDefaults standardUserDefaults] boolForKey:CACHE_KEY_LOGIN_PERSIST]) {
-        [AppDelegate clearCredentials];
-    }
 }
 
 /** @brief Clears saved credentials */
