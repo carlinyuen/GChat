@@ -87,8 +87,8 @@
 
     debugLog(@"chatVC viewWillAppear");
    
-    // Title
-    self.title = [self.contact displayName];
+    // Reset navbar
+    [self setupNavBar];
 
     // Fetch and show messages
     [self refreshTableView:self];
