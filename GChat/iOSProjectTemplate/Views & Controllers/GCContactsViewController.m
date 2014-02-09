@@ -70,6 +70,9 @@
     @property (strong, nonatomic) NSMutableArray *contactList;
     @property (copy, nonatomic) NSComparisonResult(^contactComparisonBlock)(id obj1, id obj2);
 
+    /** Chat screen */
+    @property (strong, nonatomic) GCChatViewController *chatVC;
+
     /** Storage for subscription requests */
     @property (strong, nonatomic) NSMutableDictionary *subscriptionRequests;
 
@@ -202,6 +205,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+
 #pragma mark - UI Setup
 
 /** @brief Setup Nav bar */
@@ -210,27 +214,6 @@
     // Display
     self.navigationController.navigationBarHidden = false;
     self.navigationItem.hidesBackButton = true;
-
-    // Text Color for navbar titles
-    if (deviceOSVersionLessThan(iOS7)) {
-        [[UINavigationBar appearance] setTitleTextAttributes:@{
-            UITextAttributeTextColor: [UIColor darkGrayColor],
-            UITextAttributeTextShadowColor: [UIColor clearColor],
-            UITextAttributeFont: [UIFont fontWithName:FONT_NAME_LIGHT size:FONT_SIZE_NAVBAR],
-        }];
-    } else {
-        [[UINavigationBar appearance] setTitleTextAttributes:@{
-            NSForegroundColorAttributeName: [UIColor darkGrayColor],
-            NSFontAttributeName: [UIFont fontWithName:FONT_NAME_THIN size:FONT_SIZE_NAVBAR],
-        }];
-    }
-
-	// Background Color
-	self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
-    if (deviceOSVersionLessThan(iOS7)) {
-        [[UINavigationBar appearance] setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
-        [[UINavigationBar appearance] setBackgroundColor:UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT)];
-    }
 
     // Setup loading indicator
     [self setLoadingIndicator];
@@ -248,17 +231,18 @@
     self.navigationItem.titleView = self.titleButton;
 
     // Add contact button on right side (and filter?)
-    UIButton *addButton = [UIButton buttonWithType:UIButtonTypeContactAdd];
+//    UIButton *addButton = [UIButton buttonWithType:UIButtonTypeContactAdd];
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeContactAdd];
     if (deviceOSVersionLessThan(iOS7))
     {
-        CGRect frame = addButton.frame;
+        CGRect frame = button.frame;
         frame.size.width += SIZE_INFO_BUTTON_MARGIN;
-        addButton.frame = frame;
+        button.frame = frame;
     }
-   	[addButton addTarget:self action:@selector(addButtonTapped:)
+   	[button addTarget:self action:@selector(startChatButtonTapped:)
         forControlEvents:UIControlEventTouchUpInside];
 	[self.navigationItem setRightBarButtonItem:[[UIBarButtonItem alloc]
-        initWithCustomView:addButton] animated:true];
+        initWithCustomView:button] animated:true];
 }
 
 /** @brief Setup tableview */
@@ -303,10 +287,17 @@
         initWithTitle:NSLocalizedString(@"LOGIN_NAVBAR_BACK_BUTTON_TITLE", nil)
         style:UIBarButtonItemStylePlain target:nil action:nil];
 
+    // Lazy create chat screen
+    if (!self.chatVC) {
+        self.chatVC = [[GCChatViewController alloc]
+            initWithContact:contact];
+    } else {
+        self.chatVC.contact = contact;
+    }
+
     // Jump to login page
     [self.navigationController
-        pushViewController:[[GCChatViewController alloc]
-            initWithContact:contact] animated:true];
+        pushViewController:self.chatVC animated:true];
 }
 
 /** @brief Select and open up chat view for a specific contact */
@@ -542,6 +533,23 @@
     }
 }
 
+/** @brief Shows popup entry for adding a new contact */
+- (void)showAddContactEntry
+{
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"APP_CONTACTS_ADD_TITLE", nil)
+        message:NSLocalizedString(@"APP_CONTACTS_ADD_MESSAGE", nil)
+        delegate:self
+        cancelButtonTitle:NSLocalizedString(@"POPUP_CANCEL_BUTTON_TITLE", nil)
+        otherButtonTitles:NSLocalizedString(@"APP_CONTACTS_ADD_OK", nil), nil];
+    alert.tag = AlertViewTypeAddContact;
+    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+
+    // Setup field to be email field and show
+    [[alert textFieldAtIndex:0] setKeyboardAppearance:UIKeyboardAppearanceAlert];
+    [[alert textFieldAtIndex:0] setKeyboardType:UIKeyboardTypeEmailAddress];
+    [alert show];
+}
+
 
 #pragma mark - UI Event Handlers
 
@@ -583,21 +591,10 @@
 {
 }
 
-/** @brief Add button pressed */
-- (void)addButtonTapped:(UIButton *)sender
+/** @brief Start chat button pressed */
+- (void)startChatButtonTapped:(UIButton *)sender
 {
-   UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"APP_CONTACTS_ADD_TITLE", nil)
-        message:NSLocalizedString(@"APP_CONTACTS_ADD_MESSAGE", nil)
-        delegate:self
-        cancelButtonTitle:NSLocalizedString(@"POPUP_CANCEL_BUTTON_TITLE", nil)
-        otherButtonTitles:NSLocalizedString(@"APP_CONTACTS_ADD_OK", nil), nil];
-    alert.tag = AlertViewTypeAddContact;
-    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-
-    // Setup field to be email field and show
-    [[alert textFieldAtIndex:0] setKeyboardAppearance:UIKeyboardAppearanceAlert];
-    [[alert textFieldAtIndex:0] setKeyboardType:UIKeyboardTypeEmailAddress];
-    [alert show];
+    
 }
 
 /** @brief When received notification that a contact's presence changed */

@@ -75,9 +75,6 @@
 {
     [super viewDidLoad];
 
-    // Title
-    self.title = [self.contact displayName];
-
     // Setup
     [self setupNavBar];
     [self setupFooterView];
@@ -87,6 +84,11 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+
+    debugLog(@"chatVC viewWillAppear");
+   
+    // Title
+    self.title = [self.contact displayName];
 
     // Fetch and show messages
     [self refreshTableView:self];
@@ -258,7 +260,7 @@
                 [this.tableView reloadData];
 
                 // Scroll to bottom
-                [this scrollToBottom];
+                [this scrollToBottom:false];
             }
         });
     });
@@ -288,7 +290,7 @@
         // Clear and refresh
         self.inputTextView.text = @"";
         [self.tableView reloadData];
-        [self scrollToBottom];
+        [self scrollToBottom:true];
     }
 }
 
@@ -313,7 +315,7 @@
 }
 
 /** @brief Scroll tableview to bottom */
-- (void)scrollToBottom
+- (void)scrollToBottom:(BOOL)animated
 {
     NSInteger section = [self.tableView numberOfSections] - 1;
     NSInteger row = [self.tableView numberOfRowsInSection:section] - 1;
@@ -322,7 +324,7 @@
     if (row > 0) {
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath
                 indexPathForItem:row inSection:section]
-            atScrollPosition:UITableViewScrollPositionBottom animated:true];
+            atScrollPosition:UITableViewScrollPositionBottom animated:animated];
     }
 }
 
@@ -395,13 +397,13 @@
     NSDictionary *info = [notification userInfo];
     CGRect frame = [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
 
-    [UIView animateWithDuration:ANIMATION_DURATION_MED delay:0
+    [UIView animateWithDuration:.2 delay:0
         options:UIViewAnimationOptionBeginFromCurrentState
             | UIViewAnimationCurveEaseOut
         animations:^{
             self.footerBottomConstraint.constant = frame.size.height;
             [self.view layoutIfNeeded];
-            [self scrollToBottom];
+            [self scrollToBottom:true];
         } completion:nil];
 }
 
@@ -409,7 +411,7 @@
 - (void)keyboardWillHide:(NSNotification *)notification
 {
     // Animate back to zero
-    [UIView animateWithDuration:ANIMATION_DURATION_MED delay:0
+    [UIView animateWithDuration:ANIMATION_DURATION_KEYBOARD delay:0
         options:UIViewAnimationOptionBeginFromCurrentState
             | UIViewAnimationCurveEaseOut
         animations:^{

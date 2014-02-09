@@ -1412,18 +1412,18 @@
 		5F7C89781790AF0900018AD7 /* Views & Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				22E3D3DE1899AEF800678862 /* GCLoginViewController.h */,
-				22E3D3DF1899AEF800678862 /* GCLoginViewController.m */,
-				22E3D3E01899AEF800678862 /* GCLoginViewController.xib */,
 				22E3D3E3189AFF3A00678862 /* GCChatViewController.h */,
 				22E3D3E4189AFF3A00678862 /* GCChatViewController.m */,
 				22E3D3E5189AFF3A00678862 /* GCChatViewController.xib */,
-				22A7BAE318A3E69300C2D0F3 /* GCWebViewController.h */,
-				22A7BAE418A3E69300C2D0F3 /* GCWebViewController.m */,
-				22A7BAE518A3E69300C2D0F3 /* GCWebViewController.xib */,
 				22A7BAE818A41BF800C2D0F3 /* GCContactsViewController.h */,
 				22A7BAE918A41BF800C2D0F3 /* GCContactsViewController.m */,
 				22A7BAEA18A41BF800C2D0F3 /* GCContactsViewController.xib */,
+				22E3D3DE1899AEF800678862 /* GCLoginViewController.h */,
+				22E3D3DF1899AEF800678862 /* GCLoginViewController.m */,
+				22E3D3E01899AEF800678862 /* GCLoginViewController.xib */,
+				22A7BAE318A3E69300C2D0F3 /* GCWebViewController.h */,
+				22A7BAE418A3E69300C2D0F3 /* GCWebViewController.m */,
+				22A7BAE518A3E69300C2D0F3 /* GCWebViewController.xib */,
 			);
 			path = "Views & Controllers";
 			sourceTree = "<group>";

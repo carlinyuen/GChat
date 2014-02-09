@@ -82,9 +82,9 @@
 //
 //#import "XMPPPrivacy.h"
 
-//#import "XMPPMUC.h"
-//#import "XMPPRoom.h"
-//#import "XMPPRoomMemoryStorage.h"
+#import "XMPPMUC.h"
+#import "XMPPRoom.h"
+#import "XMPPRoomMemoryStorage.h"
 //#import "XMPPRoomCoreDataStorage.h"
 //#import "XMPPRoomHybridStorage.h"
 
@@ -103,9 +103,9 @@
 #import "XMPPMessageArchivingCoreDataStorage.h"
 
 //#import "XMPPTransports.h"
-//
-//#import "XMPPCapabilities.h"
-//#import "XMPPCapabilitiesCoreDataStorage.h"
+
+#import "XMPPCapabilities.h"
+#import "XMPPCapabilitiesCoreDataStorage.h"
 
 #import "XMPPvCardAvatarModule.h"
 
