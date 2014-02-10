@@ -162,9 +162,7 @@
     [self.titleButton setTitleColor:UIColorFromHex(COLOR_HEX_BACKGROUND_DARK) forState:UIControlStateNormal];
     [self.titleButton setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
     self.titleButton.titleLabel.adjustsFontSizeToFitWidth = true;
-    self.titleButton.titleLabel.font = (deviceOSVersionLessThan(iOS7))
-        ? [UIFont fontWithName:FONT_NAME_LIGHT size:FONT_SIZE_NAVBAR]
-        : [UIFont fontWithName:FONT_NAME_THIN size:FONT_SIZE_NAVBAR];
+    self.titleButton.titleLabel.font = [UIFont fontWithName:FONT_NAME_LIGHT size:FONT_SIZE_NAVBAR];
     self.navigationItem.titleView = self.titleButton;
 }
 
