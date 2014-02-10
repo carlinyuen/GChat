@@ -64,7 +64,6 @@
     #define XMPP_PRESENCE_SHOW_CHAT @"chat"
  
 // List the modules you're using here:
-// (the following may not be a complete list)
 
 //#import "XMPPBandwidthMonitor.h"
  
@@ -97,8 +96,8 @@
 //
 //#import "TURNSocket.h"
 //
-//#import "XMPPDateTimeProfiles.h"
-//#import "NSDate+XMPPDateTimeProfiles.h"
+#import "XMPPDateTimeProfiles.h"
+#import "NSDate+XMPPDateTimeProfiles.h"
 
 #import "XMPPMessage+XEP_0085.h"
 #import "XMPPMessageArchiving.h"

@@ -154,6 +154,7 @@
     self.inputTextView.font = [UIFont fontWithName:FONT_NAME_LIGHT
         size:FONT_SIZE_CHAT_INPUT];
     self.inputTextView.showsHorizontalScrollIndicator = false;
+    self.inputTextView.showsVerticalScrollIndicator = false;
     self.inputTextView.directionalLockEnabled = true;
     self.inputTextView.layer.borderColor = [[UIColor lightGrayColor] CGColor];
     self.inputTextView.layer.borderWidth = SIZE_BORDER_WIDTH;
@@ -183,6 +184,8 @@
 - (void)setupTableView
 {
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+
+    self.tableView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
 }
 
 
