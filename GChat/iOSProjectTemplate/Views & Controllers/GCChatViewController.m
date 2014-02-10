@@ -445,7 +445,7 @@
 - (void)updateNavBarColor:(UIColor *)color
 {
     if (deviceOSVersionLessThan(iOS7)) {
-        [[UINavigationBar appearance] setBackgroundColor:color];
+//        [[UINavigationBar appearance] setBackgroundColor:color];
         self.navigationController.navigationBar.tintColor = color;
     } else {
         self.navigationController.navigationBar.barTintColor = color;
