@@ -50,6 +50,7 @@
     @property (strong, nonatomic) UIView *keyboardAccessoryView;
     @property (strong, nonatomic) UITextView *keyboardInputTextView;
     @property (strong, nonatomic) UIButton *keyboardSendButton;
+    @property (assign, nonatomic) UIEdgeInsets originalInsets;
 
     /** Storage for messages */
     @property (strong, nonatomic) NSMutableArray *messageList;
@@ -82,12 +83,6 @@
         [[NSNotificationCenter defaultCenter] addObserver:self
             selector:@selector(keyboardDidShow:)
             name:UIKeyboardDidShowNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-            selector:@selector(keyboardWillHide:)
-            name:UIKeyboardWillHideNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-            selector:@selector(keyboardDidHide:)
-            name:UIKeyboardDidHideNotification object:nil];
     }
     return self;
 }
@@ -560,15 +555,24 @@
 /** @brief Keyboard will show */
 - (void)keyboardWillShow:(NSNotification *)notification
 {
+    debugLog(@"keyboardWillShow");
+
+    // Remove observer
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+        name:UIKeyboardWillShowNotification object:nil];
+
     // Determine ending height and shrink view by that size
     NSDictionary *info = [notification userInfo];
     CGRect frame = [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
 
-    // Set insets for tableview
+    // Set insets for tableview, need to make copy for original
     UIEdgeInsets insets = self.tableView.contentInset;
+    self.originalInsets = UIEdgeInsetsMake(insets.top, insets.left, insets.bottom, insets.right);
+    debugLog(@"originalInsets: %@", NSStringFromUIEdgeInsets(self.originalInsets));
     insets.bottom = CGRectGetHeight(frame) - CGRectGetHeight(self.keyboardAccessoryView.frame);
+    insets.top -= [self tableView:self.tableView heightForHeaderInSection:0];
 
-    [UIView animateWithDuration:ANIMATION_DURATION_KEYBOARD delay:0
+    [UIView animateWithDuration:[notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] floatValue] delay:0
         options:UIViewAnimationOptionBeginFromCurrentState
         animations:^{
             self.tableView.contentInset = insets;
@@ -580,10 +584,25 @@
 /** @brief Keyboard did show */
 - (void)keyboardDidShow:(NSNotification *)notification
 {
+    debugLog(@"keyboardDidShow");
+
+    // Remove observer
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+        name:UIKeyboardDidShowNotification object:nil];
+
     // Switch first responder to keyboard input
     if (![self.keyboardInputTextView isFirstResponder]) {
+        [self.inputTextView resignFirstResponder];
         [self.keyboardInputTextView becomeFirstResponder];
     }
+
+    // Add hide keyboard observers
+    [[NSNotificationCenter defaultCenter] addObserver:self
+        selector:@selector(keyboardWillHide:)
+        name:UIKeyboardWillHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+        selector:@selector(keyboardDidHide:)
+        name:UIKeyboardDidHideNotification object:nil];
 }
 
 /** @brief Keyboard will hide */
@@ -591,17 +610,19 @@
 {
     debugLog(@"keyboardWillHide");
 
-    UIEdgeInsets insets = self.tableView.contentInset;
-    insets.bottom = 0;
+    // Remove observer
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+        name:UIKeyboardWillHideNotification object:nil];
+
     self.footerView.alpha = 1;
 
     // Animate back to zero
-    [UIView animateWithDuration:ANIMATION_DURATION_KEYBOARD delay:0
+    __block GCChatViewController *this = self;
+    [UIView animateWithDuration:[notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] floatValue] delay:0
         options:UIViewAnimationOptionBeginFromCurrentState
         animations:^{
-            self.tableView.contentInset = insets;
+            this.tableView.contentInset = this.originalInsets;
         } completion:nil];
-
 }
 
 /** @brief Keyboard did hide */
@@ -609,7 +630,19 @@
 {
     debugLog(@"keyboardDidHide");
 
+    // Remove observer
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+        name:UIKeyboardDidHideNotification object:nil];
+
     [self scrollToBottom:true];
+
+    // Add observers
+    [[NSNotificationCenter defaultCenter] addObserver:self
+            selector:@selector(keyboardWillShow:)
+            name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+        selector:@selector(keyboardDidShow:)
+        name:UIKeyboardDidShowNotification object:nil];
 }
 
 

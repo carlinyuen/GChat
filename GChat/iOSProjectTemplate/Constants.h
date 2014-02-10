@@ -66,7 +66,6 @@ extern int const COLOR_HEX_WHITE_TRANSLUCENT;
 extern int const COLOR_HEX_GREY_TRANSPARENT;
 
 // Animations
-extern float const ANIMATION_DURATION_KEYBOARD;
 extern float const ANIMATION_DURATION_FAST;
 extern float const ANIMATION_DURATION_MED;
 extern float const ANIMATION_DURATION_SLOW;
