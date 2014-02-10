@@ -107,9 +107,6 @@
 
     // Fetch and show messages
     [self refreshTableView:self];
-
-    // Make sure we're not editing
-    [self endEditing];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -124,8 +121,6 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-
-    debugLog(@"viewDidDisappear");
 
     // Update input view
     [self showFooterView];
@@ -524,7 +519,6 @@
 {
     debugLog(@"keyboardDidHide");
 
-    [self endEditing];
     [self scrollToBottom:true];
 }
 
