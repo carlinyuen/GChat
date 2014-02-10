@@ -305,6 +305,8 @@
         return;
     }
 
+    debugLog(@"refreshTableView: %@", sender);
+
     self.refreshingTableView = true;
 
     // Setup to fetch messages from CoreData
@@ -335,7 +337,7 @@
     if (!myJIDStr) {
         return;
     }
-    
+
     [self.messageList removeAllObjects];
 
     // Do this on background thread
@@ -572,12 +574,13 @@
     insets.bottom = CGRectGetHeight(frame) - CGRectGetHeight(self.keyboardAccessoryView.frame);
     insets.top = (deviceOSVersionLessThan(iOS7) ? 0 : SIZE_NAVBAR_INSET) - [self tableView:self.tableView heightForHeaderInSection:0];
 
+    __block GCChatViewController *this = self;
     [UIView animateWithDuration:[notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] floatValue] delay:0
         options:UIViewAnimationOptionBeginFromCurrentState
         animations:^{
-            self.tableView.contentInset = insets;
-            self.footerView.alpha = 0;
-            [self scrollToBottom:true];
+            this.tableView.contentInset = insets;
+            this.footerView.alpha = 0;
+            [this scrollToBottom:true];
         } completion:nil];
 }
 
@@ -595,8 +598,6 @@
 {
     debugLog(@"keyboardWillHide");
 
-    [self.inputTextView resignFirstResponder];
-    [self.keyboardInputTextView resignFirstResponder];
     self.footerView.alpha = 1;
 
     // Animate back to zero
