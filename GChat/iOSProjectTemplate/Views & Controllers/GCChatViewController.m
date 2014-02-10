@@ -185,7 +185,7 @@
         self.statusTextView.selectable = true;
     }
 
-    self.statusTextView.dataDetectorTypes = UIDataDetectorTypeLink;
+    self.statusTextView.dataDetectorTypes = UIDataDetectorTypeLink | UIDataDetectorTypePhoneNumber;
 }
 
 /** @brief Setup footer view with message sending */
@@ -637,23 +637,26 @@
 
     // Try to calculate / estimate height of contact status message
     CGSize boundingSize = CGSizeMake(CGRectGetWidth(self.view.bounds), CGFLOAT_MAX);
-    UIFont *headerFont = [UIFont boldSystemFontOfSize:[UIFont systemFontSize]];
+    UIFont *headerFont = self.statusTextView.font;
     if (deviceOSVersionLessThan(iOS7))
     {
         CGSize size = [status sizeWithFont:headerFont constrainedToSize:boundingSize lineBreakMode:NSLineBreakByWordWrapping];
         debugLog(@"size: %@", NSStringFromCGSize(size));
-        return size.height + SIZE_MIN_TOUCH;
+        return size.height + SIZE_MARGIN * 2;
     }
     else
     {
+        NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
+        paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
         CGRect bounds = [status
             boundingRectWithSize:boundingSize
             options:NSStringDrawingUsesLineFragmentOrigin
             attributes:@{
-                NSFontAttributeName:headerFont
+                NSFontAttributeName:headerFont,
+                NSParagraphStyleAttributeName:paragraphStyle,
             } context:nil];
         debugLog(@"size: %@", NSStringFromCGRect(bounds));
-        return CGRectGetHeight(bounds) + SIZE_MIN_TOUCH;
+        return CGRectGetHeight(bounds) + SIZE_MARGIN * 2;
     }
 }
 
@@ -691,8 +694,14 @@
 
     // Add textview for status
     [view addSubview:self.statusTextView];
+    self.statusTextView.text = nil; // Fix for bug with data detection
     self.statusTextView.text = [[[self.contact primaryResource] presence] status];
     [self.statusTextView sizeToFit];
+
+    // Adjust height with margin
+    CGRect frame = self.statusTextView.frame;
+    frame.size.height += SIZE_MARGIN * 2;
+    self.statusTextView.frame = frame;
 
     return view;
 }
