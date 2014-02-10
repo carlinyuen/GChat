@@ -605,11 +605,10 @@
             if (this) {
                 [this.contactList removeAllObjects];
                 [this.tableView reloadData];
+                [this setLoadingIndicator];
+                [this.navigationController popViewControllerAnimated:true];
             }
         }];
-
-    // Leave screen
-    [self.navigationController popViewControllerAnimated:true];
 }
 
 /** @brief Info button pressed */
