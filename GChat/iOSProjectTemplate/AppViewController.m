@@ -128,9 +128,8 @@
 
 - (void)reachabilityChanged:(NSNotification *)notification
 {
-    debugLog(@"reachabilityChanged");
-    debugObject(notification.userInfo);
-    debugObject(notification.object);
+    debugLog(@"reachabilityChanged: %@", [notification.object currentReachabilityString]);
+
 }
 
 
