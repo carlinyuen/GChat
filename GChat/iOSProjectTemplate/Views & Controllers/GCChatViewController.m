@@ -563,8 +563,11 @@
     // Determine ending height and shrink view by that size
     NSDictionary *info = [notification userInfo];
     CGRect frame = [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
+
+    // Set insets for tableview
     UIEdgeInsets insets = self.tableView.contentInset;
     insets.bottom = CGRectGetHeight(frame) - CGRectGetHeight(self.keyboardAccessoryView.frame);
+    insets.top = -[self tableView:self.tableView heightForHeaderInSection:0];
 
     [UIView animateWithDuration:ANIMATION_DURATION_KEYBOARD delay:0
         options:UIViewAnimationOptionBeginFromCurrentState
@@ -591,6 +594,7 @@
 
     UIEdgeInsets insets = self.tableView.contentInset;
     insets.bottom = 0;
+    insets.top = 0;
     self.footerView.alpha = 1;
 
     // Animate back to zero
@@ -621,11 +625,6 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.messageList.count;
 }
-
-//- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-//    // Use contact's status if it exists
-//    return [[[self.contact primaryResource] presence] status];
-//}
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
