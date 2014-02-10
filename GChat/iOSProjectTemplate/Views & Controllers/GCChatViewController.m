@@ -37,6 +37,9 @@
     /** Clickable title to change between nickname and email */
     @property (strong, nonatomic) UIButton *titleButton;
 
+    /** View for showing contact status */
+    @property (strong, nonatomic) UITextView *statusTextView;
+
     /** Sending message input */
     @property (strong, nonatomic) IBOutlet UIView *footerContainerView;
     @property (strong, nonatomic) UIView *footerView;
@@ -97,6 +100,7 @@
     [self setupNavBar];
     [self setupFooterView];
     [self setupTableView];
+    [self setupStatusView];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -162,6 +166,26 @@
         ? [UIFont fontWithName:FONT_NAME_LIGHT size:FONT_SIZE_NAVBAR]
         : [UIFont fontWithName:FONT_NAME_THIN size:FONT_SIZE_NAVBAR];
     self.navigationItem.titleView = self.titleButton;
+}
+
+/** @brief Setup status view */
+- (void)setupStatusView
+{
+    self.statusTextView = [[UITextView alloc] initWithFrame:CGRectMake(
+        0, 0, CGRectGetWidth(self.view.bounds), SIZE_MIN_TOUCH)];
+    self.statusTextView.textColor = [UIColor grayColor];
+    self.statusTextView.font = [UIFont fontWithName:FONT_NAME_MEDIUM size:FONT_SIZE_CONTACT_STATUS];
+    self.statusTextView.backgroundColor = [UIColor clearColor];
+    self.statusTextView.editable = false;
+    self.statusTextView.showsHorizontalScrollIndicator = false;
+    self.statusTextView.showsVerticalScrollIndicator = false;
+    self.statusTextView.directionalLockEnabled = true;
+
+    if ([self.statusTextView respondsToSelector:@selector(setSelectable:)]) {
+        self.statusTextView.selectable = true;
+    }
+
+    self.statusTextView.dataDetectorTypes = UIDataDetectorTypeLink;
 }
 
 /** @brief Setup footer view with message sending */
@@ -597,10 +621,10 @@
     return self.messageList.count;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    // Use contact's status if it exists
-    return [[[self.contact primaryResource] presence] status];
-}
+//- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+//    // Use contact's status if it exists
+//    return [[[self.contact primaryResource] presence] status];
+//}
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
@@ -618,7 +642,7 @@
     {
         CGSize size = [status sizeWithFont:headerFont constrainedToSize:boundingSize lineBreakMode:NSLineBreakByWordWrapping];
         debugLog(@"size: %@", NSStringFromCGSize(size));
-        return size.height;
+        return size.height + SIZE_MIN_TOUCH;
     }
     else
     {
@@ -629,7 +653,7 @@
                 NSFontAttributeName:headerFont
             } context:nil];
         debugLog(@"size: %@", NSStringFromCGRect(bounds));
-        return CGRectGetHeight(bounds);
+        return CGRectGetHeight(bounds) + SIZE_MIN_TOUCH;
     }
 }
 
@@ -664,6 +688,11 @@
 - (UITableViewHeaderFooterView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
     UITableViewHeaderFooterView *view = [tableView dequeueReusableHeaderFooterViewWithIdentifier:KEY_HEADER_ID];
+
+    // Add textview for status
+    [view addSubview:self.statusTextView];
+    self.statusTextView.text = [[[self.contact primaryResource] presence] status];
+    [self.statusTextView sizeToFit];
 
     return view;
 }
