@@ -910,7 +910,7 @@
     debugLog(@"roster: %@", [[[AppDelegate appDelegate] rosterStorage] sortedUsersByName]);
 
     // Instant refresh
-    [self scheduleRefresh:TIME_SILENT_REFRESH / 2 overridePrevious:true];
+    [self scheduleRefresh:(deviceOSVersionLessThan(iOS7) ? TIME_SILENT_REFRESH : 0) overridePrevious:true];
 }
 
 - (void)xmppRoster:(XMPPRoster *)sender didReceivePresenceSubscriptionRequest:(XMPPPresence *)presence
