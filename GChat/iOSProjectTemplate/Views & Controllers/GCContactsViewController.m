@@ -912,7 +912,7 @@
     debugLog(@"roster: %@", [[[AppDelegate appDelegate] rosterStorage] sortedUsersByName]);
 
     // Instant refresh
-    [self scheduleRefresh:0 overridePrevious:true];
+    [self scheduleRefresh:TIME_SILENT_REFRESH / 2 overridePrevious:true];
 }
 
 - (void)xmppRoster:(XMPPRoster *)sender didReceivePresenceSubscriptionRequest:(XMPPPresence *)presence

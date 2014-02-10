@@ -112,6 +112,9 @@
     // Reset navbar
     [self setupNavBar];
 
+    // Fix for bug with data detection
+    self.statusTextView.text = nil;
+
     // Fetch and show messages
     [self refreshTableView:self];
 }
@@ -172,7 +175,9 @@
 - (void)setupStatusView
 {
     self.statusTextView = [[UITextView alloc] initWithFrame:CGRectMake(
-        0, 0, CGRectGetWidth(self.view.bounds), SIZE_MIN_TOUCH)];
+        SIZE_MARGIN / 2, SIZE_MARGIN / 2,
+        CGRectGetWidth(self.view.bounds) - SIZE_MARGIN,
+        SIZE_MIN_TOUCH)];
     self.statusTextView.textColor = [UIColor grayColor];
     self.statusTextView.font = [UIFont fontWithName:FONT_NAME_MEDIUM size:FONT_SIZE_CONTACT_STATUS];
     self.statusTextView.backgroundColor = [UIColor clearColor];
@@ -635,29 +640,15 @@
         return 0;
     }
 
-    // Try to calculate / estimate height of contact status message
-    CGSize boundingSize = CGSizeMake(CGRectGetWidth(self.view.bounds), CGFLOAT_MAX);
-    UIFont *headerFont = self.statusTextView.font;
-    if (deviceOSVersionLessThan(iOS7))
-    {
-        CGSize size = [status sizeWithFont:headerFont constrainedToSize:boundingSize lineBreakMode:NSLineBreakByWordWrapping];
-        debugLog(@"size: %@", NSStringFromCGSize(size));
-        return size.height + SIZE_MARGIN * 2;
-    }
-    else
-    {
-        NSMutableParagraphStyle *paragraphStyle = [NSMutableParagraphStyle new];
-        paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
-        CGRect bounds = [status
-            boundingRectWithSize:boundingSize
-            options:NSStringDrawingUsesLineFragmentOrigin
-            attributes:@{
-                NSFontAttributeName:headerFont,
-                NSParagraphStyleAttributeName:paragraphStyle,
-            } context:nil];
-        debugLog(@"size: %@", NSStringFromCGRect(bounds));
-        return CGRectGetHeight(bounds) + SIZE_MARGIN * 2;
-    }
+    // Calculate height of text, need to reset width
+    CGRect frame = self.statusTextView.frame;
+    self.statusTextView.text = nil;
+    self.statusTextView.text = [[[self.contact primaryResource] presence] status];
+    frame.size.width = CGRectGetWidth(self.view.bounds);
+    self.statusTextView.frame = frame;
+    [self.statusTextView sizeToFit];
+
+    return CGRectGetHeight(self.statusTextView.frame) + SIZE_MARGIN;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -692,16 +683,10 @@
 {
     UITableViewHeaderFooterView *view = [tableView dequeueReusableHeaderFooterViewWithIdentifier:KEY_HEADER_ID];
 
+    view.backgroundColor = UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT);
+
     // Add textview for status
     [view addSubview:self.statusTextView];
-    self.statusTextView.text = nil; // Fix for bug with data detection
-    self.statusTextView.text = [[[self.contact primaryResource] presence] status];
-    [self.statusTextView sizeToFit];
-
-    // Adjust height with margin
-    CGRect frame = self.statusTextView.frame;
-    frame.size.height += SIZE_MARGIN * 2;
-    self.statusTextView.frame = frame;
 
     return view;
 }
