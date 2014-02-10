@@ -13,9 +13,13 @@
 #import "GCLoginViewController.h"
 #import "GCContactsViewController.h"
 
+    #define TIME_REACHABILITY_WARNING 6
+
 @interface AppViewController ()
 
     @property (assign, nonatomic) BOOL initialRun;
+
+    @property (strong, nonatomic) NSTimer *reachabilityTimer;
 
 @end
 
@@ -123,13 +127,42 @@
 
 #pragma mark - Class Functions
 
+- (void)cancelReachabilityTimer
+{
+    if (self.reachabilityTimer) {
+        [self.reachabilityTimer invalidate];
+    }
+    self.reachabilityTimer = nil;
+}
+
+- (void)startReachabilityTimer
+{
+    self.reachabilityTimer = [NSTimer scheduledTimerWithTimeInterval:TIME_REACHABILITY_WARNING
+        target:self selector:@selector(showNoConnectionWarning:)
+        userInfo:nil repeats:false];
+}
+
+- (void)showNoConnectionWarning:(NSTimer *)sender
+{
+    [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"POPUP_WARNING_TITLE", nil)
+        message:NSLocalizedString(@"ERROR_REACHABILITY", nil)
+        delegate:nil cancelButtonTitle:NSLocalizedString(@"POPUP_CONFIRM_BUTTON_TITLE", nil)
+        otherButtonTitles:nil] show];
+}
+
 
 #pragma mark - UI Event Handlers
 
 - (void)reachabilityChanged:(NSNotification *)notification
 {
-    debugLog(@"reachabilityChanged: %@", [notification.object currentReachabilityString]);
+    Reachability *reachability = (Reachability *)notification.object;
+    debugLog(@"reachabilityChanged: %@", [reachability currentReachabilityString]);
 
+    // If we're ever out of connection, fire off timer before showing message about no connection
+    if (![reachability isReachable]) {
+        [self cancelReachabilityTimer];
+        [self startReachabilityTimer];
+    }
 }
 
 

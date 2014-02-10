@@ -55,6 +55,7 @@
 
 // Error Message
 
+"ERROR_REACHABILITY" = "Could not reach internet. Please check your connection.";
 "ERROR_CONNECT" = "Could not connect to server. Please check your connection.";
 "ERROR_CONNECTION_TIMEOUT" = "Could not connect to server! Please check your connection and login email.";
 "ERROR_CONNECTION_AUTH" = "Could not authenticate you! Please check your email and password.";
