@@ -13,6 +13,8 @@
     #define KEY_CELL_ID @"MessageCell"
     #define KEY_HEADER_ID @"StatusCell"
 
+    #define TIME_MANUAL_REFRESH 2
+
     #define SIZE_MARGIN 6
     #define SIZE_CORNER_RADIUS 6
     #define SIZE_BORDER_WIDTH 1
@@ -54,6 +56,9 @@
 
     /** Storage for messages */
     @property (strong, nonatomic) NSMutableArray *messageList;
+
+    /** For refreshing view */
+    @property (strong, nonatomic) NSTimer *refreshTimer;
 
 @end
 
@@ -361,6 +366,9 @@
 
     // Update navbar color if show has changed
     [self refreshContactShowState];
+   
+    // Clear timer
+    self.refreshTimer = nil;
 
     // Scroll to bottom
     [self scrollToBottom:false];
@@ -469,6 +477,25 @@
 /** @brief Manual refresh */
 - (void)manualRefresh
 {
+    [self scheduleRefresh:TIME_MANUAL_REFRESH overridePrevious:true];
+}
+
+/** @brief Schedules a refresh to happen, if set to override previous, then cancel existing timer if exists, otherwise will not override it and return if an existing timer already exists */
+- (void)scheduleRefresh:(NSTimeInterval)delay overridePrevious:(BOOL)override
+{
+    if (self.refreshTimer)
+    {
+        // If existing timer: override we cancel it, no-override we exit
+        if (override) {
+            [self.refreshTimer invalidate];
+        } else {
+            return;
+        }
+    }
+
+    self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:delay
+        target:self selector:@selector(refreshTableView:)
+        userInfo:nil repeats:false];
 }
 
 
