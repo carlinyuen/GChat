@@ -18,7 +18,8 @@
 
     #define XMPP_PRESENCE_SHOW_COMPARE_AWAY @"eway"
 
-    #define TIME_REFRESH 2          // 2 seconds
+    #define TIME_SILENT_REFRESH 1
+    #define TIME_PULL_REFRESH 2
     #define TIME_CROUTON_SHOW 2     // 2 seconds
     #define TIME_POLL_ROSTER 20
 
@@ -329,8 +330,7 @@
         infoButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
     }
 
-//	[infoButton addTarget:self action:@selector(infoButtonTapped:)
-   	[infoButton addTarget:self action:@selector(logoutButtonTapped:)
+	[infoButton addTarget:self action:@selector(infoButtonTapped:)
         forControlEvents:UIControlEventTouchUpInside];
 	[self.navigationItem setLeftBarButtonItem:[[UIBarButtonItem alloc]
         initWithCustomView:infoButton] animated:true];
@@ -339,9 +339,10 @@
 /** @brief Set loading indicator into navbar */
 - (void)setLoadingIndicator
 {
-    // Show loading indicator where login button is
+    // Show loading indicator where settings button is
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    UIActivityIndicatorView *loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    UIActivityIndicatorView *loadingIndicator = [[UIActivityIndicatorView alloc]
+        initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     [loadingIndicator startAnimating];
     button.frame = loadingIndicator.frame;
     [button addSubview:loadingIndicator];
@@ -353,7 +354,9 @@
         button.frame = frame;
     }
 
-    [button addTarget:self action:@selector(logoutButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    // Allow early access to hitting the button
+    [button addTarget:self action:@selector(infoButtonTapped:)
+        forControlEvents:UIControlEventTouchUpInside];
     [self.navigationItem setLeftBarButtonItem:[[UIBarButtonItem alloc]
         initWithCustomView:button] animated:true];
 }
@@ -395,7 +398,7 @@
                     [self.tableView setContentOffset:CGPointMake(0, SIZE_PULLREFRESH_HEIGHT - originalTopInset)];
                 } completion:nil];
         }];
-    [self scheduleRefresh:TIME_REFRESH overridePrevious:true];
+    [self scheduleRefresh:TIME_PULL_REFRESH overridePrevious:true];
 }
 
 /** @brief Silent refresh, only shows activity indicator in status bar */
@@ -407,7 +410,7 @@
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:true];
 
     // Refresh
-    [self scheduleRefresh:TIME_REFRESH overridePrevious:false];
+    [self scheduleRefresh:TIME_SILENT_REFRESH overridePrevious:false];
 }
 
 /** @brief Clears contact list and replaces contents with blank arrays */
@@ -508,6 +511,9 @@
 
             // Clear timer
             self.refreshTimer = nil;
+
+            // Make sure to show info button at this point
+            [self setInfoButton];
         });
     });
 }
@@ -550,6 +556,26 @@
     [alert show];
 }
 
+/** @brief Show subscribe request */
+- (void)showSubscribeRequest:(XMPPJID *)fromUser
+{
+    // Someone asked to add you to his buddy list
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"APP_CONTACTS_SUBSCRIBE_REQUEST_TITLE", nil)
+        message:[NSString stringWithFormat:@"%@@%@ %@",
+            [fromUser user], [fromUser domain],
+            NSLocalizedString(@"APP_CONTACTS_SUBSCRIBE_REQUEST_MESSAGE", nil)]
+        delegate:self
+        cancelButtonTitle:NSLocalizedString(@"APP_CONTACTS_SUBSCRIBE_REQUEST_CANCEL", nil)
+        otherButtonTitles:NSLocalizedString(@"APP_CONTACTS_SUBSCRIBE_REQUEST_OK", nil), nil];
+    alert.tag = AlertViewTypeContactRequest;
+
+    // Hash and store request
+    [self.subscriptionRequests setObject:fromUser forKey:@([alert hash])];
+
+    // Show popup
+    [alert show];
+}
+
 
 #pragma mark - UI Event Handlers
 
@@ -589,6 +615,7 @@
 /** @brief Info button pressed */
 - (void)infoButtonTapped:(UIButton *)sender
 {
+    [self logoutButtonTapped:sender];
 }
 
 /** @brief Start chat button pressed */
@@ -616,12 +643,6 @@
     // If connected
     if ([status isEqualToString:XMPP_CONNECTION_OK])
     {
-        // Set info button into where loading indicator is 
-        [self setInfoButton];
-
-        // Silent refresh
-        [self silentRefresh:notification];
-
         // Set timer to continuously poll server
         [self startPollingTimer];
     }
@@ -648,7 +669,7 @@
     [[[AppDelegate appDelegate] roster] fetchRoster];
 
     // Refresh on delay
-    [self scheduleRefresh:TIME_REFRESH overridePrevious:true];
+    [self scheduleRefresh:TIME_PULL_REFRESH overridePrevious:true];
 }
 
 /** @brief When title button is tapped to change sorting */
@@ -876,36 +897,21 @@
 {
     debugLog(@"roster ended populating");
     debugLog(@"roster: %@", [[[AppDelegate appDelegate] rosterStorage] sortedUsersByName]);
+
+    // Instant refresh
+    [self scheduleRefresh:0 overridePrevious:true];
 }
 
 - (void)xmppRoster:(XMPPRoster *)sender didReceivePresenceSubscriptionRequest:(XMPPPresence *)presence
 {
-    // Someone asked to add you to his buddy list
-    XMPPJID *fromUser = [presence from];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"APP_CONTACTS_SUBSCRIBE_REQUEST_TITLE", nil)
-        message:[NSString stringWithFormat:@"%@@%@ %@",
-            [fromUser user], [fromUser domain],
-            NSLocalizedString(@"APP_CONTACTS_SUBSCRIBE_REQUEST_MESSAGE", nil)]
-        delegate:self
-        cancelButtonTitle:NSLocalizedString(@"APP_CONTACTS_SUBSCRIBE_REQUEST_CANCEL", nil)
-        otherButtonTitles:NSLocalizedString(@"APP_CONTACTS_SUBSCRIBE_REQUEST_OK", nil), nil];
-    alert.tag = AlertViewTypeContactRequest;
+    debugLog(@"roster received subscribe request: %@", presence);
 
-    // Hash and store request
-    [self.subscriptionRequests setObject:fromUser forKey:@([alert hash])];
-
-    // Show popup
-    [alert show];
+//    [self showSubscribeRequest:[presence from]];
 }
 
 - (void)xmppRoster:(XMPPRoster *)sender didReceiveRosterPush:(XMPPIQ *)iq
 {
     debugLog(@"roster received push: %@", iq);
-}
-
-- (void)xmppRoster:(XMPPRoster *)sender didReceiveRosterItem:(NSXMLElement *)item
-{
-    debugLog(@"roster received item: %@", item);
 }
 
 

@@ -75,10 +75,6 @@
     // View
 	self.view.backgroundColor = [UIColor whiteColor];
     self.initialRun = true;
-
-    // Contacts View
-    self.contactsVC = [[GCContactsViewController alloc] initWithNibName:@"GCContactsViewController" bundle:nil];
-    [[[AppDelegate appDelegate] roster] addDelegate:self.contactsVC delegateQueue:dispatch_get_main_queue()];
 }
 
 /** @brief Last-minute setup before view appears. */
@@ -91,8 +87,16 @@
     // Try to connect and show appropriate views
     if ([[AppDelegate appDelegate] connectWithUsername:nil andPassword:nil])
     {
+        // Contacts View - create here and add delegate when xmpp is setup
+        if (!self.contactsVC) {
+            self.contactsVC = [[GCContactsViewController alloc]
+                initWithNibName:@"GCContactsViewController" bundle:nil];
+            [[[AppDelegate appDelegate] roster] addDelegate:self.contactsVC
+                delegateQueue:dispatch_get_main_queue()];
+        }
         [self.navigationController pushViewController:self.contactsVC animated:true];
-    } else {    // Can't auto connect, need to show login screen
+    }
+    else {    // Can't auto connect, need to show login screen
         [self presentViewController:[[GCLoginViewController alloc] initWithNibName:@"GCLoginViewController" bundle:nil] animated:!self.initialRun completion:nil];
     }
     self.initialRun = false;
