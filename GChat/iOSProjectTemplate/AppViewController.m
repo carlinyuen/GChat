@@ -68,8 +68,6 @@
 	// Background Color
 	self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
     if (deviceOSVersionLessThan(iOS7)) {
-        [[UINavigationBar appearance] setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
-//        [[UINavigationBar appearance] setBackgroundColor:UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT)];
         self.navigationController.navigationBar.tintColor
             = UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT);
     }

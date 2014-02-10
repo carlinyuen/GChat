@@ -582,8 +582,6 @@
 - (void)clearNavBarColor
 {
     if (deviceOSVersionLessThan(iOS7)) {
-//        [[UINavigationBar appearance] setBackgroundColor:
-//            UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT)];
         self.navigationController.navigationBar.tintColor
             = UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT);
     } else {
