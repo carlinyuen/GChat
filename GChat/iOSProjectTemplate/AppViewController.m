@@ -159,8 +159,8 @@
     debugLog(@"reachabilityChanged: %@", [reachability currentReachabilityString]);
 
     // If we're ever out of connection, fire off timer before showing message about no connection
+    [self cancelReachabilityTimer];
     if (![reachability isReachable]) {
-        [self cancelReachabilityTimer];
         [self startReachabilityTimer];
     }
 }
