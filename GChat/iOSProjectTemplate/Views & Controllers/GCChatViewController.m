@@ -11,6 +11,7 @@
 #import <QuartzCore/QuartzCore.h>
 
     #define KEY_CELL_ID @"MessageCell"
+    #define KEY_HEADER_ID @"StatusCell"
 
     #define SIZE_MARGIN 6
     #define SIZE_CORNER_RADIUS 6
@@ -254,6 +255,9 @@
 {
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 
+    [self.tableView registerClass:[UITableViewHeaderFooterView class] forHeaderFooterViewReuseIdentifier:KEY_HEADER_ID];
+
+    // Keyboard dismissing
     if ([self.tableView respondsToSelector:@selector(setKeyboardDismissMode:)]) {
         self.tableView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
     }
@@ -337,9 +341,6 @@
 
                 // Refresh tableview
                 [this.tableView reloadData];
-
-                // Reset header if status has changed
-                [this refreshContactStatus];
 
                 // Update navbar color if show has changed
                 [this refreshContactShowState];
@@ -451,21 +452,9 @@
     }
 }
 
-/** @brief Refresh contact status indicator */
-- (void)refreshContactStatus
+/** @brief Manual refresh */
+- (void)manualRefresh
 {
-    NSString *status = [[[self.contact primaryResource] presence] status];
-    debugLog(@"refreshContactStatus: %@", status);
-
-    if (status)
-    {
-    }
-}
-
-/** @brief Shows table header */
-- (void)displayTableHeader:(BOOL)show
-{
-
 }
 
 
@@ -532,12 +521,15 @@
 /** @brief Tableview tapped with gesture recognizer */
 - (void)tableViewTapped:(UITapGestureRecognizer *)tap
 {
+    // Dismiss keyboard
     [self endEditing];
 }
 
 /** @brief When title button is tapped to change sorting */
 - (void)titleTapped:(UIButton *)sender
 {
+    // Manual refresh
+    [self manualRefresh];
 }
 
 /** @brief Keyboard will show */
@@ -605,6 +597,42 @@
     return self.messageList.count;
 }
 
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    // Use contact's status if it exists
+    return [[[self.contact primaryResource] presence] status];
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    NSString *status = [[[self.contact primaryResource] presence] status];
+
+    // If no status, no header
+    if (!status || !status.length) {
+        return 0;
+    }
+
+    // Try to calculate / estimate height of contact status message
+    CGSize boundingSize = CGSizeMake(CGRectGetWidth(self.view.bounds), CGFLOAT_MAX);
+    UIFont *headerFont = [UIFont boldSystemFontOfSize:[UIFont systemFontSize]];
+    if (deviceOSVersionLessThan(iOS7))
+    {
+        CGSize size = [status sizeWithFont:headerFont constrainedToSize:boundingSize lineBreakMode:NSLineBreakByWordWrapping];
+        debugLog(@"size: %@", NSStringFromCGSize(size));
+        return size.height;
+    }
+    else
+    {
+        CGRect bounds = [status
+            boundingRectWithSize:boundingSize
+            options:NSStringDrawingUsesLineFragmentOrigin
+            attributes:@{
+                NSFontAttributeName:headerFont
+            } context:nil];
+        debugLog(@"size: %@", NSStringFromCGRect(bounds));
+        return CGRectGetHeight(bounds);
+    }
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:KEY_CELL_ID];
@@ -631,6 +659,13 @@
     cell.detailTextLabel.font = [UIFont fontWithName:FONT_NAME_MEDIUM size:FONT_SIZE_CONTACT_STATUS];
 
     return cell;
+}
+
+- (UITableViewHeaderFooterView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    UITableViewHeaderFooterView *view = [tableView dequeueReusableHeaderFooterViewWithIdentifier:KEY_HEADER_ID];
+
+    return view;
 }
 
 
