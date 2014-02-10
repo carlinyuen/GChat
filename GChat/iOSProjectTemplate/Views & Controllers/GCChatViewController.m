@@ -570,7 +570,7 @@
     // Set insets for tableview
     UIEdgeInsets insets = self.tableView.contentInset;
     insets.bottom = CGRectGetHeight(frame) - CGRectGetHeight(self.keyboardAccessoryView.frame);
-    insets.top -= [self tableView:self.tableView heightForHeaderInSection:0];
+    insets.top = (deviceOSVersionLessThan(iOS7) ? 0 : SIZE_NAVBAR_INSET) - [self tableView:self.tableView heightForHeaderInSection:0];
 
     [UIView animateWithDuration:[notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] floatValue] delay:0
         options:UIViewAnimationOptionBeginFromCurrentState
@@ -587,7 +587,6 @@
     debugLog(@"keyboardDidShow");
 
     // Switch first responder to keyboard input
-    [self.inputTextView resignFirstResponder];
     [self.keyboardInputTextView becomeFirstResponder];
 }
 
@@ -605,7 +604,7 @@
     [UIView animateWithDuration:[notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] floatValue] delay:0
         options:UIViewAnimationOptionBeginFromCurrentState
         animations:^{
-            this.tableView.contentInset = UIEdgeInsetsMake(SIZE_NAVBAR_INSET, 0, 0, 0);
+            this.tableView.contentInset = UIEdgeInsetsMake((deviceOSVersionLessThan(iOS7) ? 0 : SIZE_NAVBAR_INSET), 0, 0, 0);
         } completion:nil];
 }
 
