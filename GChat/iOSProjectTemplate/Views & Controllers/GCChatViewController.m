@@ -340,44 +340,30 @@
 
     [self.messageList removeAllObjects];
 
-    // Do this on background thread
-    __block GCChatViewController *this = self;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^
+    // Add archived messages
+    for (XMPPMessageArchiving_Message_CoreDataObject *message in messages)
     {
-        // Add archived messages
-        for (XMPPMessageArchiving_Message_CoreDataObject *message in messages)
-        {
-            if (this) {
-                [this addMessage:@{
-                    XMPP_TIMESTAMP: message.timestamp,
-                    XMPP_MESSAGE_TEXT: [message.message body],
-                    XMPP_MESSAGE_USERNAME: (message.isOutgoing)
-                        ? myJIDStr : message.bareJidStr,
-                }];
-            }
-        }
+        [self addMessage:@{
+            XMPP_TIMESTAMP: message.timestamp,
+            XMPP_MESSAGE_TEXT: [message.message body],
+            XMPP_MESSAGE_USERNAME: (message.isOutgoing)
+                ? myJIDStr : message.bareJidStr,
+        }];
+    }
 
-        // Back to main thread
-        dispatch_sync(dispatch_get_main_queue(), ^
-        {
-            if (this)
-            {
-                // Remove flag
-                this.refreshingTableView = false;
+    // Remove flag
+    self.refreshingTableView = false;
 
-                debugLog(@"messages: %@", this.messageList);
+    debugLog(@"messages: %@", self.messageList);
 
-                // Refresh tableview
-                [this.tableView reloadData];
+    // Refresh tableview
+    [self.tableView reloadData];
 
-                // Update navbar color if show has changed
-                [this refreshContactShowState];
+    // Update navbar color if show has changed
+    [self refreshContactShowState];
 
-                // Scroll to bottom
-                [this scrollToBottom:false];
-            }
-        });
-    });
+    // Scroll to bottom
+    [self scrollToBottom:false];
 }
 
 /** @brief Send message */
