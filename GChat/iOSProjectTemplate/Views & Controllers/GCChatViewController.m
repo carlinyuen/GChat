@@ -169,10 +169,10 @@
 /** @brief Setup status view */
 - (void)setupStatusView
 {
+    CGFloat offset = (deviceOSVersionLessThan(iOS7) ? 0 : SIZE_MARGIN / 2);
     self.statusTextView = [[UITextView alloc] initWithFrame:CGRectMake(
-        SIZE_MARGIN / 2, SIZE_MARGIN / 2,
-        CGRectGetWidth(self.view.bounds) - SIZE_MARGIN,
-        SIZE_MIN_TOUCH)];
+        offset, offset,
+        CGRectGetWidth(self.view.bounds) - offset * 2, SIZE_MIN_TOUCH)];
     self.statusTextView.textColor = [UIColor grayColor];
     self.statusTextView.font = [UIFont fontWithName:FONT_NAME_MEDIUM size:FONT_SIZE_CONTACT_STATUS];
     self.statusTextView.backgroundColor = [UIColor clearColor];
@@ -637,9 +637,10 @@
     }
 
     // Calculate height of text, need to reset width
+    CGFloat offset = (deviceOSVersionLessThan(iOS7) ? 0 : SIZE_MARGIN);
     CGRect frame = self.statusTextView.frame;
     self.statusTextView.text = [[[self.contact primaryResource] presence] status];
-    frame.size.width = CGRectGetWidth(self.view.bounds);
+    frame.size.width = CGRectGetWidth(self.view.bounds) - offset;
     self.statusTextView.frame = frame;
     [self.statusTextView sizeToFit];
 
@@ -678,7 +679,7 @@
 {
     UITableViewHeaderFooterView *view = [tableView dequeueReusableHeaderFooterViewWithIdentifier:KEY_HEADER_ID];
 
-    view.backgroundColor = UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT);
+    view.contentView.backgroundColor = UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT);
 
     // Add textview for status
     [view addSubview:self.statusTextView];
