@@ -112,9 +112,6 @@
     // Reset navbar
     [self setupNavBar];
 
-    // Fix for bug with data detection
-    self.statusTextView.text = nil;
-
     // Fetch and show messages
     [self refreshTableView:self];
 }
@@ -184,13 +181,14 @@
     self.statusTextView.editable = false;
     self.statusTextView.showsHorizontalScrollIndicator = false;
     self.statusTextView.showsVerticalScrollIndicator = false;
-    self.statusTextView.directionalLockEnabled = true;
 
     if ([self.statusTextView respondsToSelector:@selector(setSelectable:)]) {
         self.statusTextView.selectable = true;
     }
 
+    // Detect links and phone numbers
     self.statusTextView.dataDetectorTypes = UIDataDetectorTypeLink | UIDataDetectorTypePhoneNumber;
+    self.statusTextView.scrollEnabled = false;  // Need this for bug in iOS 7 that makes detection wonky
 }
 
 /** @brief Setup footer view with message sending */
@@ -642,7 +640,6 @@
 
     // Calculate height of text, need to reset width
     CGRect frame = self.statusTextView.frame;
-    self.statusTextView.text = nil;
     self.statusTextView.text = [[[self.contact primaryResource] presence] status];
     frame.size.width = CGRectGetWidth(self.view.bounds);
     self.statusTextView.frame = frame;
