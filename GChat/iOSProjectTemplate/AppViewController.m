@@ -29,6 +29,9 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+       [[NSNotificationCenter defaultCenter] addObserver:self
+            selector:@selector(reachabilityChanged:)
+            name:kReachabilityChangedNotification object:nil];
     }
     return self;
 }
@@ -122,6 +125,13 @@
 
 
 #pragma mark - UI Event Handlers
+
+- (void)reachabilityChanged:(NSNotification *)notification
+{
+    debugLog(@"reachabilityChanged");
+    debugObject(notification.userInfo);
+    debugObject(notification.object);
+}
 
 
 #pragma mark - Protocols

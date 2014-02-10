@@ -76,6 +76,8 @@
 #import "XMPPRosterMemoryStorage.h"
 //#import "XMPPRosterCoreDataStorage.h"
 
+#import "XMPPGoogleSharedStatus.h"
+
 //#import "XMPPJabberRPCModule.h"
 //#import "XMPPIQ+JabberRPC.h"
 //#import "XMPPIQ+JabberRPCResponse.h"

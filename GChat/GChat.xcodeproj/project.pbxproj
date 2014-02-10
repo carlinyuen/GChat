@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		228C71F718A8B0C400B1396C /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 228C71F618A8B0C400B1396C /* Reachability.m */; };
 		22A7BA94189C61D600C2D0F3 /* CustomPullToRefreshControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A7BA93189C61D600C2D0F3 /* CustomPullToRefreshControl.m */; };
 		22A7BAE618A3E69300C2D0F3 /* GCWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A7BAE418A3E69300C2D0F3 /* GCWebViewController.m */; };
 		22A7BAE718A3E69300C2D0F3 /* GCWebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22A7BAE518A3E69300C2D0F3 /* GCWebViewController.xib */; };
@@ -170,6 +171,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		228C71F518A8B0C400B1396C /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = Reachability/Reachability.h; sourceTree = "<group>"; };
+		228C71F618A8B0C400B1396C /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = Reachability/Reachability.m; sourceTree = "<group>"; };
 		22A7BA92189C61D600C2D0F3 /* CustomPullToRefreshControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomPullToRefreshControl.h; sourceTree = "<group>"; };
 		22A7BA93189C61D600C2D0F3 /* CustomPullToRefreshControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomPullToRefreshControl.m; sourceTree = "<group>"; };
 		22A7BAE318A3E69300C2D0F3 /* GCWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCWebViewController.h; sourceTree = "<group>"; };
@@ -509,6 +512,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		228C71F418A8B0B300B1396C /* Reachability */ = {
+			isa = PBXGroup;
+			children = (
+				228C71F518A8B0C400B1396C /* Reachability.h */,
+				228C71F618A8B0C400B1396C /* Reachability.m */,
+			);
+			name = Reachability;
+			sourceTree = "<group>";
+		};
 		22A7BA91189C61D600C2D0F3 /* CustomPullToRefreshControl */ = {
 			isa = PBXGroup;
 			children = (
@@ -1367,6 +1379,7 @@
 		5F7C89731790AF0800018AD7 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				228C71F418A8B0B300B1396C /* Reachability */,
 				22A7BA91189C61D600C2D0F3 /* CustomPullToRefreshControl */,
 				22E3D1AF18986BDE00678862 /* XMPPFramework */,
 				22E3D0101898667200678862 /* TestFlightSDK2.1.4 */,
@@ -1639,6 +1652,7 @@
 				22E3D33918986BDF00678862 /* XMPPMessage+XEP_0308.m in Sources */,
 				22E3D31918986BDF00678862 /* XMPPIQ+XEP_0066.m in Sources */,
 				22E3D34118986BDF00678862 /* XMPPStringPrep.m in Sources */,
+				228C71F718A8B0C400B1396C /* Reachability.m in Sources */,
 				22E3D2F718986BDF00678862 /* XMPPLastActivity.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

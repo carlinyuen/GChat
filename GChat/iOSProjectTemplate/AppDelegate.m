@@ -40,6 +40,10 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 
+    // Setup reachability
+    self.reachability = [Reachability reachabilityWithHostname:GCHAT_DOMAIN];
+    [self.reachability startNotifier];
+
     // Create base view controller
     self.viewController = [[AppViewController alloc] initWithNibName:@"AppViewController" bundle:nil];
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:self.viewController];

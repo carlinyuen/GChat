@@ -4,3 +4,6 @@
 [submodule "GChat/iOSProjectTemplate/Libraries/CustomPullToRefreshControl"]
 	path = GChat/iOSProjectTemplate/Libraries/CustomPullToRefreshControl
 	url = ssh://git@github.com:carlinyuen/CustomPullToRefreshControl.git
+[submodule "GChat/iOSProjectTemplate/Libraries/Reachability"]
+	path = GChat/iOSProjectTemplate/Libraries/Reachability
+	url = https://github.com/tonymillion/Reachability.git

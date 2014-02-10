@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 
 #import "XMPPFramework.h"
+#import "Reachability.h"
 
 @class AppViewController;
 
@@ -17,7 +18,11 @@
 	@property (strong, nonatomic) UIWindow *window;
 
 	@property (strong, nonatomic) AppViewController *viewController;
+   
+    /** To check on rechability */
+    @property (strong, nonatomic) Reachability *reachability;
 
+    /** XMPP stuff */
     @property (strong, nonatomic, readonly) XMPPStream *xmppStream;
     @property (strong, nonatomic) XMPPRoster *roster;
     @property (strong, nonatomic) XMPPRosterMemoryStorage *rosterStorage;
