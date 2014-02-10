@@ -52,16 +52,18 @@
     self.navigationController.navigationBarHidden = true;
     
     // Text Color for navbar titles
+    UIFont *navbarFont = [UIFont fontWithName:FONT_NAME_LIGHT size:FONT_SIZE_NAVBAR];
+    UIColor *navbarColor = UIColorFromHex(COLOR_HEX_BACKGROUND_DARK);
     if (deviceOSVersionLessThan(iOS7)) {
         [[UINavigationBar appearance] setTitleTextAttributes:@{
-            UITextAttributeTextColor: UIColorFromHex(COLOR_HEX_BACKGROUND_DARK),
+            UITextAttributeTextColor: navbarColor,
             UITextAttributeTextShadowColor: [UIColor clearColor],
-            UITextAttributeFont: [UIFont fontWithName:FONT_NAME_LIGHT size:FONT_SIZE_NAVBAR],
+            UITextAttributeFont: navbarFont,
         }];
     } else {
         [[UINavigationBar appearance] setTitleTextAttributes:@{
-            NSForegroundColorAttributeName: UIColorFromHex(COLOR_HEX_BACKGROUND_DARK),
-            NSFontAttributeName: [UIFont fontWithName:FONT_NAME_THIN size:FONT_SIZE_NAVBAR],
+            NSForegroundColorAttributeName: navbarColor,
+            NSFontAttributeName: navbarFont,
         }];
     }
 
