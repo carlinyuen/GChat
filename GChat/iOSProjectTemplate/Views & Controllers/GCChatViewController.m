@@ -16,6 +16,10 @@
     #define SIZE_CORNER_RADIUS 6
     #define SIZE_BORDER_WIDTH 1
 
+    #define KEY_INPUTVIEW_CONTAINER @"container"
+    #define KEY_INPUTVIEW_TEXTVIEW @"text"
+    #define KEY_INPUTVIEW_SENDBUTTON @"button"
+
 @interface GCChatViewController () <
     UITableViewDataSource
     , UITableViewDelegate
@@ -31,10 +35,15 @@
     @property (strong, nonatomic) UIButton *titleButton;
 
     /** Sending message input */
-    @property (strong, nonatomic) IBOutlet UIView *footerView;
+    @property (strong, nonatomic) IBOutlet UIView *footerContainerView;
+    @property (strong, nonatomic) UIView *footerView;
     @property (strong, nonatomic) UITextView *inputTextView;
     @property (strong, nonatomic) UIButton *sendButton;
-    @property (weak, nonatomic) IBOutlet NSLayoutConstraint *footerBottomConstraint;
+
+    /** Input accessory view for when keyboard comes up */
+    @property (strong, nonatomic) UIView *keyboardAccessoryView;
+    @property (strong, nonatomic) UITextView *keyboardInputTextView;
+    @property (strong, nonatomic) UIButton *keyboardSendButton;
 
     /** Storage for messages */
     @property (strong, nonatomic) NSMutableArray *messageList;
@@ -61,11 +70,17 @@
             name:NOTIFICATION_PRESENCE_UPDATE object:nil];
 
         // Listen for keyboard appearances and disappearances
-        [[NSNotificationCenter defaultCenter] addObserver:self 
+        [[NSNotificationCenter defaultCenter] addObserver:self
             selector:@selector(keyboardWillShow:)
             name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self
+            selector:@selector(keyboardDidShow:)
+            name:UIKeyboardDidShowNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
             selector:@selector(keyboardWillHide:)
+            name:UIKeyboardWillHideNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+            selector:@selector(keyboardDidHide:)
             name:UIKeyboardDidHideNotification object:nil];
     }
     return self;
@@ -92,11 +107,25 @@
 
     // Fetch and show messages
     [self refreshTableView:self];
+
+    // Make sure we're not editing
+    [self endEditing];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+
+    debugLog(@"viewWillDisappear");
+
+    [self endEditing];
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+
+    debugLog(@"viewDidDisappear");
 
     // Update input view
     [self showFooterView];
@@ -139,45 +168,85 @@
 /** @brief Setup footer view with message sending */
 - (void)setupFooterView
 {
+    NSDictionary *views = [self createInputView];
+
+    self.inputTextView = views[KEY_INPUTVIEW_TEXTVIEW];
+    self.sendButton = views[KEY_INPUTVIEW_SENDBUTTON];
+    self.footerView = views[KEY_INPUTVIEW_CONTAINER];
+    self.footerView.backgroundColor
+        = UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT);
+
+    [self.footerContainerView addSubview:self.footerView];
+    self.footerContainerView.backgroundColor
+        = UIColorFromHex(COLOR_HEX_APPLE_BUTTON_BLUE);
+
+    // Setup keyboard accessory view
+    [self setupKeyboardView];
+}
+
+/** @brief Setup keyboard accessory view (basically a clone of footer) */
+- (void)setupKeyboardView
+{
+    NSDictionary *views = [self createInputView];
+
+    self.inputTextView.inputAccessoryView
+        = self.keyboardAccessoryView
+        = views[KEY_INPUTVIEW_CONTAINER];
+    self.keyboardAccessoryView.backgroundColor
+        = UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT);
+    self.keyboardInputTextView = views[KEY_INPUTVIEW_TEXTVIEW];
+    self.keyboardSendButton = views[KEY_INPUTVIEW_SENDBUTTON];
+}
+
+/** @brief Convenience method to create input view */
+- (NSDictionary *)createInputView
+{
     CGRect bounds = self.view.bounds;
     CGRect reference;
 
     // Containing view
-    self.footerView.backgroundColor = UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT);
+    UIView *containerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(bounds), SIZE_MIN_TOUCH)];
+    containerView.backgroundColor = [UIColor clearColor];
 
     // Input field
-    self.inputTextView = [[UITextView alloc] initWithFrame:CGRectMake(
+    reference = containerView.bounds;
+    UITextView *inputTextView = [[UITextView alloc] initWithFrame:CGRectMake(
         SIZE_MARGIN * 2, SIZE_MARGIN,
-        CGRectGetWidth(bounds) / 4 * 3,
+        CGRectGetWidth(reference) / 4 * 3,
         SIZE_MIN_TOUCH - SIZE_MARGIN * 2
     )];
-    self.inputTextView.font = [UIFont fontWithName:FONT_NAME_LIGHT
+    inputTextView.font = [UIFont fontWithName:FONT_NAME_LIGHT
         size:FONT_SIZE_CHAT_INPUT];
-    self.inputTextView.showsHorizontalScrollIndicator = false;
-    self.inputTextView.showsVerticalScrollIndicator = false;
-    self.inputTextView.directionalLockEnabled = true;
-    self.inputTextView.layer.borderColor = [[UIColor lightGrayColor] CGColor];
-    self.inputTextView.layer.borderWidth = SIZE_BORDER_WIDTH;
-    self.inputTextView.layer.cornerRadius = SIZE_CORNER_RADIUS;
-    self.inputTextView.delegate = self;
-    [self.footerView addSubview:self.inputTextView];
+    inputTextView.showsHorizontalScrollIndicator = false;
+    inputTextView.showsVerticalScrollIndicator = false;
+    inputTextView.directionalLockEnabled = true;
+    inputTextView.layer.borderColor = [[UIColor lightGrayColor] CGColor];
+    inputTextView.layer.borderWidth = SIZE_BORDER_WIDTH;
+    inputTextView.layer.cornerRadius = SIZE_CORNER_RADIUS;
+    inputTextView.delegate = self;
+    [containerView addSubview:inputTextView];
 
     // Send button
-    reference = self.inputTextView.frame;
-    self.sendButton = [[UIButton alloc] initWithFrame:CGRectMake(
+    reference = inputTextView.frame;
+    UIButton *sendButton = [[UIButton alloc] initWithFrame:CGRectMake(
         CGRectGetMaxX(reference) + SIZE_MARGIN, 0,
         CGRectGetWidth(bounds) - CGRectGetMaxX(reference) - SIZE_MARGIN * 2, SIZE_MIN_TOUCH
     )];
-    [self.sendButton setTitle:NSLocalizedString(@"CHAT_SEND_BUTTON_TITLE", nil)
+    [sendButton setTitle:NSLocalizedString(@"CHAT_SEND_BUTTON_TITLE", nil)
         forState:UIControlStateNormal];
-    [self.sendButton setTitleColor:UIColorFromHex(COLOR_HEX_APPLE_BUTTON_BLUE)
+    [sendButton setTitleColor:UIColorFromHex(COLOR_HEX_APPLE_BUTTON_BLUE)
         forState:UIControlStateNormal];
-    [self.sendButton addTarget:self action:@selector(sendButtonTapped:)
+    [sendButton setTitleColor:UIColorFromHex(COLOR_HEX_APPLE_BUTTON_BLUE_SELECTED)
+        forState:UIControlStateHighlighted];
+    [sendButton addTarget:self action:@selector(sendButtonTapped:)
         forControlEvents:UIControlEventTouchUpInside];
-    [self.footerView addSubview:self.sendButton];
+    [containerView addSubview:sendButton];
 
-    // Set to hidden first
-    self.footerView.alpha = 0;
+    return @{
+        KEY_INPUTVIEW_SENDBUTTON: sendButton,
+        KEY_INPUTVIEW_TEXTVIEW: inputTextView,
+        KEY_INPUTVIEW_CONTAINER: containerView,
+    };
 }
 
 /** @brief Setup tableview */
@@ -290,8 +359,7 @@
             XMPP_MESSAGE_TEXT: text,
         }];
 
-        // Clear and refresh
-        self.inputTextView.text = @"";
+        // Refresh tableview
         [self.tableView reloadData];
         [self scrollToBottom:true];
     }
@@ -331,6 +399,14 @@
     }
 }
 
+/** @brief End editing / hide keyboard */
+- (void)endEditing
+{
+    [self.inputTextView resignFirstResponder];
+    [self.keyboardInputTextView resignFirstResponder];
+    [self.view endEditing:true];
+}
+
 
 #pragma mark - Event Handlers
 
@@ -338,6 +414,10 @@
 - (void)sendButtonTapped:(UIButton *)sender
 {
     [self sendMessage:self.inputTextView.text];
+
+    // Clear field
+    self.inputTextView.text = @"";
+    self.keyboardInputTextView.text = @"";
 }
 
 /** @brief When we get a message */
@@ -399,28 +479,50 @@
     // Determine ending height and shrink view by that size
     NSDictionary *info = [notification userInfo];
     CGRect frame = [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
+    UIEdgeInsets insets = self.tableView.contentInset;
+    insets.bottom = CGRectGetHeight(frame) - CGRectGetHeight(self.keyboardAccessoryView.frame);
 
-    [UIView animateWithDuration:.2 delay:0
+    [UIView animateWithDuration:ANIMATION_DURATION_KEYBOARD delay:0
         options:UIViewAnimationOptionBeginFromCurrentState
-            | UIViewAnimationCurveEaseOut
         animations:^{
-            self.footerBottomConstraint.constant = frame.size.height;
-            [self.view layoutIfNeeded];
+            self.tableView.contentInset = insets;
+            self.footerView.alpha = 0;
             [self scrollToBottom:true];
         } completion:nil];
+}
+
+/** @brief Keyboard did show */
+- (void)keyboardDidShow:(NSNotification *)notification
+{
+    // Switch first responder to keyboard input
+    if (![self.keyboardInputTextView isFirstResponder]) {
+        [self.keyboardInputTextView becomeFirstResponder];
+    }
 }
 
 /** @brief Keyboard will hide */
 - (void)keyboardWillHide:(NSNotification *)notification
 {
+    debugLog(@"keyboardWillHide");
+
+    UIEdgeInsets insets = self.tableView.contentInset;
+    insets.bottom = 0;
+
     // Animate back to zero
     [UIView animateWithDuration:ANIMATION_DURATION_KEYBOARD delay:0
         options:UIViewAnimationOptionBeginFromCurrentState
-            | UIViewAnimationCurveEaseOut
         animations:^{
-            self.footerBottomConstraint.constant = 0;
-            [self.view layoutIfNeeded];
+            self.tableView.contentInset = insets;
+            self.footerView.alpha = 1;
         } completion:nil];
+}
+
+/** @brief Keyboard did hide */
+- (void)keyboardDidHide:(NSNotification *)notification
+{
+    debugLog(@"keyboardDidHide");
+
+    [self endEditing];
 }
 
 
@@ -477,11 +579,25 @@
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+    // Don't let message input scroll horizontally
     if (scrollView == self.inputTextView)
     {
         CGPoint offset = self.inputTextView.contentOffset;
         offset.x = 0;
         self.inputTextView.contentOffset = offset;
+    }
+}
+
+
+#pragma mark - UITextViewDelegate
+
+- (void)textViewDidChange:(UITextView *)textView
+{
+    // Make both fields match
+    if (textView == self.inputTextView) {
+        self.keyboardInputTextView.text = textView.text;
+    } else if (textView == self.keyboardInputTextView) {
+        self.inputTextView.text = textView.text;
     }
 }
 

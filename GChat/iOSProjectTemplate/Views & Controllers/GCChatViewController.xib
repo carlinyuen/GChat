@@ -7,8 +7,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="GCChatViewController">
             <connections>
-                <outlet property="footerBottomConstraint" destination="KzM-K1-5uR" id="Su1-rh-Qdg"/>
-                <outlet property="footerView" destination="xpv-6Y-fZS" id="uBQ-eE-70O"/>
+                <outlet property="footerContainerView" destination="xpv-6Y-fZS" id="QYb-LV-YQv"/>
                 <outlet property="tableView" destination="lgx-Xb-h9B" id="sC9-dG-5cZ"/>
                 <outlet property="view" destination="1" id="3"/>
             </connections>
