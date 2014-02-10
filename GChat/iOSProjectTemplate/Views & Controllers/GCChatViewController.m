@@ -641,8 +641,11 @@
     CGRect frame = self.statusTextView.frame;
     self.statusTextView.text = [[[self.contact primaryResource] presence] status];
     frame.size.width = CGRectGetWidth(self.view.bounds) - offset;
+    frame.size.height = CGFLOAT_MAX;
     self.statusTextView.frame = frame;
     [self.statusTextView sizeToFit];
+    debugLog(@"text: %@", self.statusTextView.text);
+    debugLog(@"size: %@", NSStringFromCGRect(self.statusTextView.frame));
 
     return CGRectGetHeight(self.statusTextView.frame) + SIZE_MARGIN;
 }
