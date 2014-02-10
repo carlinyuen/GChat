@@ -8,9 +8,13 @@
 
 #import "AppDelegate.h"
 
+#import "TestFlight.h"
+
 #import "AppViewController.h"
 #import "GCContactsViewController.h"
 #import "GCLoginViewController.h"
+
+    #define KEY_TESTFLIGHT @"47f2c343-7a4a-4e5d-b98e-3325a5bc85a5"
 
     #define TIME_CONNECTION_TIMEOUT 8  // In seconds
 
@@ -39,6 +43,8 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+
+    [TestFlight takeOff:KEY_TESTFLIGHT];
 
     // Setup reachability
     self.reachability = [Reachability reachabilityWithHostname:GCHAT_DOMAIN];
