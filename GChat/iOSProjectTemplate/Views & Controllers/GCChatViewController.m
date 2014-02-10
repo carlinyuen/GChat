@@ -179,6 +179,7 @@
     [self.footerContainerView addSubview:self.footerView];
     self.footerContainerView.backgroundColor
         = UIColorFromHex(COLOR_HEX_APPLE_BUTTON_BLUE);
+    self.footerContainerView.alpha = 0;
 
     // Setup keyboard accessory view
     [self setupKeyboardView];
@@ -378,10 +379,10 @@
 {
     CGRect frame = self.footerView.frame;
     frame.origin.y = CGRectGetMaxY(self.view.frame) - CGRectGetHeight(frame);
-    self.footerView.frame = frame;
+    self.footerContainerView.frame = frame;
 
     [UIView animateWithDuration:ANIMATION_DURATION_FAST delay:0 options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionCurveEaseInOut animations:^{
-            self.footerView.alpha = 1;
+            self.footerContainerView.alpha = 1;
         } completion:nil];
 }
 
@@ -507,14 +508,15 @@
 
     UIEdgeInsets insets = self.tableView.contentInset;
     insets.bottom = 0;
+    self.footerView.alpha = 1;
 
     // Animate back to zero
     [UIView animateWithDuration:ANIMATION_DURATION_KEYBOARD delay:0
         options:UIViewAnimationOptionBeginFromCurrentState
         animations:^{
             self.tableView.contentInset = insets;
-            self.footerView.alpha = 1;
         } completion:nil];
+
 }
 
 /** @brief Keyboard did hide */
@@ -523,6 +525,7 @@
     debugLog(@"keyboardDidHide");
 
     [self endEditing];
+    [self scrollToBottom:true];
 }
 
 
