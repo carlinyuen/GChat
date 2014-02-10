@@ -172,6 +172,9 @@
 
     debugLog(@"viewWillAppear");
 
+    // Clear navbar color
+    [self clearNavBarColor];
+
     // Deselect from tableview if exists
     [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:true];
 }
@@ -232,7 +235,6 @@
     self.navigationItem.titleView = self.titleButton;
 
     // Add contact button on right side (and filter?)
-//    UIButton *addButton = [UIButton buttonWithType:UIButtonTypeContactAdd];
     UIButton *button = [UIButton buttonWithType:UIButtonTypeContactAdd];
     if (deviceOSVersionLessThan(iOS7))
     {
@@ -576,6 +578,19 @@
     [alert show];
 }
 
+/** @brief Clears navbar color */
+- (void)clearNavBarColor
+{
+    if (deviceOSVersionLessThan(iOS7)) {
+        [[UINavigationBar appearance] setBackgroundColor:
+            UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT)];
+        self.navigationController.navigationBar.tintColor
+            = UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT);
+    } else {
+        self.navigationController.navigationBar.barTintColor = nil;
+    }
+}
+
 
 #pragma mark - UI Event Handlers
 
@@ -764,6 +779,7 @@
     cell.textLabel.text = [user displayName];
     cell.textLabel.backgroundColor = [UIColor clearColor];
     cell.textLabel.font = [UIFont fontWithName:FONT_NAME_LIGHT size:FONT_SIZE_CONTACT_NAME];
+    cell.textLabel.textColor = UIColorFromHex(COLOR_HEX_BACKGROUND_DARK);
 
     // Detailed text field
     cell.detailTextLabel.text = [[[user primaryResource] presence] status];

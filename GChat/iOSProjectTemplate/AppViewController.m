@@ -54,13 +54,13 @@
     // Text Color for navbar titles
     if (deviceOSVersionLessThan(iOS7)) {
         [[UINavigationBar appearance] setTitleTextAttributes:@{
-            UITextAttributeTextColor: [UIColor darkGrayColor],
+            UITextAttributeTextColor: UIColorFromHex(COLOR_HEX_BACKGROUND_DARK),
             UITextAttributeTextShadowColor: [UIColor clearColor],
             UITextAttributeFont: [UIFont fontWithName:FONT_NAME_LIGHT size:FONT_SIZE_NAVBAR],
         }];
     } else {
         [[UINavigationBar appearance] setTitleTextAttributes:@{
-            NSForegroundColorAttributeName: [UIColor darkGrayColor],
+            NSForegroundColorAttributeName: UIColorFromHex(COLOR_HEX_BACKGROUND_DARK),
             NSFontAttributeName: [UIFont fontWithName:FONT_NAME_THIN size:FONT_SIZE_NAVBAR],
         }];
     }
@@ -70,6 +70,8 @@
     if (deviceOSVersionLessThan(iOS7)) {
         [[UINavigationBar appearance] setBackgroundImage:[[UIImage alloc] init] forBarMetrics:UIBarMetricsDefault];
         [[UINavigationBar appearance] setBackgroundColor:UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT)];
+        self.navigationController.navigationBar.tintColor
+            = UIColorFromHex(COLOR_HEX_BACKGROUND_LIGHT);
     }
 
     // View

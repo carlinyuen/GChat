@@ -16,6 +16,8 @@
     #define SIZE_CORNER_RADIUS 6
     #define SIZE_BORDER_WIDTH 1
 
+    #define ALPHA_NAVBAR_COLOR 0.5
+
     #define KEY_INPUTVIEW_CONTAINER @"container"
     #define KEY_INPUTVIEW_TEXTVIEW @"text"
     #define KEY_INPUTVIEW_SENDBUTTON @"button"
@@ -115,6 +117,7 @@
 
     debugLog(@"viewWillDisappear");
 
+    // Stop editing when leaving
     [self endEditing];
 }
 
@@ -151,7 +154,7 @@
         forState:UIControlStateNormal];
     [self.titleButton setTitle:[[self.contact jid] bare]
         forState:UIControlStateHighlighted];
-    [self.titleButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
+    [self.titleButton setTitleColor:UIColorFromHex(COLOR_HEX_BACKGROUND_DARK) forState:UIControlStateNormal];
     [self.titleButton setTitleColor:[UIColor blackColor] forState:UIControlStateHighlighted];
     self.titleButton.titleLabel.adjustsFontSizeToFitWidth = true;
     self.titleButton.titleLabel.font = (deviceOSVersionLessThan(iOS7))
@@ -216,6 +219,7 @@
     inputTextView.showsHorizontalScrollIndicator = false;
     inputTextView.showsVerticalScrollIndicator = false;
     inputTextView.directionalLockEnabled = true;
+    inputTextView.scrollsToTop = false;
     inputTextView.layer.borderColor = [[UIColor lightGrayColor] CGColor];
     inputTextView.layer.borderWidth = SIZE_BORDER_WIDTH;
     inputTextView.layer.cornerRadius = SIZE_CORNER_RADIUS;
@@ -250,7 +254,14 @@
 {
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 
-    self.tableView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
+    if ([self.tableView respondsToSelector:@selector(setKeyboardDismissMode:)]) {
+        self.tableView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
+    }
+    else    // Setup tap gesture for dismiss keyboard
+    {
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tableViewTapped:)];
+        [self.tableView addGestureRecognizer:tap];
+    }
 }
 
 
@@ -326,6 +337,12 @@
 
                 // Refresh tableview
                 [this.tableView reloadData];
+
+                // Reset header if status has changed
+                [this refreshContactStatus];
+
+                // Update navbar color if show has changed
+                [this refreshContactShowState];
 
                 // Scroll to bottom
                 [this scrollToBottom:false];
@@ -403,6 +420,55 @@
     [self.view endEditing:true];
 }
 
+/** @brief Refreshes indicator for contact show state */
+- (void)refreshContactShowState
+{
+    NSString *show = [[[self.contact primaryResource] presence] show];
+    debugLog(@"refreshContactState: %@", show);
+
+    UIColor *color;
+    if ([show isEqualToString:XMPP_PRESENCE_SHOW_AWAY]
+        || [show isEqualToString:XMPP_PRESENCE_SHOW_AWAY_EXTENDED]) {
+        color = UIColorFromHex(COLOR_HEX_SHOW_AWAY);
+    } else if ([show isEqualToString:XMPP_PRESENCE_SHOW_BUSY]) {
+        color = UIColorFromHex(COLOR_HEX_SHOW_BUSY);
+    } else if (![self.contact primaryResource] || [[[[self.contact primaryResource] presence] type] isEqualToString:XMPP_PRESENCE_TYPE_OFFLINE]) {
+        color = UIColorFromHex(COLOR_HEX_SHOW_OFFLINE);
+    } else {
+        color = UIColorFromHex(COLOR_HEX_SHOW_ONLINE);
+    }
+
+    [self updateNavBarColor:[color colorWithAlphaComponent:ALPHA_NAVBAR_COLOR]];
+}
+
+/** @brief Update navbar color */
+- (void)updateNavBarColor:(UIColor *)color
+{
+    if (deviceOSVersionLessThan(iOS7)) {
+        [[UINavigationBar appearance] setBackgroundColor:color];
+        self.navigationController.navigationBar.tintColor = color;
+    } else {
+        self.navigationController.navigationBar.barTintColor = color;
+    }
+}
+
+/** @brief Refresh contact status indicator */
+- (void)refreshContactStatus
+{
+    NSString *status = [[[self.contact primaryResource] presence] status];
+    debugLog(@"refreshContactStatus: %@", status);
+
+    if (status)
+    {
+    }
+}
+
+/** @brief Shows table header */
+- (void)displayTableHeader:(BOOL)show
+{
+
+}
+
 
 #pragma mark - Event Handlers
 
@@ -462,6 +528,12 @@
 
         // TODO: Notify user of change in status
     }
+}
+
+/** @brief Tableview tapped with gesture recognizer */
+- (void)tableViewTapped:(UITapGestureRecognizer *)tap
+{
+    [self endEditing];
 }
 
 /** @brief When title button is tapped to change sorting */
