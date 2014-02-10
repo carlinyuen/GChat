@@ -644,10 +644,8 @@
     frame.size.height = CGFLOAT_MAX;
     self.statusTextView.frame = frame;
     [self.statusTextView sizeToFit];
-    debugLog(@"text: %@", self.statusTextView.text);
-    debugLog(@"size: %@", NSStringFromCGRect(self.statusTextView.frame));
 
-    return CGRectGetHeight(self.statusTextView.frame) + SIZE_MARGIN;
+    return CGRectGetHeight(self.statusTextView.frame) + offset;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
