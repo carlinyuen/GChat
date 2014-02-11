@@ -196,6 +196,9 @@
 
 - (IBAction)loginButtonTapped:(UIButton *)sender
 {
+    // Hide keyboard to also show other options in case people didn't see them on 3.5" screens
+    [self.view endEditing:true];
+
     // Validate input
     NSArray *validationErrors = [self inputValidationErrors];
     if (!validationErrors.count)
@@ -203,7 +206,8 @@
         // Try to connect
         [[AppDelegate appDelegate] connectWithUsername:self.usernameTextField.text andPassword:self.passwordTextField.text];
     }
-    else {    // Display errors
+    else    // Display errors
+    {
         [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"POPUP_ERROR_TITLE", nil)
             message:[validationErrors componentsJoinedByString:@"\n"]
             delegate:nil
