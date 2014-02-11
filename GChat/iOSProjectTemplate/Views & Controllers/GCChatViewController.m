@@ -477,6 +477,8 @@
 /** @brief Manual refresh */
 - (void)manualRefresh
 {
+    
+
     [self scheduleRefresh:TIME_MANUAL_REFRESH overridePrevious:true];
 }
 
@@ -542,6 +544,18 @@
             XMPP_MESSAGE_USERNAME: message[XMPP_MESSAGE_USERNAME],
             XMPP_MESSAGE_TEXT: message[XMPP_MESSAGE_TEXT],
         }];
+
+        // Reload tableview at that row
+        [self.tableView beginUpdates];
+        [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath
+                indexPathForItem:self.messageList.count - 1 inSection:0]
+            ] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [self.tableView endUpdates];
+
+        // Scroll to bottom if already at bottom
+        if (self.tableView.contentOffset.y >= (self.tableView.contentSize.height - self.tableView.frame.size.height) - SIZE_MIN_TOUCH) {
+            [self scrollToBottom:true];
+        }
     }
 }
 
