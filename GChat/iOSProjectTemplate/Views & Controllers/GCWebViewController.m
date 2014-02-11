@@ -46,6 +46,7 @@
         self.webViewTopConstraint.constant = 20;
         [self.webView setNeedsLayout];
     }
+    self.webView.scalesPageToFit = true;
     self.webView.delegate = self;
 
     // Loading indicator

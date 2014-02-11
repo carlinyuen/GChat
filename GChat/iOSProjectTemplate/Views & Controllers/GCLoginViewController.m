@@ -34,6 +34,9 @@
     /** Loading indicator when trying to sign in */
     @property (strong, nonatomic) UIActivityIndicatorView *loadingIndicator;
 
+    /** Flag to prevent multiple presentations at the same time */
+    @property (assign, nonatomic) BOOL isPresentingView;
+
     /** Actions */
     - (IBAction)persistButtonTapped:(UIButton *)sender;
     - (IBAction)loginButtonTapped:(UIButton *)sender;
@@ -279,15 +282,35 @@
 /** @brief Two-Factor Auth Button Pressed */
 - (void)twoFactorButtonTapped:(UIButton *)sender
 {
+    // Only present one at a time
+    if (self.isPresentingView) {
+        return;
+    }
+
+    // Create and present webview
+    self.isPresentingView = true;
     GCWebViewController *webVC = [[GCWebViewController alloc] initWithURLString:URL_TWOFACTOR_SUPPORT];
-    [self presentViewController:webVC animated:true completion:nil];
+    __block GCLoginViewController *this = self;
+    [self presentViewController:webVC animated:true completion:^{
+        this.isPresentingView = false;
+    }];
 }
 
 /** @brief Google Apps Button Pressed */
 - (void)googleAppsButtonTapped:(UIButton *)sender
 {
+    // Only present one at a time
+    if (self.isPresentingView) {
+        return;
+    }
+
+    // Create and present webview
+    self.isPresentingView = true;
     GCWebViewController *webVC = [[GCWebViewController alloc] initWithURLString:URL_GOOGLEAPPS_SUPPORT];
-    [self presentViewController:webVC animated:true completion:nil];
+    __block GCLoginViewController *this = self;
+    [self presentViewController:webVC animated:true completion:^{
+        this.isPresentingView = false;
+    }];
 }
 
 
