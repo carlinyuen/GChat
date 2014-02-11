@@ -7,6 +7,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="GCLoginViewController">
             <connections>
+                <outlet property="googleAppsButton" destination="AkR-r2-Ee4" id="d98-oq-Tl8"/>
                 <outlet property="loginButton" destination="WWe-WC-tjf" id="x0x-Iv-p9I"/>
                 <outlet property="passwordTextField" destination="rD6-1J-Sqs" id="8KG-zs-gGz"/>
                 <outlet property="persistButton" destination="LbO-dc-HrT" id="pQi-0V-Wkh"/>
@@ -82,6 +83,15 @@
                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                     <state key="normal" title="Using Two-Factor Authentication?">
                         <color key="titleColor" red="0.3333333432674408" green="0.65098041296005249" blue="1" alpha="1" colorSpace="deviceRGB"/>
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AkR-r2-Ee4">
+                    <rect key="frame" x="20" y="286" width="280" height="30"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <state key="normal" title="Using Google Apps?">
+                        <color key="titleColor" red="0.33333334329999997" green="0.65098041299999998" blue="1" alpha="1" colorSpace="deviceRGB"/>
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                 </button>

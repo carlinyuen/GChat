@@ -16,20 +16,25 @@
     #define TEXT_CHECKBOX_CHECKED @"\u2611"
 
     #define URL_TWOFACTOR_SUPPORT @"https://support.google.com/accounts/answer/185833"
+    #define URL_GOOGLEAPPS_SUPPORT @"http://www.olark.com/gtalk/check_srv"
 
 @interface GCLoginViewController () <
     UITextFieldDelegate
 >
 
+    /** UI elements */
     @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
     @property (weak, nonatomic) IBOutlet UITextField *usernameTextField;
     @property (weak, nonatomic) IBOutlet UITextField *passwordTextField;
     @property (weak, nonatomic) IBOutlet UIButton *persistButton;
     @property (weak, nonatomic) IBOutlet UIButton *loginButton;
     @property (weak, nonatomic) IBOutlet UIButton *twoFactorButton;
+    @property (weak, nonatomic) IBOutlet UIButton *googleAppsButton;
 
+    /** Loading indicator when trying to sign in */
     @property (strong, nonatomic) UIActivityIndicatorView *loadingIndicator;
 
+    /** Actions */
     - (IBAction)persistButtonTapped:(UIButton *)sender;
     - (IBAction)loginButtonTapped:(UIButton *)sender;
     - (IBAction)viewTapped:(UITapGestureRecognizer *)sender;
@@ -62,12 +67,15 @@
     self.titleLabel.font = [UIFont fontWithName:(deviceOSVersionLessThan(iOS7)
         ? FONT_NAME_THINNEST : FONT_NAME_THIN) size:FONT_SIZE_TITLE];
 
+    // Username / email field
     self.usernameTextField.placeholder = NSLocalizedString(@"LOGIN_USERNAME_FIELD_PLACEHOLDER", nil);
     [self.usernameTextField setKeyboardAppearance:UIKeyboardAppearanceAlert];
 
+    // Password field
     self.passwordTextField.placeholder = NSLocalizedString(@"LOGIN_PASSWORD_FIELD_PLACEHOLDER", nil);
     [self.passwordTextField setKeyboardAppearance:UIKeyboardAppearanceAlert];
 
+    // Login button
     [self.loginButton setTitle:NSLocalizedString(@"LOGIN_SIGNIN_BUTTON_TITLE", nil)
         forState:UIControlStateNormal];
     [self.loginButton setTitleColor:UIColorFromHex(COLOR_HEX_APPLE_BUTTON_BLUE)
@@ -75,12 +83,21 @@
     [self.loginButton setTitleColor:UIColorFromHex(COLOR_HEX_APPLE_BUTTON_BLUE_SELECTED)
         forState:UIControlStateHighlighted];
 
+    // Two factor auth button
     [self.twoFactorButton setTitle:NSLocalizedString(@"LOGIN_TWOFACTOR_BUTTON_TITLE", nil) forState:UIControlStateNormal];
     [self.twoFactorButton setTitleColor:UIColorFromHex(COLOR_HEX_APPLE_BUTTON_BLUE)
         forState:UIControlStateNormal];
     [self.twoFactorButton setTitleColor:UIColorFromHex(COLOR_HEX_APPLE_BUTTON_BLUE_SELECTED)
         forState:UIControlStateHighlighted];
     [self.twoFactorButton addTarget:self action:@selector(twoFactorButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+
+    // Google Apps button
+    [self.googleAppsButton setTitle:NSLocalizedString(@"LOGIN_GOOGLEAPPS_BUTTON_TITLE", nil) forState:UIControlStateNormal];
+    [self.googleAppsButton setTitleColor:UIColorFromHex(COLOR_HEX_APPLE_BUTTON_BLUE)
+        forState:UIControlStateNormal];
+    [self.googleAppsButton setTitleColor:UIColorFromHex(COLOR_HEX_APPLE_BUTTON_BLUE_SELECTED)
+        forState:UIControlStateHighlighted];
+    [self.googleAppsButton addTarget:self action:@selector(googleAppsButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
 
     // Loading indicator
     self.loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
@@ -263,6 +280,13 @@
 - (void)twoFactorButtonTapped:(UIButton *)sender
 {
     GCWebViewController *webVC = [[GCWebViewController alloc] initWithURLString:URL_TWOFACTOR_SUPPORT];
+    [self presentViewController:webVC animated:true completion:nil];
+}
+
+/** @brief Google Apps Button Pressed */
+- (void)googleAppsButtonTapped:(UIButton *)sender
+{
+    GCWebViewController *webVC = [[GCWebViewController alloc] initWithURLString:URL_GOOGLEAPPS_SUPPORT];
     [self presentViewController:webVC animated:true completion:nil];
 }
 
