@@ -161,6 +161,8 @@
 
 -(void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
+    debugLog(@"performBackgroundFetch");
+
     // Just open up the app and let it fetch any new messages for 30 seconds
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW,
         (int64_t)((TIME_BACKGROUND_FETCH - 1) * NSEC_PER_SEC));
