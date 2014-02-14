@@ -4,7 +4,7 @@
 $deviceToken = '2992a3679414c70c28bbea5eeaf790edb379afeec9f34bca258168d672451007';
 
 // Put your private key's passphrase here:
-$passphrase = 'pushchat';
+$passphrase = 'gchat';
 
 // Put your alert message here:
 $message = 'My first push notification!';
