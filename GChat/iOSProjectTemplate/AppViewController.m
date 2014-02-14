@@ -110,6 +110,18 @@
 
     debugLog(@"viewDidAppear");
 
+    // Restart timers
+    if (self.contactsVC) {
+        [self.contactsVC startPollingTimer];
+    }
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+
+    // Disable timers
+    [self.contactsVC cancelPollingTimer];
 }
 
 /** @brief Dispose of any resources that can be recreated. */

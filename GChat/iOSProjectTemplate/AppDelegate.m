@@ -177,8 +177,8 @@
 {
     debugLog(@"cleanup");
 
-    // Disable timers
-//    [self.viewController cancelPollingTimer];
+    // Tell view that app is hidden
+    [self.viewController viewDidDisappear:true];
 
     // Clear credentials
     if (![[NSUserDefaults standardUserDefaults] boolForKey:CACHE_KEY_LOGIN_PERSIST]) {
