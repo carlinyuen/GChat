@@ -192,10 +192,6 @@
     if ([[AppDelegate appDelegate] connectWithUsername:nil andPassword:nil]) {
         [[UIApplication sharedApplication] cancelAllLocalNotifications];
     }
-
-    // TODO: Remove, for testing
-    UIERealTimeBlurView *blurView = [[UIERealTimeBlurView alloc] initWithFrame:CGRectMake(60, 110, 200, 200)];
-    [self.view addSubview:blurView];
 }
 
 /** @brief Dispose of any resources that can be recreated. */
