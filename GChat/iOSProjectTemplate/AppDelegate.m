@@ -55,6 +55,10 @@
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:self.viewController];
 	self.window.rootViewController = nav;
 
+    // Let the device know we want to receive push notifications
+	[[UIApplication sharedApplication] registerForRemoteNotificationTypes:
+		(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+
     // Handle notifications
     UILocalNotification *notification = [launchOptions objectForKey:UIApplicationLaunchOptionsLocalNotificationKey];
     if (notification)
@@ -117,6 +121,19 @@
     [self cleanup];
 }
 
+
+#pragma mark - Push Notifications
+
+- (void)application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken
+{
+	NSLog(@"My token is: %@", deviceToken);
+}
+ 
+- (void)application:(UIApplication*)application didFailToRegisterForRemoteNotificationsWithError:(NSError*)error
+{
+	NSLog(@"Failed to get token, error: %@", error);
+}
+
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
 {
     debugLog(@"receivedLocalNotification: %@", notification.userInfo);
@@ -133,6 +150,9 @@
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
 {
 }
+
+
+#pragma mark - Cleaning Up Data
 
 /** @brief Perform app cleanup */
 - (void)cleanup
