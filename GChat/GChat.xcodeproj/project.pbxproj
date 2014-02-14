@@ -1400,15 +1400,15 @@
 		5F7C89731790AF0800018AD7 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				228C71F818AEBA0500B1396C /* RealTimeBlur */,
-				228C71F418A8B0B300B1396C /* Reachability */,
-				22A7BA91189C61D600C2D0F3 /* CustomPullToRefreshControl */,
-				22E3D1AF18986BDE00678862 /* XMPPFramework */,
-				22E3D0101898667200678862 /* TestFlightSDK2.1.4 */,
-				22E3D009189865C500678862 /* libidn */,
-				22E3CFF81898651100678862 /* KissXML */,
 				22E3CFF0189864BE00678862 /* CocoaAsyncSocket */,
 				22E3CFD7189864A800678862 /* CocoaLumberjack */,
+				22A7BA91189C61D600C2D0F3 /* CustomPullToRefreshControl */,
+				22E3CFF81898651100678862 /* KissXML */,
+				22E3D009189865C500678862 /* libidn */,
+				228C71F418A8B0B300B1396C /* Reachability */,
+				228C71F818AEBA0500B1396C /* RealTimeBlur */,
+				22E3D0101898667200678862 /* TestFlightSDK2.1.4 */,
+				22E3D1AF18986BDE00678862 /* XMPPFramework */,
 			);
 			path = Libraries;
 			sourceTree = "<group>";
