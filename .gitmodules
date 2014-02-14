@@ -7,3 +7,6 @@
 [submodule "GChat/iOSProjectTemplate/Libraries/Reachability"]
 	path = GChat/iOSProjectTemplate/Libraries/Reachability
 	url = https://github.com/tonymillion/Reachability.git
+[submodule "GChat/iOSProjectTemplate/Libraries/RealTimeBlur"]
+	path = GChat/iOSProjectTemplate/Libraries/RealTimeBlur
+	url = git@github.com:alexdrone/ios-realtimeblur.git

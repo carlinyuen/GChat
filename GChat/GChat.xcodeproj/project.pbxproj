@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		228C71F718A8B0C400B1396C /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 228C71F618A8B0C400B1396C /* Reachability.m */; };
+		228C71FD18AEBA0F00B1396C /* UIERealTimeBlurView.m in Sources */ = {isa = PBXBuildFile; fileRef = 228C71FA18AEBA0F00B1396C /* UIERealTimeBlurView.m */; };
+		228C71FE18AEBA0F00B1396C /* UIImage+BoxBlur.m in Sources */ = {isa = PBXBuildFile; fileRef = 228C71FC18AEBA0F00B1396C /* UIImage+BoxBlur.m */; };
 		22A7BA94189C61D600C2D0F3 /* CustomPullToRefreshControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A7BA93189C61D600C2D0F3 /* CustomPullToRefreshControl.m */; };
 		22A7BAE618A3E69300C2D0F3 /* GCWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A7BAE418A3E69300C2D0F3 /* GCWebViewController.m */; };
 		22A7BAE718A3E69300C2D0F3 /* GCWebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22A7BAE518A3E69300C2D0F3 /* GCWebViewController.xib */; };
@@ -173,6 +175,10 @@
 /* Begin PBXFileReference section */
 		228C71F518A8B0C400B1396C /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = Reachability/Reachability.h; sourceTree = "<group>"; };
 		228C71F618A8B0C400B1396C /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = Reachability/Reachability.m; sourceTree = "<group>"; };
+		228C71F918AEBA0F00B1396C /* UIERealTimeBlurView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UIERealTimeBlurView.h; path = RealTimeBlur/RealTimeBlur/Classes/UIERealTimeBlurView.h; sourceTree = "<group>"; };
+		228C71FA18AEBA0F00B1396C /* UIERealTimeBlurView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UIERealTimeBlurView.m; path = RealTimeBlur/RealTimeBlur/Classes/UIERealTimeBlurView.m; sourceTree = "<group>"; };
+		228C71FB18AEBA0F00B1396C /* UIImage+BoxBlur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+BoxBlur.h"; path = "RealTimeBlur/RealTimeBlur/Classes/UIImage+BoxBlur.h"; sourceTree = "<group>"; };
+		228C71FC18AEBA0F00B1396C /* UIImage+BoxBlur.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+BoxBlur.m"; path = "RealTimeBlur/RealTimeBlur/Classes/UIImage+BoxBlur.m"; sourceTree = "<group>"; };
 		22A7BA92189C61D600C2D0F3 /* CustomPullToRefreshControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomPullToRefreshControl.h; sourceTree = "<group>"; };
 		22A7BA93189C61D600C2D0F3 /* CustomPullToRefreshControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomPullToRefreshControl.m; sourceTree = "<group>"; };
 		22A7BAE318A3E69300C2D0F3 /* GCWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCWebViewController.h; sourceTree = "<group>"; };
@@ -519,6 +525,17 @@
 				228C71F618A8B0C400B1396C /* Reachability.m */,
 			);
 			name = Reachability;
+			sourceTree = "<group>";
+		};
+		228C71F818AEBA0500B1396C /* RealTimeBlur */ = {
+			isa = PBXGroup;
+			children = (
+				228C71F918AEBA0F00B1396C /* UIERealTimeBlurView.h */,
+				228C71FA18AEBA0F00B1396C /* UIERealTimeBlurView.m */,
+				228C71FB18AEBA0F00B1396C /* UIImage+BoxBlur.h */,
+				228C71FC18AEBA0F00B1396C /* UIImage+BoxBlur.m */,
+			);
+			name = RealTimeBlur;
 			sourceTree = "<group>";
 		};
 		22A7BA91189C61D600C2D0F3 /* CustomPullToRefreshControl */ = {
@@ -1379,6 +1396,7 @@
 		5F7C89731790AF0800018AD7 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				228C71F818AEBA0500B1396C /* RealTimeBlur */,
 				228C71F418A8B0B300B1396C /* Reachability */,
 				22A7BA91189C61D600C2D0F3 /* CustomPullToRefreshControl */,
 				22E3D1AF18986BDE00678862 /* XMPPFramework */,
@@ -1606,6 +1624,7 @@
 				22E3D31A18986BDF00678862 /* XMPPMessage+XEP_0066.m in Sources */,
 				22E3D2EA18986BDF00678862 /* XMPPResourceCoreDataStorageObject.m in Sources */,
 				22E3D32018986BDF00678862 /* NSString+XEP_0106.m in Sources */,
+				228C71FE18AEBA0F00B1396C /* UIImage+BoxBlur.m in Sources */,
 				22E3D31B18986BDF00678862 /* NSDate+XMPPDateTimeProfiles.m in Sources */,
 				22E3CFEB189864A800678862 /* DDLog.m in Sources */,
 				22E3D32118986BDF00678862 /* XMPPCapabilities.xcdatamodel in Sources */,
@@ -1621,6 +1640,7 @@
 				22E3D33A18986BDF00678862 /* XMPPMessage+XEP_0333.m in Sources */,
 				22E3D2FC18986BDF00678862 /* XMPPRoomOccupantCoreDataStorageObject.m in Sources */,
 				22E3D2E618986BDF00678862 /* XMPPGoogleSharedStatus.m in Sources */,
+				228C71FD18AEBA0F00B1396C /* UIERealTimeBlurView.m in Sources */,
 				22E3D2E118986BDF00678862 /* XMPPParser.m in Sources */,
 				22E3D32418986BDF00678862 /* XMPPCapsResourceCoreDataStorageObject.m in Sources */,
 				22E3D2F018986BDF00678862 /* XMPPUserMemoryStorageObject.m in Sources */,
