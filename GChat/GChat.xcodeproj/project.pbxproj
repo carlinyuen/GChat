@@ -10,6 +10,7 @@
 		228C71F718A8B0C400B1396C /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 228C71F618A8B0C400B1396C /* Reachability.m */; };
 		228C71FD18AEBA0F00B1396C /* UIERealTimeBlurView.m in Sources */ = {isa = PBXBuildFile; fileRef = 228C71FA18AEBA0F00B1396C /* UIERealTimeBlurView.m */; };
 		228C71FE18AEBA0F00B1396C /* UIImage+BoxBlur.m in Sources */ = {isa = PBXBuildFile; fileRef = 228C71FC18AEBA0F00B1396C /* UIImage+BoxBlur.m */; };
+		228C720018AEBA8300B1396C /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228C71FF18AEBA8300B1396C /* Accelerate.framework */; };
 		22A7BA94189C61D600C2D0F3 /* CustomPullToRefreshControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A7BA93189C61D600C2D0F3 /* CustomPullToRefreshControl.m */; };
 		22A7BAE618A3E69300C2D0F3 /* GCWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A7BAE418A3E69300C2D0F3 /* GCWebViewController.m */; };
 		22A7BAE718A3E69300C2D0F3 /* GCWebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22A7BAE518A3E69300C2D0F3 /* GCWebViewController.xib */; };
@@ -179,6 +180,7 @@
 		228C71FA18AEBA0F00B1396C /* UIERealTimeBlurView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UIERealTimeBlurView.m; path = RealTimeBlur/RealTimeBlur/Classes/UIERealTimeBlurView.m; sourceTree = "<group>"; };
 		228C71FB18AEBA0F00B1396C /* UIImage+BoxBlur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+BoxBlur.h"; path = "RealTimeBlur/RealTimeBlur/Classes/UIImage+BoxBlur.h"; sourceTree = "<group>"; };
 		228C71FC18AEBA0F00B1396C /* UIImage+BoxBlur.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+BoxBlur.m"; path = "RealTimeBlur/RealTimeBlur/Classes/UIImage+BoxBlur.m"; sourceTree = "<group>"; };
+		228C71FF18AEBA8300B1396C /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		22A7BA92189C61D600C2D0F3 /* CustomPullToRefreshControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomPullToRefreshControl.h; sourceTree = "<group>"; };
 		22A7BA93189C61D600C2D0F3 /* CustomPullToRefreshControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomPullToRefreshControl.m; sourceTree = "<group>"; };
 		22A7BAE318A3E69300C2D0F3 /* GCWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCWebViewController.h; sourceTree = "<group>"; };
@@ -498,6 +500,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				228C720018AEBA8300B1396C /* Accelerate.framework in Frameworks */,
 				22E3D3DD1898739C00678862 /* SystemConfiguration.framework in Frameworks */,
 				22E3D34A18986EFF00678862 /* CoreData.framework in Frameworks */,
 				22E3D34518986C7100678862 /* libxml2.dylib in Frameworks */,
@@ -1343,6 +1346,7 @@
 		5F7C892D1790A36700018AD7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				228C71FF18AEBA8300B1396C /* Accelerate.framework */,
 				22E3D3DC1898739C00678862 /* SystemConfiguration.framework */,
 				22E3D34918986EFF00678862 /* CoreData.framework */,
 				22E3D34618986CA600678862 /* libxml2.2.dylib */,
