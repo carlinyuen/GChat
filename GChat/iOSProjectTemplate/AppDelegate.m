@@ -17,6 +17,7 @@
     #define KEY_TESTFLIGHT @"47f2c343-7a4a-4e5d-b98e-3325a5bc85a5"
 
     #define TIME_CONNECTION_TIMEOUT 8  // In seconds
+    #define TIME_BACKGROUND_FETCH 30
 
     // Defined here https://developers.google.com/talk/open_communications
     #define GCHAT_DOMAIN @"talk.google.com"
@@ -44,6 +45,7 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 
+    // Testflight Config
     [TestFlight takeOff:KEY_TESTFLIGHT];
 
     // Setup reachability
@@ -54,6 +56,9 @@
     self.viewController = [[AppViewController alloc] initWithNibName:@"AppViewController" bundle:nil];
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:self.viewController];
 	self.window.rootViewController = nav;
+
+    // Setup background fetching
+    [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:TIME_BACKGROUND_FETCH];
 
     // Let the device know we want to receive push notifications
 	[[UIApplication sharedApplication] registerForRemoteNotificationTypes:
@@ -149,6 +154,19 @@
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
 {
+}
+
+
+#pragma mark - Background Fetching
+
+-(void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
+{
+    // Just open up the app and let it fetch any new messages for 30 seconds
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW,
+        (int64_t)((TIME_BACKGROUND_FETCH - 1) * NSEC_PER_SEC));
+    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+        completionHandler(UIBackgroundFetchResultNewData);
+    });
 }
 
 
